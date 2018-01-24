@@ -4,6 +4,7 @@
 
 <p align="center">
   <a href="https://goreportcard.com/report/github.com/essentialkaos/perfecto"><img src="https://goreportcard.com/badge/github.com/essentialkaos/perfecto"></a>
+  <a href="https://codebeat.co/projects/github-com-essentialkaos-perfecto-master"><img alt="codebeat badge" src="https://codebeat.co/badges/74af2307-8aa2-48eb-afd5-2ae3620a1149" /></a>
   <a href="https://travis-ci.org/essentialkaos/perfecto"><img src="https://travis-ci.org/essentialkaos/perfecto.svg"></a>
   <a href="#license"><img src="https://gh.kaos.io/ekol.svg"></a>
 </p>
