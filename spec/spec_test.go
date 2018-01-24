@@ -36,6 +36,8 @@ func (s *SpecSuite) TestParsing(c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(spec, NotNil)
 
+	c.Assert(spec.GetFileName(), Equals, "test")
+
 	c.Assert(spec.GetLine(-1), DeepEquals, Line{-1, ""})
 	c.Assert(spec.GetLine(99), DeepEquals, Line{-1, ""})
 	c.Assert(spec.GetLine(34), DeepEquals, Line{34, "%{__make} %{?_smp_mflags}"})

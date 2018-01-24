@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"pkg.re/essentialkaos/ek.v9/fsutil"
+	"pkg.re/essentialkaos/ek.v9/path"
 	"pkg.re/essentialkaos/ek.v9/strutil"
 )
 
@@ -157,6 +158,11 @@ func (s *Spec) GetLine(index int) Line {
 	}
 
 	return Line{-1, ""}
+}
+
+// GetFileName return spec file name without extension
+func (s *Spec) GetFileName() string {
+	return strings.Replace(path.Base(s.File), ".spec", "", -1)
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //

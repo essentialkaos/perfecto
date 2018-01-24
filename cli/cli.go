@@ -34,17 +34,22 @@ const (
 
 // Options
 const (
-	OPT_SUMMARY  = "s:summary"
+	OPT_FORMAT   = "f:format"
 	OPT_NO_LINT  = "nl:no-lint"
 	OPT_NO_COLOR = "nc:no-color"
 	OPT_HELP     = "h:help"
 	OPT_VER      = "v:version"
 )
 
+const (
+	FORMAT_SUMMARY = "summary"
+	FORMAT_TINY    = "tiny"
+)
+
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 var optMap = options.Map{
-	OPT_SUMMARY:  {Type: options.BOOL},
+	OPT_FORMAT:   {Type: options.STRING},
 	OPT_NO_LINT:  {Type: options.BOOL},
 	OPT_NO_COLOR: {Type: options.BOOL},
 	OPT_HELP:     {Type: options.BOOL, Alias: "u:usage"},
@@ -139,21 +144,29 @@ func process(file string) {
 	report := check.Check(s, !options.GetB(OPT_NO_LINT))
 
 	if report.IsPerfect() {
-		fmtc.Println("{g}Your spec is perfect. Great job!{!}")
+		if options.GetS(OPT_FORMAT) == FORMAT_TINY {
+			fmtc.Printf("%24s: {g}✔ {!}\n", s.GetFileName())
+		} else {
+			fmtc.Println("{g}This spec is perfect!{!}")
+		}
+
 		os.Exit(0)
 	}
 
-	if options.GetB(OPT_SUMMARY) {
-		renderResume(report)
-	} else {
-		renderReport(report)
+	switch options.GetS(OPT_FORMAT) {
+	case FORMAT_SUMMARY:
+		renderSummary(report)
+	case FORMAT_TINY:
+		renderTinyReport(s, report)
+	default:
+		renderFullReport(report)
 	}
 
 	os.Exit(1)
 }
 
-// renderReport render all alerts from report
-func renderReport(r *check.Report) {
+// renderFullReport render all alerts from report
+func renderFullReport(r *check.Report) {
 	fmtc.NewLine()
 
 	if len(r.Notices) != 0 {
@@ -178,7 +191,7 @@ func renderReport(r *check.Report) {
 
 	fmtc.Printf("{s}%s{!}\n\n", strings.Repeat("-", 88))
 
-	renderResume(r)
+	renderSummary(r)
 
 	fmtc.NewLine()
 }
@@ -226,8 +239,8 @@ func renderAlert(alert check.Alert) {
 	}
 }
 
-// renderResume print number for each alert type
-func renderResume(r *check.Report) {
+// renderSummary print number for each alert type
+func renderSummary(r *check.Report) {
 	categories := map[uint8][]check.Alert{
 		check.LEVEL_NOTICE:   r.Notices,
 		check.LEVEL_WARNING:  r.Warnings,
@@ -244,7 +257,7 @@ func renderResume(r *check.Report) {
 
 	var result []string
 
-	fmtc.Printf("{*}Resume:{!} ")
+	fmtc.Printf("{*}Summary:{!} ")
 
 	for _, level := range levels {
 		alerts := categories[level]
@@ -258,6 +271,37 @@ func renderResume(r *check.Report) {
 		)
 	}
 	fmtc.Println(strings.Join(result, "{s-} • {!}"))
+}
+
+// renderTinyReport render tiny report (usefull for mass check)
+func renderTinyReport(s *spec.Spec, r *check.Report) {
+	fmtc.Printf("%24s: ", s.GetFileName())
+
+	categories := map[uint8][]check.Alert{
+		check.LEVEL_NOTICE:   r.Notices,
+		check.LEVEL_WARNING:  r.Warnings,
+		check.LEVEL_ERROR:    r.Errors,
+		check.LEVEL_CRITICAL: r.Criticals,
+	}
+
+	levels := []uint8{
+		check.LEVEL_NOTICE,
+		check.LEVEL_WARNING,
+		check.LEVEL_ERROR,
+		check.LEVEL_CRITICAL,
+	}
+
+	for _, level := range levels {
+		alerts := categories[level]
+
+		if len(alerts) == 0 {
+			continue
+		}
+
+		fmtc.Printf(fgColor[level]+"%s{!}", strings.Repeat("•", len(alerts)))
+	}
+
+	fmtc.NewLine()
 }
 
 // isLinterInstalled checks if rpmlint is installed
@@ -282,11 +326,20 @@ func printErrorAndExit(f string, a ...interface{}) {
 func showUsage() {
 	info := usage.NewInfo("spec-file")
 
-	info.AddOption(OPT_SUMMARY, "Print only summary info")
+	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny){!}", "format")
 	info.AddOption(OPT_NO_LINT, "Disable rpmlint checks")
 	info.AddOption(OPT_NO_COLOR, "Disable colors in output")
 	info.AddOption(OPT_HELP, "Show this help message")
 	info.AddOption(OPT_VER, "Show version")
+
+	info.AddExample("app.spec", "Check spec and print extended report")
+	info.AddExample(
+		"--no-lint app.spec",
+		"Check spec without rpmlint and print extended report",
+	)
+
+	info.AddExample("--format tiny app.spec", "Check spec and print tiny report")
+	info.AddExample("--format summary app.spec", "Check spec and print summary")
 
 	info.Render()
 }

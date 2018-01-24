@@ -61,11 +61,25 @@ Usage: spec-file {options}
 
 Options
 
-  --summary, -s      Print only summary info
-  --no-lint, -nl     Disable rpmlint checks
-  --no-color, -nc    Disable colors in output
-  --help, -h         Show this help message
-  --version, -v      Show version
+  --format, -f format    Output format (summary|tiny)
+  --no-lint, -nl         Disable rpmlint checks
+  --no-color, -nc        Disable colors in output
+  --help, -h             Show this help message
+  --version, -v          Show version
+
+Examples
+
+  spec-file app.spec
+  Check spec and print extended report
+
+  spec-file --no-lint app.spec
+  Check spec without rpmlint and print extended report
+
+  spec-file --format tiny app.spec
+  Check spec and print tiny report
+
+  spec-file --format summary app.spec
+  Check spec and print summary
 
 ```
 
