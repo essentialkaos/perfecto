@@ -283,7 +283,6 @@ func extractHeaders(s *Spec) []*Header {
 
 		if isSectionHeader(line.Text) {
 			if header != nil {
-				fmt.Println(line.Text)
 				header.Data = s.Data[start : index-1]
 				result = append(result, header)
 				header = nil
