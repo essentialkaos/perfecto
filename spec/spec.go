@@ -231,7 +231,9 @@ func extractSections(s *Spec, names []string) []*Section {
 	for index, line := range s.Data {
 		if isSectionHeader(line.Text) {
 			if section != nil {
-				section.Data = s.Data[start : index-1]
+				if start+1 <= index-1 {
+					section.Data = s.Data[start+1 : index-1]
+				}
 				result = append(result, section)
 				section = nil
 			}
@@ -252,7 +254,7 @@ func extractSections(s *Spec, names []string) []*Section {
 	}
 
 	if section != nil {
-		section.Data = s.Data[start:]
+		section.Data = s.Data[start+1:]
 		result = append(result, section)
 	}
 
@@ -266,20 +268,25 @@ func extractHeaders(s *Spec) []*Header {
 	var start int
 
 	for index, line := range s.Data {
-		if header == nil && isHeaderTag(line.Text) {
-			header = &Header{}
-			start = index
-		} else if isSectionHeader(line.Text) {
-			if header != nil {
-				header.Data = s.Data[start : index-1]
-				result = append(result, header)
-				header = nil
-			}
-
-			if strings.HasPrefix(line.Text, "%package") {
+		if header == nil {
+			if len(result) == 0 && isHeaderTag(line.Text) {
+				header = &Header{}
+				start = index
+				continue
+			} else if strings.HasPrefix(line.Text, "%package") {
 				name, sub := parsePackageName(line.Text)
 				header = &Header{Package: name, Subpackage: sub}
 				start = index
+				continue
+			}
+		}
+
+		if isSectionHeader(line.Text) {
+			if header != nil {
+				fmt.Println(line.Text)
+				header.Data = s.Data[start : index-1]
+				result = append(result, header)
+				header = nil
 			}
 		}
 	}

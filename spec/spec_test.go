@@ -54,10 +54,11 @@ func (s *SpecSuite) TestSections(c *C) {
 	c.Assert(sections, HasLen, 13)
 	sections = spec.GetSections(SECTION_BUILD)
 	c.Assert(sections, HasLen, 1)
-	c.Assert(sections[0].Data, HasLen, 2)
+	c.Assert(sections[0].Data, HasLen, 1)
 	sections = spec.GetSections(SECTION_SETUP)
 	c.Assert(sections[0].Name, Equals, "setup")
 	c.Assert(sections[0].Args, DeepEquals, []string{"-qn", "%{name}-%{version}"})
+	c.Assert(sections[0].Data, HasLen, 0)
 }
 
 func (s *SpecSuite) TestHeaders(c *C) {

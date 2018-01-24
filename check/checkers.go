@@ -66,6 +66,8 @@ func getCheckers() []Checker {
 		checkForMakeMacro,
 		checkForHeaderTags,
 		checkSetupOptions,
+		checkForUnescapedPercent,
+		checkForMacroDefenitionPosition,
 	}
 }
 
@@ -293,6 +295,52 @@ func checkSetupOptions(s *spec.Spec) []Alert {
 
 			if contains(line, "-c -n") {
 				result = append(result, Alert{LEVEL_NOTICE, "Setup options can be simplified to \"-cn\"", line})
+			}
+		}
+	}
+
+	return result
+}
+
+// checkForUnescapedPercent check changelog and descriptions for unescaped percent symbol
+func checkForUnescapedPercent(s *spec.Spec) []Alert {
+	var result []Alert
+
+	sections := []string{"description", "changelog"}
+
+	for _, section := range s.GetSections(sections...) {
+		for _, line := range section.Data {
+			if prefix(line, "%") {
+				continue
+			}
+
+			if contains(line, "%") && !contains(line, "%%") {
+				result = append(result, Alert{LEVEL_ERROR, "Symbol % must be escaped by another % (i.e % → %%)", line})
+			}
+		}
+	}
+
+	return result
+}
+
+// checkForMacroDefenitionPosition check for macro defined after description
+func checkForMacroDefenitionPosition(s *spec.Spec) []Alert {
+	var result []Alert
+
+	var underDescription bool
+
+	for _, line := range s.Data {
+		if !underDescription && prefix(line, "%description") {
+			underDescription = true
+		}
+
+		if prefix(line, "%files") {
+			break
+		}
+
+		if underDescription {
+			if contains(line, "%global ") || contains(line, "%define ") {
+				result = append(result, Alert{LEVEL_WARNING, "Move %define and %global to top of your spec", line})
 			}
 		}
 	}
