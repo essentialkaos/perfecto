@@ -13,7 +13,7 @@ Source0:            https://domain.com/%{name}-%{version}.tar.gz
 ###############################################################################
 
 %description
-Test spec %for perfecto app.
+Test spec for perfecto app.
 
 ###############################################################################
 

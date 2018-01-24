@@ -286,7 +286,7 @@ func checkForHeaderTags(s *spec.Spec) []Alert {
 func checkForUnescapedPercent(s *spec.Spec) []Alert {
 	var result []Alert
 
-	sections := []string{"description", "changelog"}
+	sections := []string{"changelog"}
 
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {

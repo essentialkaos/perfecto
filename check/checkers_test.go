@@ -173,11 +173,9 @@ func (sc *CheckSuite) TestCheckForUnescapedPercent(c *chk.C) {
 
 	alerts := checkForUnescapedPercent(s)
 
-	c.Assert(alerts, chk.HasLen, 2)
+	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Symbol % must be escaped by another % (i.e % → %%)")
-	c.Assert(alerts[0].Line.Index, chk.Equals, 16)
-	c.Assert(alerts[1].Info, chk.Equals, "Symbol % must be escaped by another % (i.e % → %%)")
-	c.Assert(alerts[1].Line.Index, chk.Equals, 67)
+	c.Assert(alerts[0].Line.Index, chk.Equals, 67)
 }
 
 func (sc *CheckSuite) TestCheckForMacroDefenitionPosition(c *chk.C) {
