@@ -61,7 +61,7 @@ Usage: spec-file {options}
 
 Options
 
-  --resume, -r       Print resume only
+  --summary, -s      Print only summary info
   --no-lint, -nl     Disable rpmlint checks
   --no-color, -nc    Disable colors in output
   --help, -h         Show this help message

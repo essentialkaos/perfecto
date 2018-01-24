@@ -18,6 +18,7 @@ import (
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
+// Checker is spec check function
 type Checker func(s *spec.Spec) []Alert
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -315,17 +316,6 @@ func contains(line spec.Line, value string) bool {
 func containsTag(data []spec.Line, tag string) bool {
 	for _, line := range data {
 		if prefix(line, tag) {
-			return true
-		}
-	}
-
-	return false
-}
-
-// containsAny return true if given string contains any of given substrings
-func containsAny(data string, values ...string) bool {
-	for _, value := range values {
-		if strings.Contains(data, value) {
 			return true
 		}
 	}

@@ -34,7 +34,7 @@ const (
 
 // Options
 const (
-	OPT_RESUME   = "r:resume"
+	OPT_SUMMARY  = "s:summary"
 	OPT_NO_LINT  = "nl:no-lint"
 	OPT_NO_COLOR = "nc:no-color"
 	OPT_HELP     = "h:help"
@@ -44,7 +44,7 @@ const (
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 var optMap = options.Map{
-	OPT_RESUME:   {Type: options.BOOL},
+	OPT_SUMMARY:  {Type: options.BOOL},
 	OPT_NO_LINT:  {Type: options.BOOL},
 	OPT_NO_COLOR: {Type: options.BOOL},
 	OPT_HELP:     {Type: options.BOOL, Alias: "u:usage"},
@@ -81,6 +81,7 @@ var headers = map[uint8]string{
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
+// Init is main function of cli
 func Init() {
 	args, errs := options.Parse(optMap)
 
@@ -142,7 +143,7 @@ func process(file string) {
 		os.Exit(0)
 	}
 
-	if options.GetB(OPT_RESUME) {
+	if options.GetB(OPT_SUMMARY) {
 		renderResume(report)
 	} else {
 		renderReport(report)
@@ -269,11 +270,6 @@ func printError(f string, a ...interface{}) {
 	fmtc.Fprintf(os.Stderr, "{r}"+f+"{!}\n", a...)
 }
 
-// printError prints warning message to console
-func printWarn(f string, a ...interface{}) {
-	fmtc.Fprintf(os.Stderr, "{y}"+f+"{!}\n", a...)
-}
-
 // printErrorAndExit print error mesage and exit with exit code 1
 func printErrorAndExit(f string, a ...interface{}) {
 	printError(f, a...)
@@ -286,7 +282,7 @@ func printErrorAndExit(f string, a ...interface{}) {
 func showUsage() {
 	info := usage.NewInfo("spec-file")
 
-	info.AddOption(OPT_RESUME, "Print resume only")
+	info.AddOption(OPT_SUMMARY, "Print only summary info")
 	info.AddOption(OPT_NO_LINT, "Disable rpmlint checks")
 	info.AddOption(OPT_NO_COLOR, "Disable colors in output")
 	info.AddOption(OPT_HELP, "Show this help message")

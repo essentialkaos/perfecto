@@ -134,12 +134,12 @@ func (s *Spec) HasSection(section string) bool {
 	return hasSection(s, section)
 }
 
-// GetSection return slice with sections
+// GetSections return slice with sections
 func (s *Spec) GetSections(names ...string) []*Section {
 	return extractSections(s, names)
 }
 
-// GetHeader return slice with headers
+// GetHeaders return slice with headers
 func (s *Spec) GetHeaders() []*Header {
 	return extractHeaders(s)
 }
