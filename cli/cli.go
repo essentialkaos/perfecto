@@ -34,11 +34,12 @@ const (
 
 // Options
 const (
-	OPT_FORMAT   = "f:format"
-	OPT_NO_LINT  = "nl:no-lint"
-	OPT_NO_COLOR = "nc:no-color"
-	OPT_HELP     = "h:help"
-	OPT_VER      = "v:version"
+	OPT_FORMAT      = "f:format"
+	OPT_LINT_CONFIG = "lc:lint-config"
+	OPT_NO_LINT     = "nl:no-lint"
+	OPT_NO_COLOR    = "nc:no-color"
+	OPT_HELP        = "h:help"
+	OPT_VER         = "v:version"
 )
 
 const (
@@ -49,11 +50,12 @@ const (
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 var optMap = options.Map{
-	OPT_FORMAT:   {Type: options.STRING},
-	OPT_NO_LINT:  {Type: options.BOOL},
-	OPT_NO_COLOR: {Type: options.BOOL},
-	OPT_HELP:     {Type: options.BOOL, Alias: "u:usage"},
-	OPT_VER:      {Type: options.BOOL, Alias: "ver"},
+	OPT_FORMAT:      {Type: options.STRING},
+	OPT_LINT_CONFIG: {Type: options.STRING},
+	OPT_NO_LINT:     {Type: options.BOOL},
+	OPT_NO_COLOR:    {Type: options.BOOL},
+	OPT_HELP:        {Type: options.BOOL, Alias: "u:usage"},
+	OPT_VER:         {Type: options.BOOL, Alias: "ver"},
 }
 
 var bgColor = map[uint8]string{
@@ -141,7 +143,7 @@ func process(file string) {
 		printErrorAndExit("Can't run linter: rpmlint not installed. Install rpmlint or use option '--no-lint'.")
 	}
 
-	report := check.Check(s, !options.GetB(OPT_NO_LINT))
+	report := check.Check(s, !options.GetB(OPT_NO_LINT), options.GetS(OPT_LINT_CONFIG))
 
 	if report.IsPerfect() {
 		if options.GetS(OPT_FORMAT) == FORMAT_TINY {
@@ -327,6 +329,7 @@ func showUsage() {
 	info := usage.NewInfo("spec-file")
 
 	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny){!}", "format")
+	info.AddOption(OPT_LINT_CONFIG, "Path to rpmlint config", "config")
 	info.AddOption(OPT_NO_LINT, "Disable rpmlint checks")
 	info.AddOption(OPT_NO_COLOR, "Disable colors in output")
 	info.AddOption(OPT_HELP, "Show this help message")

@@ -18,8 +18,12 @@ import (
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // Lint run rpmlint and return alerts from it
-func Lint(s *spec.Spec) []Alert {
+func Lint(s *spec.Spec, linterConfig string) []Alert {
 	cmd := exec.Command("rpmlint", s.File)
+
+	if linterConfig != "" {
+		cmd.Args = append(cmd.Args, "-f", linterConfig)
+	}
 
 	output, _ := cmd.Output()
 
