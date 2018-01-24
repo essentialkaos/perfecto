@@ -133,7 +133,7 @@ func process(file string) {
 	}
 
 	if !options.GetB(OPT_NO_LINT) && !isLinterInstalled() {
-		printErrorAndExit("Can't run linter: rpmlinter is not installed")
+		printErrorAndExit("Can't run linter: rpmlint not installed. Install rpmlint or use option '--no-lint'.")
 	}
 
 	report := check.Check(s, !options.GetB(OPT_NO_LINT))
