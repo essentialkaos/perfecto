@@ -65,7 +65,6 @@ func getCheckers() []Checker {
 		checkChangelogHeaders,
 		checkForMakeMacro,
 		checkForHeaderTags,
-		checkSetupOptions,
 		checkForUnescapedPercent,
 		checkForMacroDefenitionPosition,
 	}
@@ -93,7 +92,7 @@ func checkForUselessSpaces(s *spec.Spec) []Alert {
 	return result
 }
 
-// checkForLineLength checks changelog and description lines for 88 symbols limit
+// checkForLineLength checks changelog and description lines for 80 symbols limit
 func checkForLineLength(s *spec.Spec) []Alert {
 	var result []Alert
 
@@ -106,8 +105,8 @@ func checkForLineLength(s *spec.Spec) []Alert {
 				continue
 			}
 
-			if strutil.Len(line.Text) > 88 {
-				result = append(result, Alert{LEVEL_WARNING, "Line is longer than 88 symbols", line})
+			if strutil.Len(line.Text) > 80 {
+				result = append(result, Alert{LEVEL_WARNING, "Line is longer than 80 symbols", line})
 			}
 		}
 	}
@@ -208,7 +207,7 @@ func checkChangelogHeaders(s *spec.Spec) []Alert {
 
 	for _, section := range s.GetSections("changelog") {
 		for _, line := range section.Data {
-			// Ignore changelog records' headers
+			// Ignore changelog records text
 			if !prefix(line, "* ") {
 				continue
 			}
@@ -217,7 +216,7 @@ func checkChangelogHeaders(s *spec.Spec) []Alert {
 				result = append(result, Alert{LEVEL_WARNING, "Misformatted changelog record header", line})
 			} else {
 				separator := strings.Index(line.Text, " - ")
-				if !strings.Contains(strutil.Substr(line.Text, separator+1, 999999), "-") {
+				if !strings.Contains(strutil.Substr(line.Text, separator+3, 999999), "-") {
 					result = append(result, Alert{LEVEL_WARNING, "Changelog record header must contain release", line})
 				}
 			}
@@ -267,34 +266,15 @@ func checkForHeaderTags(s *spec.Spec) []Alert {
 	for _, header := range s.GetHeaders() {
 		if header.Package == "" {
 			if !containsTag(header.Data, "URL:") {
-				result = append(result, Alert{LEVEL_ERROR, "Package must contain URL tag", spec.Line{-1, ""}})
+				result = append(result, Alert{LEVEL_ERROR, "Main package must contain URL tag", spec.Line{-1, ""}})
 			}
 		}
 
 		if !containsTag(header.Data, "Group:") {
 			if header.Package == "" {
-				result = append(result, Alert{LEVEL_WARNING, "Package must contain Group tag", spec.Line{-1, ""}})
+				result = append(result, Alert{LEVEL_WARNING, "Main package must contain Group tag", spec.Line{-1, ""}})
 			} else {
 				result = append(result, Alert{LEVEL_WARNING, fmt.Sprintf("Package %s must contain Group tag", header.Package), spec.Line{-1, ""}})
-			}
-		}
-	}
-
-	return result
-}
-
-// checkSetupOptions check setup options
-func checkSetupOptions(s *spec.Spec) []Alert {
-	var result []Alert
-
-	for _, section := range s.GetSections("setup") {
-		for _, line := range section.Data {
-			if contains(line, "-q -n") {
-				result = append(result, Alert{LEVEL_NOTICE, "Setup options can be simplified to \"-qn\"", line})
-			}
-
-			if contains(line, "-c -n") {
-				result = append(result, Alert{LEVEL_NOTICE, "Setup options can be simplified to \"-cn\"", line})
 			}
 		}
 	}
