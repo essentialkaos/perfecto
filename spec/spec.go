@@ -125,6 +125,12 @@ var tags = []string{
 
 // Read read and parse rpm spec file
 func Read(file string) (*Spec, error) {
+	err := checkFile(file)
+
+	if err != nil {
+		return nil, err
+	}
+
 	return readFile(file)
 }
 
@@ -169,12 +175,6 @@ func (s *Spec) GetFileName() string {
 
 // readFile read and parse spec file
 func readFile(file string) (*Spec, error) {
-	err := checkFile(file)
-
-	if err != nil {
-		return nil, err
-	}
-
 	fd, err := os.OpenFile(file, os.O_RDONLY, 0)
 
 	if err != nil {
@@ -191,6 +191,10 @@ func readFile(file string) (*Spec, error) {
 	for s.Scan() {
 		spec.Data = append(spec.Data, Line{line, strings.TrimRight(s.Text(), "\r\n")})
 		line++
+	}
+
+	if !isSpec(spec) {
+		return nil, fmt.Errorf("File %s is not a spec file", file)
 	}
 
 	return spec, nil
@@ -357,4 +361,36 @@ func isSectionMatch(data string, names []string) bool {
 	}
 
 	return false
+}
+
+// isSpec check that given file contains spec data
+func isSpec(spec *Spec) bool {
+	var count int
+
+	markers := []string{"%install", "%files", "%changelog"}
+
+	for _, line := range spec.Data {
+		for _, marker := range markers {
+			if strings.HasPrefix(line.Text, marker) {
+				count++
+			}
+		}
+	}
+
+	if count < 3 {
+		return false
+	}
+
+	count = 0
+	markers = []string{"Name:", "Version:", "Summary:"}
+
+	for _, line := range spec.Data {
+		for _, marker := range markers {
+			if strings.HasPrefix(line.Text, marker) {
+				count++
+			}
+		}
+	}
+
+	return count >= 3
 }
