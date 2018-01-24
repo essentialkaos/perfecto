@@ -30,6 +30,8 @@ testWithCover() {
   echo "mode: count" > coverage.txt
 
   for subpkg in "spec" "check" ; do
+    echo "Testing ../$subpkg..."
+
     go test -covermode=count -coverprofile=coverage.tmp "../$subpkg"
 
     if [[ $? -ne 0 ]] ; then
