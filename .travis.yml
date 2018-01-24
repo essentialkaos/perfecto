@@ -26,4 +26,4 @@ before_install:
   - make deps-test
 
 script:
-  - make test
+  - .travis/script.sh
