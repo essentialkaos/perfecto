@@ -67,6 +67,7 @@ func getCheckers() []Checker {
 		checkForHeaderTags,
 		checkForUnescapedPercent,
 		checkForMacroDefenitionPosition,
+		checkForSeparatorLength,
 	}
 }
 
@@ -322,6 +323,19 @@ func checkForMacroDefenitionPosition(s *spec.Spec) []Alert {
 			if contains(line, "%global ") || contains(line, "%define ") {
 				result = append(result, Alert{LEVEL_WARNING, "Move %define and %global to top of your spec", line})
 			}
+		}
+	}
+
+	return result
+}
+
+// checkForSeparatorLength check for separator length
+func checkForSeparatorLength(s *spec.Spec) []Alert {
+	var result []Alert
+
+	for _, line := range s.Data {
+		if contains(line, "#") && strings.Trim(line.Text, "#") == "" && strings.Count(line.Text, "#") != 80 {
+			result = append(result, Alert{LEVEL_NOTICE, "Separator must be 80 symbols long", line})
 		}
 	}
 

@@ -191,6 +191,19 @@ func (sc *CheckSuite) TestCheckForMacroDefenitionPosition(c *chk.C) {
 	c.Assert(alerts[0].Line.Index, chk.Equals, 35)
 }
 
+func (sc *CheckSuite) TestCheckForSeparatorLength(c *chk.C) {
+	s, err := spec.Read("../testdata/test_4.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts := checkForSeparatorLength(s)
+
+	c.Assert(alerts, chk.HasLen, 1)
+	c.Assert(alerts[0].Info, chk.Equals, "Separator must be 80 symbols long")
+	c.Assert(alerts[0].Line.Index, chk.Equals, 63)
+}
+
 func (sc *CheckSuite) TestAux(c *chk.C) {
-	c.Assert(getCheckers(), chk.HasLen, 11)
+	c.Assert(getCheckers(), chk.HasLen, 12)
 }
