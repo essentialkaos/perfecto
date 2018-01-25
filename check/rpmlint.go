@@ -19,11 +19,13 @@ import (
 
 // Lint run rpmlint and return alerts from it
 func Lint(s *spec.Spec, linterConfig string) []Alert {
-	cmd := exec.Command("rpmlint", s.File)
+	cmd := exec.Command("rpmlint")
 
 	if linterConfig != "" {
 		cmd.Args = append(cmd.Args, "-f", linterConfig)
 	}
+
+	cmd.Args = append(cmd.Args, s.File)
 
 	output, _ := cmd.Output()
 
