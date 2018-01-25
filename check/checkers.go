@@ -188,11 +188,11 @@ func checkForDevNull(s *spec.Spec) []Alert {
 		"preun", "postun", "posttrans",
 	}
 
-	devNull := strings.Trim(">/dev/null 2>&1 || :", " ")
+	devNull := strings.Replace(">/dev/null 2>&1 || :", " ", "", -1)
 
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {
-			if strings.Contains(strings.Trim(line.Text, " "), devNull) {
+			if strings.Contains(strings.Replace(line.Text, " ", "", -1), devNull) {
 				result = append(result, Alert{LEVEL_NOTICE, "Use \"&>/dev/null || :\" instead of \">/dev/null 2>&1 || :\"", line})
 			}
 		}
