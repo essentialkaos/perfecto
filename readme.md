@@ -61,11 +61,13 @@ Usage: spec-file {options}
 
 Options
 
-  --format, -f format    Output format (summary|tiny)
-  --no-lint, -nl         Disable rpmlint checks
-  --no-color, -nc        Disable colors in output
-  --help, -h             Show this help message
-  --version, -v          Show version
+  --format, -f format        Output format (summary|tiny)
+  --lint-config, -c file     Path to rpmlint configuration file
+  --error-level, -e level    Return non-zero exit code if alert level greater than given (notice|warning|error|critical)
+  --no-lint, -nl             Disable rpmlint checks
+  --no-color, -nc            Disable colors in output
+  --help, -h                 Show this help message
+  --version, -v              Show version
 
 Examples
 

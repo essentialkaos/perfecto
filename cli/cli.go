@@ -35,7 +35,8 @@ const (
 // Options
 const (
 	OPT_FORMAT      = "f:format"
-	OPT_LINT_CONFIG = "lc:lint-config"
+	OPT_LINT_CONFIG = "c:lint-config"
+	OPT_ERROR_LEVEL = "e:error-level"
 	OPT_NO_LINT     = "nl:no-lint"
 	OPT_NO_COLOR    = "nc:no-color"
 	OPT_HELP        = "h:help"
@@ -52,6 +53,7 @@ const (
 var optMap = options.Map{
 	OPT_FORMAT:      {Type: options.STRING},
 	OPT_LINT_CONFIG: {Type: options.STRING},
+	OPT_ERROR_LEVEL: {Type: options.STRING},
 	OPT_NO_LINT:     {Type: options.BOOL},
 	OPT_NO_COLOR:    {Type: options.BOOL},
 	OPT_HELP:        {Type: options.BOOL, Alias: "u:usage"},
@@ -164,7 +166,7 @@ func process(file string) {
 		renderFullReport(report)
 	}
 
-	os.Exit(1)
+	os.Exit(getExitCode(report))
 }
 
 // renderFullReport render all alerts from report
@@ -306,6 +308,45 @@ func renderTinyReport(s *spec.Spec, r *check.Report) {
 	fmtc.NewLine()
 }
 
+// getExitCode
+func getExitCode(r *check.Report) int {
+	if options.GetS(OPT_ERROR_LEVEL) == "" {
+		return 1
+	}
+
+	var maxLevel int
+
+	switch {
+	case len(r.Criticals) != 0:
+		maxLevel = 4
+	case len(r.Errors) != 0:
+		maxLevel = 3
+	case len(r.Warnings) != 0:
+		maxLevel = 2
+	case len(r.Notices) != 0:
+		maxLevel = 1
+	}
+
+	var nonZero bool
+
+	switch options.GetS(OPT_ERROR_LEVEL) {
+	case "notice":
+		nonZero = maxLevel >= 1
+	case "warning":
+		nonZero = maxLevel >= 2
+	case "errror":
+		nonZero = maxLevel >= 3
+	case "critical":
+		nonZero = maxLevel == 4
+	}
+
+	if nonZero {
+		return 1
+	}
+
+	return 0
+}
+
 // isLinterInstalled checks if rpmlint is installed
 func isLinterInstalled() bool {
 	return env.Which("rpmlint") != ""
@@ -329,7 +370,8 @@ func showUsage() {
 	info := usage.NewInfo("spec-file")
 
 	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny){!}", "format")
-	info.AddOption(OPT_LINT_CONFIG, "Path to rpmlint config", "config")
+	info.AddOption(OPT_LINT_CONFIG, "Path to rpmlint configuration file", "file")
+	info.AddOption(OPT_ERROR_LEVEL, "Return non-zero exit code if alert level greater than given {s-}(notice|warning|error|critical){!}", "level")
 	info.AddOption(OPT_NO_LINT, "Disable rpmlint checks")
 	info.AddOption(OPT_NO_COLOR, "Disable colors in output")
 	info.AddOption(OPT_HELP, "Show this help message")
