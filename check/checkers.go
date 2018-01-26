@@ -149,6 +149,11 @@ func checkForNonMacroPaths(s *spec.Spec) []Alert {
 				continue
 			}
 
+			// Ignore comments
+			if prefix(line, "#") {
+				continue
+			}
+
 			for _, macro := range pathMacroSlice {
 				if contains(line, macro.Value) {
 					result = append(result, Alert{LEVEL_WARNING, fmt.Sprintf("Path \"%s\" should be used as macro \"%s\"", macro.Value, macro.Name), line})
@@ -291,10 +296,6 @@ func checkForUnescapedPercent(s *spec.Spec) []Alert {
 
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {
-			if prefix(line, "%") {
-				continue
-			}
-
 			if contains(line, "%") && !contains(line, "%%") {
 				result = append(result, Alert{LEVEL_ERROR, "Symbol % must be escaped by another % (i.e % → %%)", line})
 			}
