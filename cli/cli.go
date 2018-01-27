@@ -88,6 +88,13 @@ var headers = map[uint8]string{
 	check.LEVEL_CRITICAL: "Critical",
 }
 
+var fallbackLevel = map[uint8]string{
+	check.LEVEL_NOTICE:   "N",
+	check.LEVEL_WARNING:  "W",
+	check.LEVEL_ERROR:    "E",
+	check.LEVEL_CRITICAL: "C",
+}
+
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // Init is main function of cli
@@ -302,7 +309,12 @@ func renderTinyReport(s *spec.Spec, r *check.Report) {
 			continue
 		}
 
-		fmtc.Printf(fgColor[level]+"%s{!}", strings.Repeat("•", len(alerts)))
+		if options.GetB(OPT_NO_COLOR) {
+			fmtc.Printf(strings.Repeat(fallbackLevel[level]+" ", len(alerts)))
+		} else {
+			fmtc.Printf(fgColor[level]+"%s{!}", strings.Repeat("•", len(alerts)))
+		}
+
 	}
 
 	fmtc.NewLine()
