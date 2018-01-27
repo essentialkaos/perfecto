@@ -44,7 +44,7 @@ var pathMacroSlice = []macro{
 	{"/usr/include", "%{_includedir}"},
 	{"/usr/share/info", "%{_infodir}"},
 	{"/usr/share/man", "%{_mandir}"},
-	{"/etc/rc.d/init.d", ""},
+	{"/etc/rc.d/init.d", "%{_initddir}"},
 	{"/etc/init", "%{_initddir}"},
 	{"/usr/share/java", "%{_javadir}"},
 	{"/usr/share/javadoc", "%{_javadocdir}"},
