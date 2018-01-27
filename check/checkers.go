@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"strings"
 
+	"pkg.re/essentialkaos/ek.v9/sliceutil"
 	"pkg.re/essentialkaos/ek.v9/strutil"
 
 	"github.com/essentialkaos/perfecto/spec"
@@ -144,13 +145,13 @@ func checkForNonMacroPaths(s *spec.Spec) []Alert {
 
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {
-			// Ignore env vars exports
-			if contains(line, "export") {
+			// Ignore comments and env vars exports
+			if contains(line, "export") || prefix(line, "#") {
 				continue
 			}
 
-			// Ignore comments
-			if prefix(line, "#") {
+			// Ignore sed replacements
+			if contains(line, "sed") {
 				continue
 			}
 
@@ -248,7 +249,7 @@ func checkForMakeMacro(s *spec.Spec) []Alert {
 				result = append(result, Alert{LEVEL_WARNING, "Use %{__make} macro instead of \"make\"", line})
 			}
 
-			if section.Name == "install" && contains(line, " install") {
+			if section.Name == "install" && containsField(line, "install") && contains(line, "DESTDIR") {
 				if prefix(line, "make") || prefix(line, "%{__make}") {
 					result = append(result, Alert{LEVEL_WARNING, "Use %{make_install} macro instead of \"make install\"", line})
 				}
@@ -256,7 +257,9 @@ func checkForMakeMacro(s *spec.Spec) []Alert {
 
 			if section.Name == "build" && !contains(line, "%{?_smp_mflags}") {
 				if prefix(line, "make") || prefix(line, "%{__make}") {
-					result = append(result, Alert{LEVEL_WARNING, "Don't forget to use %{?_smp_mflags} macro with make command", line})
+					if line.Text == "make" || line.Text == "%{__make}" || containsField(line, "all") {
+						result = append(result, Alert{LEVEL_WARNING, "Don't forget to use %{?_smp_mflags} macro with make command", line})
+					}
 				}
 			}
 		}
@@ -353,6 +356,11 @@ func prefix(line spec.Line, value string) bool {
 // contains is strings.Contains wrapper
 func contains(line spec.Line, value string) bool {
 	return strings.Contains(line.Text, value)
+}
+
+// containsField return true if line contains given field
+func containsField(line spec.Line, value string) bool {
+	return sliceutil.Contains(strutil.Fields(line.Text), value)
 }
 
 // containsTag check if data contains given tag

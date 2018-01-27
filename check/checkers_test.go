@@ -96,7 +96,7 @@ func (sc *CheckSuite) TestCheckForBuildRoot(c *chk.C) {
 	c.Assert(alerts[0].Info, chk.Equals, "Build root path must be used as macro %{buildroot}")
 	c.Assert(alerts[0].Line.Index, chk.Equals, 41)
 	c.Assert(alerts[1].Info, chk.Equals, "Slash after %{buildroot} macro is useless")
-	c.Assert(alerts[1].Line.Index, chk.Equals, 44)
+	c.Assert(alerts[1].Line.Index, chk.Equals, 46)
 }
 
 func (sc *CheckSuite) TestCheckForDevNull(c *chk.C) {
@@ -109,7 +109,7 @@ func (sc *CheckSuite) TestCheckForDevNull(c *chk.C) {
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Use \"&>/dev/null || :\" instead of \">/dev/null 2>&1 || :\"")
-	c.Assert(alerts[0].Line.Index, chk.Equals, 44)
+	c.Assert(alerts[0].Line.Index, chk.Equals, 46)
 }
 
 func (sc *CheckSuite) TestCheckChangelogHeaders(c *chk.C) {
@@ -122,9 +122,9 @@ func (sc *CheckSuite) TestCheckChangelogHeaders(c *chk.C) {
 
 	c.Assert(alerts, chk.HasLen, 2)
 	c.Assert(alerts[0].Info, chk.Equals, "Changelog record header must contain release")
-	c.Assert(alerts[0].Line.Index, chk.Equals, 67)
+	c.Assert(alerts[0].Line.Index, chk.Equals, 69)
 	c.Assert(alerts[1].Info, chk.Equals, "Misformatted changelog record header")
-	c.Assert(alerts[1].Line.Index, chk.Equals, 70)
+	c.Assert(alerts[1].Line.Index, chk.Equals, 72)
 }
 
 func (sc *CheckSuite) TestCheckForMakeMacro(c *chk.C) {
