@@ -284,7 +284,7 @@ func renderSummary(r *check.Report) {
 	fmtc.Println(strings.Join(result, "{s-} • {!}"))
 }
 
-// renderTinyReport render tiny report (usefull for mass check)
+// renderTinyReport render tiny report (useful for mass check)
 func renderTinyReport(s *spec.Spec, r *check.Report) {
 	fmtc.Printf("%24s: ", s.GetFileName())
 
