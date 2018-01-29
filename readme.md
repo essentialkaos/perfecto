@@ -9,9 +9,11 @@
   <a href="#license"><img src="https://gh.kaos.io/ekol.svg"></a>
 </p>
 
-_perfecto_ is tool for checking perfectly written RPM specs.
+_perfecto_ is tool for checking perfectly written RPM specs. Currently, _perfecto_ used by default for checking specs for [EK Public Repository](https://yum.kaos.io).
 
 ![Screenshot](https://gh.kaos.io/perfecto.png)
+
+![Screenshot](https://gh.kaos.io/perfecto2.png)
 
 ### Installing
 
