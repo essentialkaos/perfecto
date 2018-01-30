@@ -39,6 +39,7 @@ rm -rf %{buildroot}
 %{make_install} PREFIX=%{buildroot}%{_prefix}
 
 %clean
+# perfecto:absolve 2
 rm -rf %{buildroot}
 
 %post

@@ -30,27 +30,29 @@ type macro struct {
 }
 
 var pathMacroSlice = []macro{
-	{"/var", "%{_var}"},
-	{"/usr", "%{_usr}"},
-	{"/usr/src", "%{_usrsrc}"},
-	{"/usr/share/doc", "%{_docdir}"},
+	{"/etc/init", "%{_initddir}"},
+	{"/etc/rc.d/init.d", "%{_initddir}"},
 	{"/etc", "%{_sysconfdir}"},
 	{"/usr/bin", "%{_bindir}"},
+	{"/usr/include", "%{_includedir}"},
 	{"/usr/lib", "%{_libdir}"},
 	{"/usr/lib64", "%{_libdir}"},
 	{"/usr/libexec", "%{_libexecdir}"},
 	{"/usr/sbin", "%{_sbindir}"},
-	{"/var/lib", "%{_sharedstatedir}"},
-	{"/usr/share", "%{_datarootdir}"},
-	{"/usr/include", "%{_includedir}"},
+	{"/usr/share/doc", "%{_defaultdocdir}"},
+	{"/usr/share/doc", "%{_docdir}"},
 	{"/usr/share/info", "%{_infodir}"},
-	{"/usr/share/man", "%{_mandir}"},
-	{"/etc/rc.d/init.d", "%{_initddir}"},
-	{"/etc/init", "%{_initddir}"},
 	{"/usr/share/java", "%{_javadir}"},
 	{"/usr/share/javadoc", "%{_javadocdir}"},
-	{"/usr/share/doc", "%{_defaultdocdir}"},
+	{"/usr/share/man", "%{_mandir}"},
+	{"/usr/share", "%{_datarootdir}"},
+	{"/usr/src", "%{_usrsrc}"},
+	{"/usr", "%{_usr}"},
+	{"/var/lib", "%{_sharedstatedir}"},
+	{"/var", "%{_var}"},
 }
+
+var emptyLine = spec.Line{-1, "", false}
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
@@ -81,11 +83,12 @@ func checkForUselessSpaces(s *spec.Spec) []Alert {
 	for _, line := range s.Data {
 		if contains(line, " ") {
 			if strings.TrimSpace(line.Text) == "" {
-				result = append(result, Alert{LEVEL_NOTICE, "Line contains useless spaces", spec.Line{line.Index, ""}})
+				impLine := spec.Line{line.Index, strings.Replace(line.Text, " ", "▒", -1), line.Skip}
+				result = append(result, Alert{LEVEL_NOTICE, "Line contains useless spaces", impLine})
 			} else if strings.TrimRight(line.Text, " ") != line.Text {
 				cleanLine := strings.TrimRight(line.Text, " ")
 				spaces := len(line.Text) - len(cleanLine)
-				impLine := spec.Line{line.Index, cleanLine + strings.Repeat("▒", spaces)}
+				impLine := spec.Line{line.Index, cleanLine + strings.Repeat("▒", spaces), line.Skip}
 				result = append(result, Alert{LEVEL_NOTICE, "Line contains spaces at the end of line", impLine})
 			}
 		}
@@ -98,12 +101,15 @@ func checkForUselessSpaces(s *spec.Spec) []Alert {
 func checkForLineLength(s *spec.Spec) []Alert {
 	var result []Alert
 
-	sections := []string{"description", "changelog"}
+	sections := []string{
+		spec.SECTION_DESCRIPTION,
+		spec.SECTION_CHANGELOG,
+	}
 
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {
 			// Ignore changelog headers
-			if section.Name == "changelog" && prefix(line, "* ") {
+			if section.Name == spec.SECTION_CHANGELOG && prefix(line, "* ") {
 				continue
 			}
 
@@ -138,9 +144,24 @@ func checkForNonMacroPaths(s *spec.Spec) []Alert {
 	var result []Alert
 
 	sections := []string{
-		"prep", "setup", "build", "install", "check",
-		"files", "package", "verifyscript", "pretrans",
-		"pre", "post", "preun", "postun", "posttrans",
+		spec.SECTION_BUILD,
+		spec.SECTION_CHECK,
+		spec.SECTION_CLEAN,
+		spec.SECTION_FILES,
+		spec.SECTION_INSTALL,
+		spec.SECTION_PACKAGE,
+		spec.SECTION_POST,
+		spec.SECTION_POSTTRANS,
+		spec.SECTION_POSTUN,
+		spec.SECTION_PRE,
+		spec.SECTION_PREP,
+		spec.SECTION_PRETRANS,
+		spec.SECTION_PREUN,
+		spec.SECTION_SETUP,
+		spec.SECTION_TRIGGERIN,
+		spec.SECTION_TRIGGERPOSTUN,
+		spec.SECTION_TRIGGERUN,
+		spec.SECTION_VERIFYSCRIPT,
 	}
 
 	for _, section := range s.GetSections(sections...) {
@@ -155,8 +176,11 @@ func checkForNonMacroPaths(s *spec.Spec) []Alert {
 				continue
 			}
 
+			text := line.Text
+
 			for _, macro := range pathMacroSlice {
-				if contains(line, macro.Value) {
+				if strings.Contains(text, macro.Value) {
+					text = strings.Replace(text, macro.Value, "", -1)
 					result = append(result, Alert{LEVEL_WARNING, fmt.Sprintf("Path \"%s\" should be used as macro \"%s\"", macro.Value, macro.Name), line})
 				}
 			}
@@ -170,7 +194,12 @@ func checkForNonMacroPaths(s *spec.Spec) []Alert {
 func checkForBuildRoot(s *spec.Spec) []Alert {
 	var result []Alert
 
-	for _, section := range s.GetSections("install") {
+	sections := []string{
+		spec.SECTION_INSTALL,
+		spec.SECTION_CLEAN,
+	}
+
+	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {
 			if contains(line, "$RPM_BUILD_ROOT") {
 				result = append(result, Alert{LEVEL_ERROR, "Build root path must be used as macro %{buildroot}", line})
@@ -190,9 +219,21 @@ func checkForDevNull(s *spec.Spec) []Alert {
 	var result []Alert
 
 	sections := []string{
-		"prep", "setup", "build", "install", "check",
-		"verifyscript", "pretrans", "pre", "post",
-		"preun", "postun", "posttrans",
+		spec.SECTION_BUILD,
+		spec.SECTION_CHECK,
+		spec.SECTION_INSTALL,
+		spec.SECTION_POST,
+		spec.SECTION_POSTTRANS,
+		spec.SECTION_POSTUN,
+		spec.SECTION_PRE,
+		spec.SECTION_PREP,
+		spec.SECTION_PRETRANS,
+		spec.SECTION_PREUN,
+		spec.SECTION_SETUP,
+		spec.SECTION_TRIGGERPOSTUN,
+		spec.SECTION_TRIGGERUN,
+		spec.SECTION_VERIFYSCRIPT,
+		spec.SECTION_VERIFYSCRIPT,
 	}
 
 	devNull := strings.Replace(">/dev/null 2>&1 || :", " ", "", -1)
@@ -212,7 +253,7 @@ func checkForDevNull(s *spec.Spec) []Alert {
 func checkChangelogHeaders(s *spec.Spec) []Alert {
 	var result []Alert
 
-	for _, section := range s.GetSections("changelog") {
+	for _, section := range s.GetSections(spec.SECTION_CHANGELOG) {
 		for _, line := range section.Data {
 			// Ignore changelog records text
 			if !prefix(line, "* ") {
@@ -237,7 +278,11 @@ func checkChangelogHeaders(s *spec.Spec) []Alert {
 func checkForMakeMacro(s *spec.Spec) []Alert {
 	var result []Alert
 
-	sections := []string{"build", "install", "check"}
+	sections := []string{
+		spec.SECTION_BUILD,
+		spec.SECTION_INSTALL,
+		spec.SECTION_CHECK,
+	}
 
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {
@@ -249,13 +294,13 @@ func checkForMakeMacro(s *spec.Spec) []Alert {
 				result = append(result, Alert{LEVEL_WARNING, "Use %{__make} macro instead of \"make\"", line})
 			}
 
-			if section.Name == "install" && containsField(line, "install") && contains(line, "DESTDIR") {
+			if section.Name == spec.SECTION_INSTALL && containsField(line, "install") && contains(line, "DESTDIR") {
 				if prefix(line, "make") || prefix(line, "%{__make}") {
 					result = append(result, Alert{LEVEL_WARNING, "Use %{make_install} macro instead of \"make install\"", line})
 				}
 			}
 
-			if section.Name == "build" && !contains(line, "%{?_smp_mflags}") {
+			if section.Name == spec.SECTION_BUILD && !contains(line, "%{?_smp_mflags}") {
 				if prefix(line, "make") || prefix(line, "%{__make}") {
 					if line.Text == "make" || line.Text == "%{__make}" || containsField(line, "all") {
 						result = append(result, Alert{LEVEL_WARNING, "Don't forget to use %{?_smp_mflags} macro with make command", line})
@@ -275,15 +320,15 @@ func checkForHeaderTags(s *spec.Spec) []Alert {
 	for _, header := range s.GetHeaders() {
 		if header.Package == "" {
 			if !containsTag(header.Data, "URL:") {
-				result = append(result, Alert{LEVEL_ERROR, "Main package must contain URL tag", spec.Line{-1, ""}})
+				result = append(result, Alert{LEVEL_ERROR, "Main package must contain URL tag", emptyLine})
 			}
 		}
 
 		if !containsTag(header.Data, "Group:") {
 			if header.Package == "" {
-				result = append(result, Alert{LEVEL_WARNING, "Main package must contain Group tag", spec.Line{-1, ""}})
+				result = append(result, Alert{LEVEL_WARNING, "Main package must contain Group tag", emptyLine})
 			} else {
-				result = append(result, Alert{LEVEL_WARNING, fmt.Sprintf("Package %s must contain Group tag", header.Package), spec.Line{-1, ""}})
+				result = append(result, Alert{LEVEL_WARNING, fmt.Sprintf("Package %s must contain Group tag", header.Package), emptyLine})
 			}
 		}
 	}
@@ -295,7 +340,7 @@ func checkForHeaderTags(s *spec.Spec) []Alert {
 func checkForUnescapedPercent(s *spec.Spec) []Alert {
 	var result []Alert
 
-	sections := []string{"changelog"}
+	sections := []string{spec.SECTION_CHANGELOG}
 
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {

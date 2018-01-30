@@ -11,6 +11,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"pkg.re/essentialkaos/ek.v9/fsutil"
@@ -22,21 +23,26 @@ import (
 
 // Sections
 const (
-	SECTION_PREP        = "prep"
-	SECTION_SETUP       = "setup"
-	SECTION_BUILD       = "build"
-	SECTION_INSTALL     = "install"
-	SECTION_CHECK       = "check"
-	SECTION_CLEAN       = "clean"
-	SECTION_FILES       = "files"
-	SECTION_CHANGELOG   = "changelog"
-	SECTION_PACKAGE     = "package"
-	SECTION_DESCRIPTION = "description"
-	SECTION_PRETRANS    = "pretrans"
-	SECTION_PRE         = "pre"
-	SECTION_POST        = "post"
-	SECTION_POSTUN      = "postun"
-	SECTION_POSTTRANS   = "posttrans"
+	SECTION_BUILD         = "build"
+	SECTION_CHANGELOG     = "changelog"
+	SECTION_CHECK         = "check"
+	SECTION_CLEAN         = "clean"
+	SECTION_DESCRIPTION   = "description"
+	SECTION_FILES         = "files"
+	SECTION_INSTALL       = "install"
+	SECTION_PACKAGE       = "package"
+	SECTION_POST          = "post"
+	SECTION_POSTTRANS     = "posttrans"
+	SECTION_POSTUN        = "postun"
+	SECTION_PRE           = "pre"
+	SECTION_PREP          = "prep"
+	SECTION_PRETRANS      = "pretrans"
+	SECTION_PREUN         = "preun"
+	SECTION_SETUP         = "setup"
+	SECTION_TRIGGERIN     = "triggerin"
+	SECTION_TRIGGERPOSTUN = "triggerpostun"
+	SECTION_TRIGGERUN     = "triggerun"
+	SECTION_VERIFYSCRIPT  = "verifyscript"
 )
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -51,6 +57,7 @@ type Spec struct {
 type Line struct {
 	Index int
 	Text  string
+	Skip  bool
 }
 
 // Header header contains header info and data
@@ -88,6 +95,9 @@ var sections = []string{
 	"preun",
 	"postun",
 	"posttrans",
+	"triggerin",
+	"triggerun",
+	"triggerpostun",
 }
 
 // tags is slice with header tags
@@ -154,7 +164,7 @@ func (s *Spec) GetHeaders() []*Header {
 // GetLine return spec line by index
 func (s *Spec) GetLine(index int) Line {
 	if index < 0 {
-		return Line{-1, ""}
+		return Line{-1, "", false}
 	}
 
 	for _, line := range s.Data {
@@ -163,7 +173,7 @@ func (s *Spec) GetLine(index int) Line {
 		}
 	}
 
-	return Line{-1, ""}
+	return Line{-1, "", false}
 }
 
 // GetFileName return spec file name without extension
@@ -183,13 +193,25 @@ func readFile(file string) (*Spec, error) {
 
 	defer fd.Close()
 
-	line := 1
+	line, skip := 1, 0
 	spec := &Spec{File: file}
 	r := bufio.NewReader(fd)
 	s := bufio.NewScanner(r)
 
 	for s.Scan() {
-		spec.Data = append(spec.Data, Line{line, strings.TrimRight(s.Text(), "\r\n")})
+		text := strings.TrimRight(s.Text(), "\r\n")
+
+		if isSkipTag(text) {
+			skip = extractSkipCount(text)
+			skip++
+		}
+
+		spec.Data = append(spec.Data, Line{line, text, skip != 0})
+
+		if skip != 0 {
+			skip--
+		}
+
 		line++
 	}
 
@@ -338,14 +360,11 @@ func parseSectionName(text string) (string, []string) {
 
 // parsePackageName parse package name
 func parsePackageName(text string) (string, bool) {
-	switch strings.Count(text, " ") {
-	case 1:
-		return strutil.ReadField(text, 1, true), true
-	case 2:
+	if strutil.ReadField(text, 1, true) == "-n" {
 		return strutil.ReadField(text, 2, true), false
 	}
 
-	return "", true
+	return strutil.ReadField(text, 1, true), true
 }
 
 // isSectionMatch return true if data contains name of any given sections
@@ -393,4 +412,26 @@ func isSpec(spec *Spec) bool {
 	}
 
 	return count >= 3
+}
+
+// isSkipTag return true if text contains skip tag
+func isSkipTag(text string) bool {
+	return strings.Contains(text, "perfecto:absolve")
+}
+
+// extractSkipCount return number of lines to skip
+func extractSkipCount(text string) int {
+	count := strutil.ReadField(text, 2, true)
+
+	if count == "" {
+		return 1
+	}
+
+	countInt, err := strconv.Atoi(count)
+
+	if err != nil || countInt <= 0 {
+		return 0
+	}
+
+	return countInt
 }

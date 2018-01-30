@@ -10,6 +10,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"pkg.re/essentialkaos/ek.v9/env"
@@ -28,7 +29,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "0.0.1"
+	VER  = "1.0.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -43,6 +44,7 @@ const (
 	OPT_VER         = "v:version"
 )
 
+// Supported formats
 const (
 	FORMAT_SUMMARY = "summary"
 	FORMAT_TINY    = "tiny"
@@ -238,15 +240,21 @@ func renderAlert(alert check.Alert) {
 	fg := fgColor[alert.Level]
 	hl := hlColor[alert.Level]
 
+	fmtc.Printf(fg + "│ {!}")
+
 	if alert.Line.Index != -1 {
-		fmtc.Printf(fg+"│ "+hl+"[%d]{!} "+fg+"%s{!}\n", alert.Line.Index, alert.Info)
+		if alert.Line.Skip {
+			fmtc.Printf(hl+"[%d]{!} {s}[A]{!} "+fg+"%s{!}\n", alert.Line.Index, alert.Info)
+		} else {
+			fmtc.Printf(hl+"[%d]{!} "+fg+"%s{!}\n", alert.Line.Index, alert.Info)
+		}
 
 		if alert.Line.Text != "" {
 			text := strutil.Ellipsis(alert.Line.Text, 86)
 			fmtc.Printf(fg+"│ {s-}%s{!}\n", text)
 		}
 	} else {
-		fmtc.Printf(fg+"│ "+hl+"[global]{!} "+fg+"%s{!}\n", alert.Info)
+		fmtc.Printf(hl+"[global]{!} "+fg+"%s{!}\n", alert.Info)
 	}
 }
 
@@ -277,10 +285,19 @@ func renderSummary(r *check.Report) {
 			continue
 		}
 
-		result = append(result,
-			fgColor[level]+headers[level]+": "+fmtc.Sprintf("%d", len(alerts))+"{!}",
-		)
+		actual, absolved := splitAlertsCount(alerts)
+
+		if absolved != 0 {
+			result = append(result,
+				fgColor[level]+headers[level]+": "+strconv.Itoa(actual)+"{s-}/"+strconv.Itoa(absolved)+"{!}",
+			)
+		} else {
+			result = append(result,
+				fgColor[level]+headers[level]+": "+strconv.Itoa(actual)+"{!}",
+			)
+		}
 	}
+
 	fmtc.Println(strings.Join(result, "{s-} • {!}"))
 }
 
@@ -309,12 +326,21 @@ func renderTinyReport(s *spec.Spec, r *check.Report) {
 			continue
 		}
 
-		if options.GetB(OPT_NO_COLOR) {
-			fmtc.Printf(strings.Repeat(fallbackLevel[level]+" ", len(alerts)))
-		} else {
-			fmtc.Printf(fgColor[level]+"%s{!}", strings.Repeat("•", len(alerts)))
+		for _, alert := range alerts {
+			if options.GetB(OPT_NO_COLOR) {
+				if alert.Line.Skip {
+					fmtc.Printf("X ")
+				} else {
+					fmtc.Printf(fallbackLevel[level] + " ")
+				}
+			} else {
+				if alert.Line.Skip {
+					fmtc.Printf("{s-}%s{!}", "•")
+				} else {
+					fmtc.Printf(fgColor[level]+"%s{!}", "•")
+				}
+			}
 		}
-
 	}
 
 	fmtc.NewLine()
@@ -322,20 +348,16 @@ func renderTinyReport(s *spec.Spec, r *check.Report) {
 
 // getExitCode
 func getExitCode(r *check.Report) int {
-	if options.GetS(OPT_ERROR_LEVEL) == "" {
-		return 1
-	}
-
 	var maxLevel int
 
 	switch {
-	case len(r.Criticals) != 0:
+	case countAlerts(r.Criticals) != 0:
 		maxLevel = 4
-	case len(r.Errors) != 0:
+	case countAlerts(r.Errors) != 0:
 		maxLevel = 3
-	case len(r.Warnings) != 0:
+	case countAlerts(r.Warnings) != 0:
 		maxLevel = 2
-	case len(r.Notices) != 0:
+	case countAlerts(r.Notices) != 0:
 		maxLevel = 1
 	}
 
@@ -357,6 +379,27 @@ func getExitCode(r *check.Report) int {
 	}
 
 	return 0
+}
+
+// countAlerts return number of actual alerts
+func countAlerts(alerts []check.Alert) int {
+	var counter int
+
+	for _, alert := range alerts {
+		if !alert.Line.Skip {
+			counter++
+		}
+	}
+
+	return counter
+}
+
+// splitAlertsCount count actual and absolved alerts
+func splitAlertsCount(alerts []check.Alert) (int, int) {
+	actual := countAlerts(alerts)
+	absolved := len(alerts) - actual
+
+	return actual, absolved
 }
 
 // isLinterInstalled checks if rpmlint is installed
