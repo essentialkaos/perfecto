@@ -52,6 +52,8 @@ var pathMacroSlice = []macro{
 	{"/usr/share/doc", "%{_defaultdocdir}"},
 }
 
+var emptyLine = spec.Line{-1, "", false}
+
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // getCheckers return slice with all supported checkers
@@ -81,11 +83,11 @@ func checkForUselessSpaces(s *spec.Spec) []Alert {
 	for _, line := range s.Data {
 		if contains(line, " ") {
 			if strings.TrimSpace(line.Text) == "" {
-				result = append(result, Alert{LEVEL_NOTICE, "Line contains useless spaces", spec.Line{line.Index, ""}})
+				result = append(result, Alert{LEVEL_NOTICE, "Line contains useless spaces", emptyLine})
 			} else if strings.TrimRight(line.Text, " ") != line.Text {
 				cleanLine := strings.TrimRight(line.Text, " ")
 				spaces := len(line.Text) - len(cleanLine)
-				impLine := spec.Line{line.Index, cleanLine + strings.Repeat("▒", spaces)}
+				impLine := spec.Line{line.Index, cleanLine + strings.Repeat("▒", spaces), line.Skip}
 				result = append(result, Alert{LEVEL_NOTICE, "Line contains spaces at the end of line", impLine})
 			}
 		}
@@ -275,15 +277,15 @@ func checkForHeaderTags(s *spec.Spec) []Alert {
 	for _, header := range s.GetHeaders() {
 		if header.Package == "" {
 			if !containsTag(header.Data, "URL:") {
-				result = append(result, Alert{LEVEL_ERROR, "Main package must contain URL tag", spec.Line{-1, ""}})
+				result = append(result, Alert{LEVEL_ERROR, "Main package must contain URL tag", emptyLine})
 			}
 		}
 
 		if !containsTag(header.Data, "Group:") {
 			if header.Package == "" {
-				result = append(result, Alert{LEVEL_WARNING, "Main package must contain Group tag", spec.Line{-1, ""}})
+				result = append(result, Alert{LEVEL_WARNING, "Main package must contain Group tag", emptyLine})
 			} else {
-				result = append(result, Alert{LEVEL_WARNING, fmt.Sprintf("Package %s must contain Group tag", header.Package), spec.Line{-1, ""}})
+				result = append(result, Alert{LEVEL_WARNING, fmt.Sprintf("Package %s must contain Group tag", header.Package), emptyLine})
 			}
 		}
 	}

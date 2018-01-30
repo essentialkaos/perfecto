@@ -43,9 +43,9 @@ func (s *SpecSuite) TestParsing(c *C) {
 
 	c.Assert(spec.GetFileName(), Equals, "test")
 
-	c.Assert(spec.GetLine(-1), DeepEquals, Line{-1, ""})
-	c.Assert(spec.GetLine(99), DeepEquals, Line{-1, ""})
-	c.Assert(spec.GetLine(34), DeepEquals, Line{34, "%{__make} %{?_smp_mflags}"})
+	c.Assert(spec.GetLine(-1), DeepEquals, Line{-1, "", false})
+	c.Assert(spec.GetLine(99), DeepEquals, Line{-1, "", false})
+	c.Assert(spec.GetLine(34), DeepEquals, Line{34, "%{__make} %{?_smp_mflags}", false})
 }
 
 func (s *SpecSuite) TestSections(c *C) {
@@ -66,6 +66,11 @@ func (s *SpecSuite) TestSections(c *C) {
 	c.Assert(sections[0].Name, Equals, "setup")
 	c.Assert(sections[0].Args, DeepEquals, []string{"-qn", "%{name}-%{version}"})
 	c.Assert(sections[0].Data, HasLen, 0)
+
+	name, subpackage := parsePackageName("%package abcd abcd abcd")
+
+	c.Assert(name, Equals, "")
+	c.Assert(subpackage, Equals, false)
 }
 
 func (s *SpecSuite) TestHeaders(c *C) {
@@ -89,4 +94,14 @@ func (s *SpecSuite) TestHeaders(c *C) {
 	pkgName, subPkg = parsePackageName("%package -n magic")
 	c.Assert(pkgName, Equals, "magic")
 	c.Assert(subPkg, Equals, false)
+}
+
+func (s *SpecSuite) TestSkipTag(c *C) {
+	c.Assert(isSkipTag("# perfecto:absolve 3"), Equals, true)
+	c.Assert(isSkipTag("# abcd 1"), Equals, false)
+
+	c.Assert(extractSkipCount("# perfecto:absolve"), Equals, 1)
+	c.Assert(extractSkipCount("# perfecto:absolve ABC"), Equals, 0)
+	c.Assert(extractSkipCount("# perfecto:absolve 1"), Equals, 1)
+	c.Assert(extractSkipCount("# perfecto:absolve 10"), Equals, 10)
 }
