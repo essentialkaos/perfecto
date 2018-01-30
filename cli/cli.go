@@ -44,6 +44,7 @@ const (
 	OPT_VER         = "v:version"
 )
 
+// Supported formats
 const (
 	FORMAT_SUMMARY = "summary"
 	FORMAT_TINY    = "tiny"

@@ -10,7 +10,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         0.0.1
+Version:         1.0.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -59,5 +59,10 @@ rm -rf %{buildroot}
 ################################################################################
 
 %changelog
+* Wed Jan 31 2018 Anton Novojilov <andy@essentialkaos.com> - 1.0.0-0
+- Added support of tag 'perfecto:absolve' for "absolving" some alerts
+- Improved spec parsing
+- Improved checks
+
 * Sun May 21 2017 Anton Novojilov <andy@essentialkaos.com> - 0.0.1-0
 - First public release
