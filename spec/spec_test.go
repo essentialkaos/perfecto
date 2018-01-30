@@ -66,11 +66,6 @@ func (s *SpecSuite) TestSections(c *C) {
 	c.Assert(sections[0].Name, Equals, "setup")
 	c.Assert(sections[0].Args, DeepEquals, []string{"-qn", "%{name}-%{version}"})
 	c.Assert(sections[0].Data, HasLen, 0)
-
-	name, subpackage := parsePackageName("%package abcd abcd abcd")
-
-	c.Assert(name, Equals, "")
-	c.Assert(subpackage, Equals, false)
 }
 
 func (s *SpecSuite) TestHeaders(c *C) {

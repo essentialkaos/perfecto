@@ -23,21 +23,26 @@ import (
 
 // Sections
 const (
-	SECTION_PREP        = "prep"
-	SECTION_SETUP       = "setup"
-	SECTION_BUILD       = "build"
-	SECTION_INSTALL     = "install"
-	SECTION_CHECK       = "check"
-	SECTION_CLEAN       = "clean"
-	SECTION_FILES       = "files"
-	SECTION_CHANGELOG   = "changelog"
-	SECTION_PACKAGE     = "package"
-	SECTION_DESCRIPTION = "description"
-	SECTION_PRETRANS    = "pretrans"
-	SECTION_PRE         = "pre"
-	SECTION_POST        = "post"
-	SECTION_POSTUN      = "postun"
-	SECTION_POSTTRANS   = "posttrans"
+	SECTION_BUILD         = "build"
+	SECTION_CHANGELOG     = "changelog"
+	SECTION_CHECK         = "check"
+	SECTION_CLEAN         = "clean"
+	SECTION_DESCRIPTION   = "description"
+	SECTION_FILES         = "files"
+	SECTION_INSTALL       = "install"
+	SECTION_PACKAGE       = "package"
+	SECTION_POST          = "post"
+	SECTION_POSTTRANS     = "posttrans"
+	SECTION_POSTUN        = "postun"
+	SECTION_PRE           = "pre"
+	SECTION_PREP          = "prep"
+	SECTION_PRETRANS      = "pretrans"
+	SECTION_PREUN         = "preun"
+	SECTION_SETUP         = "setup"
+	SECTION_TRIGGERIN     = "triggerin"
+	SECTION_TRIGGERPOSTUN = "triggerpostun"
+	SECTION_TRIGGERUN     = "triggerun"
+	SECTION_VERIFYSCRIPT  = "verifyscript"
 )
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -90,6 +95,9 @@ var sections = []string{
 	"preun",
 	"postun",
 	"posttrans",
+	"triggerin",
+	"triggerun",
+	"triggerpostun",
 }
 
 // tags is slice with header tags
@@ -195,6 +203,7 @@ func readFile(file string) (*Spec, error) {
 
 		if isSkipTag(text) {
 			skip = extractSkipCount(text)
+			skip++
 		}
 
 		spec.Data = append(spec.Data, Line{line, text, skip != 0})
@@ -351,14 +360,11 @@ func parseSectionName(text string) (string, []string) {
 
 // parsePackageName parse package name
 func parsePackageName(text string) (string, bool) {
-	switch strings.Count(text, " ") {
-	case 1:
-		return strutil.ReadField(text, 1, true), true
-	case 2:
+	if strutil.ReadField(text, 1, true) == "-n" {
 		return strutil.ReadField(text, 2, true), false
 	}
 
-	return "", false
+	return strutil.ReadField(text, 1, true), true
 }
 
 // isSectionMatch return true if data contains name of any given sections
