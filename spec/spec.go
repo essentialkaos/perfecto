@@ -69,9 +69,11 @@ type Header struct {
 
 // Section contains section info and data
 type Section struct {
-	Name string
-	Args []string
-	Data []Line
+	Name  string
+	Args  []string
+	Data  []Line
+	Start int
+	End   int
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -181,6 +183,19 @@ func (s *Spec) GetFileName() string {
 	return strings.Replace(path.Base(s.File), ".spec", "", -1)
 }
 
+// GetPackageName return package name if section is package specific
+func (s *Section) GetPackageName() string {
+	if len(s.Args) == 0 {
+		return ""
+	}
+
+	if s.Args[0] == "-n" && len(s.Args) > 1 {
+		return s.Args[1]
+	}
+
+	return s.Args[0]
+}
+
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // readFile read and parse spec file
@@ -265,6 +280,7 @@ func extractSections(s *Spec, names []string) []*Section {
 			if section != nil {
 				if start+1 <= index-1 {
 					section.Data = s.Data[start+1 : index-1]
+					section.Start, section.End = start+1, index
 				}
 				result = append(result, section)
 				section = nil
@@ -287,6 +303,7 @@ func extractSections(s *Spec, names []string) []*Section {
 
 	if section != nil {
 		section.Data = s.Data[start+1:]
+		section.Start, section.End = start+1, len(s.Data)
 		result = append(result, section)
 	}
 

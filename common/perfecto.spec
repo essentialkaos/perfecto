@@ -10,13 +10,13 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         1.0.0
+Version:         1.0.1
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
 URL:             https://github.com/essentialkaos/perfecto
 
-Source0:         https://source.kaos.io/%{name}/%{name}-%{version}.tar.bz2
+Source0:         https://source.kaos.st/%{name}/%{name}-%{version}.tar.bz2
 
 BuildRoot:       %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -59,6 +59,9 @@ rm -rf %{buildroot}
 ################################################################################
 
 %changelog
+* Thu Feb 08 2018 Anton Novojilov <andy@essentialkaos.com> - 1.0.1-0
+- Added check for defattr macro in files section
+
 * Wed Jan 31 2018 Anton Novojilov <andy@essentialkaos.com> - 1.0.0-0
 - Added support of tag 'perfecto:absolve' for "absolving" some alerts
 - Improved spec parsing

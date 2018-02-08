@@ -204,6 +204,17 @@ func (sc *CheckSuite) TestCheckForSeparatorLength(c *chk.C) {
 	c.Assert(alerts[0].Line.Index, chk.Equals, 63)
 }
 
+func (sc *CheckSuite) TestCheckForDefAttr(c *chk.C) {
+	s, err := spec.Read("../testdata/test_5.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts := checkForDefAttr(s)
+
+	c.Assert(alerts, chk.HasLen, 2)
+}
+
 func (sc *CheckSuite) TestAux(c *chk.C) {
-	c.Assert(getCheckers(), chk.HasLen, 12)
+	c.Assert(getCheckers(), chk.HasLen, 13)
 }
