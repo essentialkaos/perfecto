@@ -58,14 +58,19 @@ func (s *SpecSuite) TestSections(c *C) {
 	c.Assert(spec.HasSection(SECTION_CHECK), Equals, false)
 
 	sections := spec.GetSections()
-	c.Assert(sections, HasLen, 13)
+	c.Assert(sections, HasLen, 14)
 	sections = spec.GetSections(SECTION_BUILD)
 	c.Assert(sections, HasLen, 1)
 	c.Assert(sections[0].Data, HasLen, 1)
+	c.Assert(sections[0].Start, Equals, 33)
+	c.Assert(sections[0].End, Equals, 35)
 	sections = spec.GetSections(SECTION_SETUP)
 	c.Assert(sections[0].Name, Equals, "setup")
 	c.Assert(sections[0].Args, DeepEquals, []string{"-qn", "%{name}-%{version}"})
 	c.Assert(sections[0].Data, HasLen, 0)
+	sections = spec.GetSections(SECTION_FILES)
+	c.Assert(sections, HasLen, 2)
+	c.Assert(sections[1].GetPackageName(), Equals, "magic")
 }
 
 func (s *SpecSuite) TestHeaders(c *C) {
@@ -99,4 +104,13 @@ func (s *SpecSuite) TestSkipTag(c *C) {
 	c.Assert(extractSkipCount("# perfecto:absolve ABC"), Equals, 0)
 	c.Assert(extractSkipCount("# perfecto:absolve 1"), Equals, 1)
 	c.Assert(extractSkipCount("# perfecto:absolve 10"), Equals, 10)
+}
+
+func (s *SpecSuite) TestSectionPackageParsing(c *C) {
+	section := Section{"test", []string{}, []Line{}, 0, 0}
+	c.Assert(section.GetPackageName(), Equals, "")
+	section = Section{"test", []string{"test1"}, []Line{}, 0, 0}
+	c.Assert(section.GetPackageName(), Equals, "test1")
+	section = Section{"test", []string{"-n", "test2"}, []Line{}, 0, 0}
+	c.Assert(section.GetPackageName(), Equals, "test2")
 }

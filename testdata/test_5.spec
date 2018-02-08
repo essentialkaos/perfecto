@@ -27,6 +27,16 @@ Test subpackge for perfecto app.
 
 ################################################################################
 
+%package docs
+
+Summary:            Test subpackage for perfecto
+Group:              Documentation
+
+%description docs
+Test subpackge for perfecto app.
+
+################################################################################
+
 %prep
 %setup -qn %{name}-%{version}
 
@@ -54,12 +64,14 @@ rm -rf %{buildroot}
 ################################################################################
 
 %files
-%defattr(-,root,root,-)
 %{_bindir}/%{name}
 
 %files magic
-%defattr(-,root,root,-)
 %{_bindir}/%{name}-magic
+
+%files docs
+%defattr(-,root,root,-)
+%{_docdir}/%{name}
 
 ################################################################################
 

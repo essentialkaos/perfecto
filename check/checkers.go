@@ -71,6 +71,7 @@ func getCheckers() []Checker {
 		checkForUnescapedPercent,
 		checkForMacroDefenitionPosition,
 		checkForSeparatorLength,
+		checkForDefAttr,
 	}
 }
 
@@ -385,6 +386,36 @@ func checkForSeparatorLength(s *spec.Spec) []Alert {
 	for _, line := range s.Data {
 		if contains(line, "#") && strings.Trim(line.Text, "#") == "" && strings.Count(line.Text, "#") != 80 {
 			result = append(result, Alert{LEVEL_NOTICE, "Separator must be 80 symbols long", line})
+		}
+	}
+
+	return result
+}
+
+// checkForDefAttr check spec for %defattr macro in %files sections
+func checkForDefAttr(s *spec.Spec) []Alert {
+	var result []Alert
+
+	for _, section := range s.GetSections(spec.SECTION_FILES) {
+		hasDefAttr := false
+
+		for _, line := range section.Data {
+			if prefix(line, "%defattr") {
+				hasDefAttr = true
+			}
+		}
+
+		if hasDefAttr {
+			continue
+		}
+
+		packageName := section.GetPackageName()
+
+		switch packageName {
+		case "":
+			result = append(result, Alert{LEVEL_ERROR, "%files section must contains %defattr macro", emptyLine})
+		default:
+			result = append(result, Alert{LEVEL_ERROR, "%files section for package " + packageName + " must contains %defattr macro", emptyLine})
 		}
 	}
 
