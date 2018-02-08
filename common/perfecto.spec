@@ -60,7 +60,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Thu Feb 08 2018 Anton Novojilov <andy@essentialkaos.com> - 1.0.1-0
-- Added more checks
+- Added check for defattr macro in files section
 
 * Wed Jan 31 2018 Anton Novojilov <andy@essentialkaos.com> - 1.0.0-0
 - Added support of tag 'perfecto:absolve' for "absolving" some alerts
