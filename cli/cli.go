@@ -29,7 +29,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "1.0.1"
+	VER  = "1.0.2"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -372,6 +372,8 @@ func getExitCode(r *check.Report) int {
 		nonZero = maxLevel >= 3
 	case "critical":
 		nonZero = maxLevel == 4
+	default:
+		nonZero = maxLevel != 0
 	}
 
 	if nonZero {
