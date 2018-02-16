@@ -52,6 +52,13 @@ var pathMacroSlice = []macro{
 	{"/var", "%{_var}"},
 }
 
+var binariesAsMacro = []string{
+	"7zip", "bzip2", "bzr", "cat", "chgrp", "chmod", "chown", "cp", "cpio",
+	"file", "git", "grep", "gzip", "hg", "id", "install", "ld", "lrzip", "lzip",
+	"mkdir", "mv", "nm", "objcopy", "objdump", "patch", "perl", "python", "quilt",
+	"rm", "rsh", "sed", "semodule", "ssh", "strip", "tar", "unzip", "xz",
+}
+
 var emptyLine = spec.Line{-1, "", false}
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -72,6 +79,7 @@ func getCheckers() []Checker {
 		checkForMacroDefenitionPosition,
 		checkForSeparatorLength,
 		checkForDefAttr,
+		checkForUselessBinaryMacro,
 	}
 }
 
@@ -129,7 +137,11 @@ func checkForDist(s *spec.Spec) []Alert {
 
 	for _, header := range s.GetHeaders() {
 		for _, line := range header.Data {
-			if strings.HasPrefix(line.Text, "Release:") {
+			if isComment(line) {
+				continue
+			}
+
+			if prefix(line, "Release:") {
 				if !contains(line, "%{?dist}") {
 					result = append(result, Alert{LEVEL_ERROR, "Release tag must contains %{?dist} as part of release", line})
 				}
@@ -167,8 +179,12 @@ func checkForNonMacroPaths(s *spec.Spec) []Alert {
 
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {
+			if isComment(line) {
+				continue
+			}
+
 			// Ignore comments and env vars exports
-			if contains(line, "export") || prefix(line, "#") {
+			if contains(line, "export") {
 				continue
 			}
 
@@ -202,6 +218,10 @@ func checkForBuildRoot(s *spec.Spec) []Alert {
 
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {
+			if isComment(line) {
+				continue
+			}
+
 			if contains(line, "$RPM_BUILD_ROOT") {
 				result = append(result, Alert{LEVEL_ERROR, "Build root path must be used as macro %{buildroot}", line})
 			}
@@ -256,6 +276,10 @@ func checkChangelogHeaders(s *spec.Spec) []Alert {
 
 	for _, section := range s.GetSections(spec.SECTION_CHANGELOG) {
 		for _, line := range section.Data {
+			if isComment(line) {
+				continue
+			}
+
 			// Ignore changelog records text
 			if !prefix(line, "* ") {
 				continue
@@ -287,6 +311,10 @@ func checkForMakeMacro(s *spec.Spec) []Alert {
 
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {
+			if isComment(line) {
+				continue
+			}
+
 			if !contains(line, "make") {
 				continue
 			}
@@ -422,6 +450,21 @@ func checkForDefAttr(s *spec.Spec) []Alert {
 	return result
 }
 
+// checkForUselessBinaryMacro check spec for useless binary macro
+func checkForUselessBinaryMacro(s *spec.Spec) []Alert {
+	var result []Alert
+
+	for _, line := range s.Data {
+		for _, binary := range binariesAsMacro {
+			if contains(line, "%{__"+binary+"}") {
+				result = append(result, Alert{LEVEL_NOTICE, fmt.Sprintf("Useless macro %%{__%s} used for executing %s binary", binary, binary), line})
+			}
+		}
+	}
+
+	return result
+}
+
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // prefix is strings.HasPrefix wrapper
@@ -437,6 +480,11 @@ func contains(line spec.Line, value string) bool {
 // containsField return true if line contains given field
 func containsField(line spec.Line, value string) bool {
 	return sliceutil.Contains(strutil.Fields(line.Text), value)
+}
+
+// isComment return true if current line is commented
+func isComment(line spec.Line) bool {
+	return prefix(line, "#")
 }
 
 // containsTag check if data contains given tag

@@ -44,7 +44,7 @@ Test subpackge for perfecto app.
 %{__make} %{?_smp_mflags}
 
 %install
-rm -rf %{buildroot}
+%{__rm} -rf %{buildroot}
 
 %{make_install} PREFIX=%{buildroot}%{_prefix}
 
