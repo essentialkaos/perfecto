@@ -213,8 +213,25 @@ func (sc *CheckSuite) TestCheckForDefAttr(c *chk.C) {
 	alerts := checkForDefAttr(s)
 
 	c.Assert(alerts, chk.HasLen, 2)
+	c.Assert(alerts[0].Info, chk.Equals, "%files section must contains %defattr macro")
+	c.Assert(alerts[0].Line.Index, chk.Equals, -1)
+	c.Assert(alerts[1].Info, chk.Equals, "%files section for package magic must contains %defattr macro")
+	c.Assert(alerts[1].Line.Index, chk.Equals, -1)
+}
+
+func (sc *CheckSuite) TestCheckForUselessBinaryMacro(c *chk.C) {
+	s, err := spec.Read("../testdata/test_5.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts := checkForUselessBinaryMacro(s)
+
+	c.Assert(alerts, chk.HasLen, 1)
+	c.Assert(alerts[0].Info, chk.Equals, "Useless macro %{__rm} used for executing rm binary")
+	c.Assert(alerts[0].Line.Index, chk.Equals, 47)
 }
 
 func (sc *CheckSuite) TestAux(c *chk.C) {
-	c.Assert(getCheckers(), chk.HasLen, 13)
+	c.Assert(getCheckers(), chk.HasLen, 14)
 }

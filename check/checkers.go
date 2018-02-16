@@ -52,6 +52,13 @@ var pathMacroSlice = []macro{
 	{"/var", "%{_var}"},
 }
 
+var binariesAsMacro = []string{
+	"7zip", "bzip2", "bzr", "cat", "chgrp", "chmod", "chown", "cp", "cpio",
+	"file", "git", "grep", "gzip", "hg", "id", "install", "ld", "lrzip", "lzip",
+	"mkdir", "mv", "nm", "objcopy", "objdump", "patch", "perl", "python", "quilt",
+	"rm", "rsh", "sed", "semodule", "ssh", "strip", "tar", "unzip", "xz",
+}
+
 var emptyLine = spec.Line{-1, "", false}
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -72,6 +79,7 @@ func getCheckers() []Checker {
 		checkForMacroDefenitionPosition,
 		checkForSeparatorLength,
 		checkForDefAttr,
+		checkForUselessBinaryMacro,
 	}
 }
 
@@ -416,6 +424,21 @@ func checkForDefAttr(s *spec.Spec) []Alert {
 			result = append(result, Alert{LEVEL_ERROR, "%files section must contains %defattr macro", emptyLine})
 		default:
 			result = append(result, Alert{LEVEL_ERROR, "%files section for package " + packageName + " must contains %defattr macro", emptyLine})
+		}
+	}
+
+	return result
+}
+
+// checkForUselessBinaryMacro check spec for useless binary macro
+func checkForUselessBinaryMacro(s *spec.Spec) []Alert {
+	var result []Alert
+
+	for _, line := range s.Data {
+		for _, binary := range binariesAsMacro {
+			if contains(line, "%{__"+binary+"}") {
+				result = append(result, Alert{LEVEL_NOTICE, fmt.Sprintf("Useless macro %%{__%s} used for executing %s binary", binary, binary), line})
+			}
 		}
 	}
 

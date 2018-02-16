@@ -10,7 +10,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         1.0.2
+Version:         1.1.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -59,6 +59,9 @@ rm -rf %{buildroot}
 ################################################################################
 
 %changelog
+* Sat Feb 17 2018 Anton Novojilov <andy@essentialkaos.com> - 1.1.0-0
+- Added check for useless binary macro usage
+
 * Wed Feb 14 2018 Anton Novojilov <andy@essentialkaos.com> - 1.0.2-0
 - Fixed bug with selecting proper exit code if max alert level wasn't defined
 
