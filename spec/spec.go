@@ -279,7 +279,7 @@ func extractSections(s *Spec, names []string) []*Section {
 		if isSectionHeader(line.Text) {
 			if section != nil {
 				if start+1 <= index-1 {
-					section.Data = s.Data[start+1 : index-1]
+					section.Data = s.Data[start+1 : index]
 					section.Start, section.End = start+1, index
 				}
 				result = append(result, section)
