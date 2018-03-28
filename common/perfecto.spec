@@ -63,6 +63,7 @@ rm -rf %{buildroot}
 - Fixed bug with extracting sections names
 - Added check for empty sections
 - Added check for indent in files section
+- Added check for setup section arguments
 
 * Sat Feb 17 2018 Anton Novojilov <andy@essentialkaos.com> - 1.1.0-0
 - Added check for useless binary macro usage

@@ -258,7 +258,42 @@ func (sc *CheckSuite) TestCheckForIndentInFilesSection(c *chk.C) {
 	c.Assert(alerts[0].Line.Index, chk.Equals, 66)
 }
 
+func (sc *CheckSuite) TestCheckForSetupArguments(c *chk.C) {
+	s, err := spec.Read("../testdata/test_4.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts := checkForSetupArguments(s)
+
+	c.Assert(alerts, chk.HasLen, 1)
+	c.Assert(alerts[0].Info, chk.Equals, "Arguments \"-q -c -n\" can be simplified to \"-qcn\"")
+	c.Assert(alerts[0].Line.Index, chk.Equals, 33)
+
+	s, err = spec.Read("../testdata/test_5.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts = checkForSetupArguments(s)
+
+	c.Assert(alerts, chk.HasLen, 1)
+	c.Assert(alerts[0].Info, chk.Equals, "Arguments \"-c -n\" can be simplified to \"-cn\"")
+	c.Assert(alerts[0].Line.Index, chk.Equals, 41)
+
+	s, err = spec.Read("../testdata/test_6.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts = checkForSetupArguments(s)
+
+	c.Assert(alerts, chk.HasLen, 1)
+	c.Assert(alerts[0].Info, chk.Equals, "Arguments \"-q -n\" can be simplified to \"-qn\"")
+	c.Assert(alerts[0].Line.Index, chk.Equals, 31)
+}
+
 func (sc *CheckSuite) TestAux(c *chk.C) {
 	// This test will fail if new checkers was added
-	c.Assert(getCheckers(), chk.HasLen, 16)
+	c.Assert(getCheckers(), chk.HasLen, 17)
 }

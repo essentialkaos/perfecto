@@ -82,6 +82,7 @@ func getCheckers() []Checker {
 		checkForUselessBinaryMacro,
 		checkForEmptySections,
 		checkForIndentInFilesSection,
+		checkForSetupArguments,
 	}
 }
 
@@ -509,6 +510,24 @@ func checkForIndentInFilesSection(s *spec.Spec) []Alert {
 	return result
 }
 
+// checkForSetupArguments check setup arguments
+func checkForSetupArguments(s *spec.Spec) []Alert {
+	var result []Alert
+
+	for _, section := range s.GetSections(spec.SECTION_SETUP) {
+		switch {
+		case containsArgs(section, "-q", "-c", "-n"):
+			result = append(result, Alert{LEVEL_NOTICE, "Arguments \"-q -c -n\" can be simplified to \"-qcn\"", s.GetLine(section.Start)})
+		case containsArgs(section, "-q", "-n"):
+			result = append(result, Alert{LEVEL_NOTICE, "Arguments \"-q -n\" can be simplified to \"-qn\"", s.GetLine(section.Start)})
+		case containsArgs(section, "-c", "-n"):
+			result = append(result, Alert{LEVEL_NOTICE, "Arguments \"-c -n\" can be simplified to \"-cn\"", s.GetLine(section.Start)})
+		}
+	}
+
+	return result
+}
+
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // prefix is strings.HasPrefix wrapper
@@ -535,6 +554,17 @@ func isComment(line spec.Line) bool {
 func isEmptyData(data []spec.Line) bool {
 	for _, line := range data {
 		if strings.Replace(line.Text, " ", "", -1) != "" {
+			return false
+		}
+	}
+
+	return true
+}
+
+// containsArgs return true if section contains given args
+func containsArgs(section *spec.Section, args ...string) bool {
+	for _, arg := range args {
+		if !sliceutil.Contains(section.Args, arg) {
 			return false
 		}
 	}

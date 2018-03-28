@@ -30,7 +30,7 @@ Test subpackge for perfecto app.
 ################################################################################
 
 %prep
-%setup -qn %{name}-%{version}
+%setup -q -c -n %{name}-%{version}
 
 %define _system /usr/system
 
