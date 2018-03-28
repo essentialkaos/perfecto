@@ -80,6 +80,7 @@ func getCheckers() []Checker {
 		checkForSeparatorLength,
 		checkForDefAttr,
 		checkForUselessBinaryMacro,
+		checkForEmptySections,
 	}
 }
 
@@ -465,6 +466,34 @@ func checkForUselessBinaryMacro(s *spec.Spec) []Alert {
 	return result
 }
 
+// checkForEmptySections check spec for empty sections
+func checkForEmptySections(s *spec.Spec) []Alert {
+	var result []Alert
+
+	sections := []string{
+		spec.SECTION_CHECK,
+		spec.SECTION_POST,
+		spec.SECTION_POSTTRANS,
+		spec.SECTION_POSTUN,
+		spec.SECTION_PRE,
+		spec.SECTION_PRETRANS,
+		spec.SECTION_PREUN,
+		spec.SECTION_TRIGGERPOSTUN,
+		spec.SECTION_TRIGGERUN,
+		spec.SECTION_VERIFYSCRIPT,
+		spec.SECTION_VERIFYSCRIPT,
+	}
+
+	for _, section := range s.GetSections(sections...) {
+		fmt.Println(section.Name)
+		if len(section.Args) == 0 && isEmptyData(section.Data) {
+			result = append(result, Alert{LEVEL_ERROR, fmt.Sprintf("Section %%%s is empty", section.Name), s.GetLine(section.Start)})
+		}
+	}
+
+	return result
+}
+
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // prefix is strings.HasPrefix wrapper
@@ -485,6 +514,17 @@ func containsField(line spec.Line, value string) bool {
 // isComment return true if current line is commented
 func isComment(line spec.Line) bool {
 	return prefix(line, "#")
+}
+
+// isEmptyData check if data is empty or contains only spaces
+func isEmptyData(data []spec.Line) bool {
+	for _, line := range data {
+		if strings.Replace(line.Text, " ", "", -1) != "" {
+			return false
+		}
+	}
+
+	return true
 }
 
 // containsTag check if data contains given tag

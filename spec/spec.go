@@ -2,7 +2,7 @@ package spec
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 //                                                                                    //
-//                     Copyright (c) 2009-2017 ESSENTIAL KAOS                         //
+//                     Copyright (c) 2009-2018 ESSENTIAL KAOS                         //
 //        Essential Kaos Open Source License <https://essentialkaos.com/ekol>         //
 //                                                                                    //
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -286,7 +286,7 @@ func extractSections(s *Spec, names []string) []*Section {
 				section = nil
 			}
 
-			if !isSectionMatch(line.Text, names) {
+			if !isSectionMatch(strutil.ReadField(line.Text, 0, true, " "), names) {
 				continue
 			}
 
@@ -391,7 +391,7 @@ func isSectionMatch(data string, names []string) bool {
 	}
 
 	for _, name := range names {
-		if strings.HasPrefix(data, "%"+name) {
+		if data == "%"+name {
 			return true
 		}
 	}
