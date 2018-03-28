@@ -245,6 +245,20 @@ func (sc *CheckSuite) TestCheckForEmptySections(c *chk.C) {
 	c.Assert(alerts[0].Line.Index, chk.Equals, 45)
 }
 
+func (sc *CheckSuite) TestCheckForIndentInFilesSection(c *chk.C) {
+	s, err := spec.Read("../testdata/test_6.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts := checkForIndentInFilesSection(s)
+
+	c.Assert(alerts, chk.HasLen, 1)
+	c.Assert(alerts[0].Info, chk.Equals, "Don't use indent in %files section")
+	c.Assert(alerts[0].Line.Index, chk.Equals, 66)
+}
+
 func (sc *CheckSuite) TestAux(c *chk.C) {
-	c.Assert(getCheckers(), chk.HasLen, 15)
+	// This test will fail if new checkers was added
+	c.Assert(getCheckers(), chk.HasLen, 16)
 }

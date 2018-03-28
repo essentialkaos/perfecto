@@ -63,7 +63,7 @@ rm -rf %{buildroot}
 
 %files magic
 %defattr(-,root,root,-)
-%{_bindir}/%{name}-magic
+  %{_bindir}/%{name}-magic
 
 ################################################################################
 

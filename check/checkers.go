@@ -81,6 +81,7 @@ func getCheckers() []Checker {
 		checkForDefAttr,
 		checkForUselessBinaryMacro,
 		checkForEmptySections,
+		checkForIndentInFilesSection,
 	}
 }
 
@@ -485,9 +486,23 @@ func checkForEmptySections(s *spec.Spec) []Alert {
 	}
 
 	for _, section := range s.GetSections(sections...) {
-		fmt.Println(section.Name)
 		if len(section.Args) == 0 && isEmptyData(section.Data) {
 			result = append(result, Alert{LEVEL_ERROR, fmt.Sprintf("Section %%%s is empty", section.Name), s.GetLine(section.Start)})
+		}
+	}
+
+	return result
+}
+
+// checkForIndentInFilesSection check spec for prefixes in %files section
+func checkForIndentInFilesSection(s *spec.Spec) []Alert {
+	var result []Alert
+
+	for _, section := range s.GetSections(spec.SECTION_FILES) {
+		for _, line := range section.Data {
+			if strings.HasPrefix(line.Text, " ") || strings.HasPrefix(line.Text, "\t") {
+				result = append(result, Alert{LEVEL_NOTICE, "Don't use indent in %files section", line})
+			}
 		}
 	}
 
