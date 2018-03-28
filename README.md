@@ -56,6 +56,28 @@ go get -u github.com/essentialkaos/perfecto
 
 You can download prebuilt binaries for Linux and OS X from [EK Apps Repository](https://apps.kaos.st/perfecto/latest).
 
+### Using on TravisCI
+
+For using latest stable version _perfecto_ on TravisCI use this `.travis.yml` file:
+
+```yaml
+language: bash
+
+cache: apt
+
+before_install:
+  - echo "deb http://us.archive.ubuntu.com/ubuntu xenial main universe" | sudo tee -a /etc/apt/sources.list
+  - sudo apt-get update -qq
+  - sudo apt-get install -y rpmlint
+  - sudo ln -sf /usr/bin/python2.7 /usr/bin/python2.6
+  - wget https://apps.kaos.st/perfecto/latest/linux/x86_64/perfecto
+  - chmod +x perfecto
+  - ./perfecto -v
+
+script:
+  - ./perfecto PATH_TO_YOUR_SPEC_HERE
+```
+
 ### Usage
 
 ```
