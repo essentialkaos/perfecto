@@ -1,6 +1,6 @@
 <p align="center"><a href="#readme"><img src="https://gh.kaos.st/perfecto.svg"/></a></p>
 
-<p align="center"><a href="#installing">Installing</a> • <a href="#usage">Usage</a> • <a href="#build-status">Build Status</a> • <a href="#license">License</a></p>
+<p align="center"><a href="#installing">Installing</a> • <a href="#using-on-travisci">Using on TravisCI</a> • <a href="#usage">Usage</a> • <a href="#build-status">Build Status</a> • <a href="#license">License</a></p>
 
 <p align="center">
   <a href="https://goreportcard.com/report/github.com/essentialkaos/perfecto"><img src="https://goreportcard.com/badge/github.com/essentialkaos/perfecto"></a>
