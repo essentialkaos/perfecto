@@ -1,6 +1,6 @@
 <p align="center"><a href="#readme"><img src="https://gh.kaos.st/perfecto.svg"/></a></p>
 
-<p align="center"><a href="#installing">Installing</a> • <a href="#usage">Usage</a> • <a href="#build-status">Build Status</a> • <a href="#license">License</a></p>
+<p align="center"><a href="#installing">Installing</a> • <a href="#using-on-travisci">Using on TravisCI</a> • <a href="#usage">Usage</a> • <a href="#build-status">Build Status</a> • <a href="#license">License</a></p>
 
 <p align="center">
   <a href="https://goreportcard.com/report/github.com/essentialkaos/perfecto"><img src="https://goreportcard.com/badge/github.com/essentialkaos/perfecto"></a>
@@ -55,6 +55,28 @@ go get -u github.com/essentialkaos/perfecto
 #### Prebuilt binaries
 
 You can download prebuilt binaries for Linux and OS X from [EK Apps Repository](https://apps.kaos.st/perfecto/latest).
+
+### Using on TravisCI
+
+For using latest stable version _perfecto_ on TravisCI use this `.travis.yml` file:
+
+```yaml
+language: bash
+
+cache: apt
+
+before_install:
+  - echo "deb http://us.archive.ubuntu.com/ubuntu xenial main universe" | sudo tee -a /etc/apt/sources.list
+  - sudo apt-get update -qq
+  - sudo apt-get install -y rpmlint
+  - sudo ln -sf /usr/bin/python2.7 /usr/bin/python2.6
+  - wget https://apps.kaos.st/perfecto/latest/linux/x86_64/perfecto
+  - chmod +x perfecto
+  - ./perfecto -v
+
+script:
+  - ./perfecto PATH_TO_YOUR_SPEC_HERE
+```
 
 ### Usage
 

@@ -80,6 +80,9 @@ func getCheckers() []Checker {
 		checkForSeparatorLength,
 		checkForDefAttr,
 		checkForUselessBinaryMacro,
+		checkForEmptySections,
+		checkForIndentInFilesSection,
+		checkForSetupArguments,
 	}
 }
 
@@ -465,6 +468,66 @@ func checkForUselessBinaryMacro(s *spec.Spec) []Alert {
 	return result
 }
 
+// checkForEmptySections check spec for empty sections
+func checkForEmptySections(s *spec.Spec) []Alert {
+	var result []Alert
+
+	sections := []string{
+		spec.SECTION_CHECK,
+		spec.SECTION_POST,
+		spec.SECTION_POSTTRANS,
+		spec.SECTION_POSTUN,
+		spec.SECTION_PRE,
+		spec.SECTION_PRETRANS,
+		spec.SECTION_PREUN,
+		spec.SECTION_TRIGGERPOSTUN,
+		spec.SECTION_TRIGGERUN,
+		spec.SECTION_VERIFYSCRIPT,
+		spec.SECTION_VERIFYSCRIPT,
+	}
+
+	for _, section := range s.GetSections(sections...) {
+		if len(section.Args) == 0 && isEmptyData(section.Data) {
+			result = append(result, Alert{LEVEL_ERROR, fmt.Sprintf("Section %%%s is empty", section.Name), s.GetLine(section.Start)})
+		}
+	}
+
+	return result
+}
+
+// checkForIndentInFilesSection check spec for prefixes in %files section
+func checkForIndentInFilesSection(s *spec.Spec) []Alert {
+	var result []Alert
+
+	for _, section := range s.GetSections(spec.SECTION_FILES) {
+		for _, line := range section.Data {
+			if strings.HasPrefix(line.Text, " ") || strings.HasPrefix(line.Text, "\t") {
+				result = append(result, Alert{LEVEL_NOTICE, "Don't use indent in %files section", line})
+			}
+		}
+	}
+
+	return result
+}
+
+// checkForSetupArguments check setup arguments
+func checkForSetupArguments(s *spec.Spec) []Alert {
+	var result []Alert
+
+	for _, section := range s.GetSections(spec.SECTION_SETUP) {
+		switch {
+		case containsArgs(section, "-q", "-c", "-n"):
+			result = append(result, Alert{LEVEL_NOTICE, "Arguments \"-q -c -n\" can be simplified to \"-qcn\"", s.GetLine(section.Start)})
+		case containsArgs(section, "-q", "-n"):
+			result = append(result, Alert{LEVEL_NOTICE, "Arguments \"-q -n\" can be simplified to \"-qn\"", s.GetLine(section.Start)})
+		case containsArgs(section, "-c", "-n"):
+			result = append(result, Alert{LEVEL_NOTICE, "Arguments \"-c -n\" can be simplified to \"-cn\"", s.GetLine(section.Start)})
+		}
+	}
+
+	return result
+}
+
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // prefix is strings.HasPrefix wrapper
@@ -485,6 +548,28 @@ func containsField(line spec.Line, value string) bool {
 // isComment return true if current line is commented
 func isComment(line spec.Line) bool {
 	return prefix(line, "#")
+}
+
+// isEmptyData check if data is empty or contains only spaces
+func isEmptyData(data []spec.Line) bool {
+	for _, line := range data {
+		if strings.Replace(line.Text, " ", "", -1) != "" {
+			return false
+		}
+	}
+
+	return true
+}
+
+// containsArgs return true if section contains given args
+func containsArgs(section *spec.Section, args ...string) bool {
+	for _, arg := range args {
+		if !sliceutil.Contains(section.Args, arg) {
+			return false
+		}
+	}
+
+	return true
 }
 
 // containsTag check if data contains given tag

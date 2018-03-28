@@ -17,7 +17,6 @@ Test spec for perfecto app.
 
 ################################################################################
 
-%if 1
 %package magic
 
 Summary:            Test subpackage for perfecto
@@ -25,14 +24,11 @@ Group:              System Environment/Base
 
 %description magic
 Test subpackge for perfecto app.
-%endif
 
 ################################################################################
 
 %prep
-%setup -q -c -n %{name}-%{version}
-
-%define _system /usr/system
+%setup -q -n %{name}-%{version}
 
 %build
 %{__make} %{?_smp_mflags}
@@ -43,7 +39,12 @@ rm -rf %{buildroot}
 %{make_install} PREFIX=%{buildroot}%{_prefix}
 
 %clean
+# perfecto:absolve 2
 rm -rf %{buildroot}
+
+%check
+
+
 
 %post
 %{__chkconfig} --add %{name} &>/dev/null || :
@@ -60,8 +61,12 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 %{_bindir}/%{name}
 
-###############################################################################
+%files magic
+%defattr(-,root,root,-)
+  %{_bindir}/%{name}-magic
+
+################################################################################
 
 %changelog
 * Wed Jan 24 2018 Anton Novojilov <andy@essentialkaos.com> - 1.0.0-0
-- Test changelog %record
+- Test changelog record

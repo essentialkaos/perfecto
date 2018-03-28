@@ -38,7 +38,7 @@ Test subpackge for perfecto app.
 ################################################################################
 
 %prep
-%setup -qn %{name}-%{version}
+%setup -c -n %{name}-%{version}
 
 %build
 %{__make} %{?_smp_mflags}

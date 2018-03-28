@@ -2,7 +2,7 @@ package spec
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 //                                                                                    //
-//                     Copyright (c) 2009-2017 ESSENTIAL KAOS                         //
+//                     Copyright (c) 2009-2018 ESSENTIAL KAOS                         //
 //        Essential Kaos Open Source License <https://essentialkaos.com/ekol>         //
 //                                                                                    //
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -61,13 +61,13 @@ func (s *SpecSuite) TestSections(c *C) {
 	c.Assert(sections, HasLen, 14)
 	sections = spec.GetSections(SECTION_BUILD)
 	c.Assert(sections, HasLen, 1)
-	c.Assert(sections[0].Data, HasLen, 1)
+	c.Assert(sections[0].Data, HasLen, 2)
 	c.Assert(sections[0].Start, Equals, 33)
 	c.Assert(sections[0].End, Equals, 35)
 	sections = spec.GetSections(SECTION_SETUP)
 	c.Assert(sections[0].Name, Equals, "setup")
 	c.Assert(sections[0].Args, DeepEquals, []string{"-qn", "%{name}-%{version}"})
-	c.Assert(sections[0].Data, HasLen, 0)
+	c.Assert(sections[0].Data, HasLen, 1)
 	sections = spec.GetSections(SECTION_FILES)
 	c.Assert(sections, HasLen, 2)
 	c.Assert(sections[1].GetPackageName(), Equals, "magic")
