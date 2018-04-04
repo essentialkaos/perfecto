@@ -260,12 +260,23 @@ func checkForDevNull(s *spec.Spec) []Alert {
 		spec.SECTION_VERIFYSCRIPT,
 	}
 
-	devNull := strings.Replace(">/dev/null 2>&1 || :", " ", "", -1)
+	variations := []string{
+		">/dev/null 2>&1",
+		"2>&1 >/dev/null",
+		">/dev/null 2>/dev/null",
+		"2>/dev/null >/dev/null",
+	}
 
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {
-			if strings.Contains(strings.Replace(line.Text, " ", "", -1), devNull) {
-				result = append(result, Alert{LEVEL_NOTICE, "Use \"&>/dev/null || :\" instead of \">/dev/null 2>&1 || :\"", line})
+			for _, v := range variations {
+				if strings.Contains(strings.Replace(line.Text, " ", "", -1), strings.Replace(v, " ", "", -1)) {
+					result = append(result, Alert{LEVEL_NOTICE, fmt.Sprintf("Use \"&>/dev/null || :\" instead of \"%s || :\"", v), line})
+				}
+			}
+
+			if contains(line, "|| exit 0") {
+				result = append(result, Alert{LEVEL_NOTICE, "Use \" || :\" instead of \" || exit 0\"", line})
 			}
 		}
 	}

@@ -44,6 +44,9 @@ install -pm file %{buildroot}/etc/
 %{__sed} -i -e 's|/usr/bin/traceroute|/bin/traceroute|' %{buildroot}%{_sysconfdir}/file
 
 rm -f %{buildroot}/%{_usr}/file >/dev/null 2>&1 || :
+rm -f %{buildroot}%{_usr}/file 2>&1 >/dev/null
+rm -f %{buildroot}%{_usr}/file >/dev/null  2>/dev/null
+rm -f %{buildroot}%{_usr}/file 2>/dev/null >/dev/null || exit 0
 
 %clean
 rm -rf %{buildroot}
