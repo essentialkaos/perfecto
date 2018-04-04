@@ -10,7 +10,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         1.2.0
+Version:         1.3.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -59,6 +59,9 @@ rm -rf %{buildroot}
 ################################################################################
 
 %changelog
+* Thu Apr 05 2018 Anton Novojilov <andy@essentialkaos.com> - 1.3.0-0
+- Improved check for output redirect to /dev/null
+
 * Wed Mar 28 2018 Anton Novojilov <andy@essentialkaos.com> - 1.2.0-0
 - Fixed bug with extracting sections names
 - Fixed bug with extracting section data

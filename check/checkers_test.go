@@ -107,9 +107,17 @@ func (sc *CheckSuite) TestCheckForDevNull(c *chk.C) {
 
 	alerts := checkForDevNull(s)
 
-	c.Assert(alerts, chk.HasLen, 1)
+	c.Assert(alerts, chk.HasLen, 5)
 	c.Assert(alerts[0].Info, chk.Equals, "Use \"&>/dev/null || :\" instead of \">/dev/null 2>&1 || :\"")
 	c.Assert(alerts[0].Line.Index, chk.Equals, 46)
+	c.Assert(alerts[1].Info, chk.Equals, "Use \"&>/dev/null || :\" instead of \"2>&1 >/dev/null || :\"")
+	c.Assert(alerts[1].Line.Index, chk.Equals, 47)
+	c.Assert(alerts[2].Info, chk.Equals, "Use \"&>/dev/null || :\" instead of \">/dev/null 2>/dev/null || :\"")
+	c.Assert(alerts[2].Line.Index, chk.Equals, 48)
+	c.Assert(alerts[3].Info, chk.Equals, "Use \"&>/dev/null || :\" instead of \"2>/dev/null >/dev/null || :\"")
+	c.Assert(alerts[3].Line.Index, chk.Equals, 49)
+	c.Assert(alerts[4].Info, chk.Equals, "Use \" || :\" instead of \" || exit 0\"")
+	c.Assert(alerts[4].Line.Index, chk.Equals, 49)
 }
 
 func (sc *CheckSuite) TestCheckChangelogHeaders(c *chk.C) {
@@ -122,9 +130,9 @@ func (sc *CheckSuite) TestCheckChangelogHeaders(c *chk.C) {
 
 	c.Assert(alerts, chk.HasLen, 2)
 	c.Assert(alerts[0].Info, chk.Equals, "Changelog record header must contain release")
-	c.Assert(alerts[0].Line.Index, chk.Equals, 69)
+	c.Assert(alerts[0].Line.Index, chk.Equals, 72)
 	c.Assert(alerts[1].Info, chk.Equals, "Misformatted changelog record header")
-	c.Assert(alerts[1].Line.Index, chk.Equals, 72)
+	c.Assert(alerts[1].Line.Index, chk.Equals, 75)
 }
 
 func (sc *CheckSuite) TestCheckForMakeMacro(c *chk.C) {
