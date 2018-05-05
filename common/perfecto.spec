@@ -10,7 +10,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         1.3.0
+Version:         2.0.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -20,7 +20,7 @@ Source0:         https://source.kaos.st/%{name}/%{name}-%{version}.tar.bz2
 
 BuildRoot:       %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:   golang >= 1.9
+BuildRequires:   golang >= 1.10
 
 Requires:        rpmlint
 
@@ -59,6 +59,10 @@ rm -rf %{buildroot}
 ################################################################################
 
 %changelog
+* Sun May 06 2018 Anton Novojilov <andy@essentialkaos.com> - 2.0.0-0
+- Added short format output
+- Code refactoring
+
 * Thu Apr 05 2018 Anton Novojilov <andy@essentialkaos.com> - 1.3.0-0
 - Improved check for output redirect to /dev/null
 
