@@ -121,9 +121,10 @@ func process(file string) {
 	}
 
 	report := check.Check(s, !options.GetB(OPT_NO_LINT), options.GetS(OPT_LINT_CONFIG))
+	format := options.GetS(OPT_FORMAT)
 
 	if report.IsPerfect() {
-		switch options.GetS(OPT_FORMAT) {
+		switch format {
 		case FORMAT_TINY:
 			fmtc.Printf("%24s: {g}✔ {!}\n", s.GetFileName())
 		case FORMAT_JSON:
@@ -131,14 +132,16 @@ func process(file string) {
 		case FORMAT_XML:
 			fmtc.Println(`<?xml version="1.0" encoding="UTF-8"?>`)
 			fmtc.Println("<alerts>\n</alerts>")
-		default:
+		case "", FORMAT_SUMMARY, FORMAT_SHORT:
 			fmtc.Println("{g}This spec is perfect!{!}")
+		default:
+			printErrorAndExit("Output format \"%s\" is not supported", format)
 		}
 
 		os.Exit(0)
 	}
 
-	switch options.GetS(OPT_FORMAT) {
+	switch format {
 	case FORMAT_SUMMARY:
 		renderSummary(report)
 	case FORMAT_TINY:
@@ -149,8 +152,10 @@ func process(file string) {
 		renderJSONReport(report)
 	case FORMAT_XML:
 		renderXMLReport(report)
-	default:
+	case "":
 		renderFullReport(report)
+	default:
+		printErrorAndExit("Output format \"%s\" is not supported", format)
 	}
 
 	os.Exit(getExitCode(report))
