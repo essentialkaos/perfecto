@@ -120,6 +120,51 @@ func renderShortReport(r *check.Report) {
 	renderSummary(r)
 }
 
+// renderTinyReport render tiny report (useful for mass check)
+func renderTinyReport(s *spec.Spec, r *check.Report) {
+	fmtc.Printf("%24s: ", s.GetFileName())
+
+	categories := map[uint8][]check.Alert{
+		check.LEVEL_NOTICE:   r.Notices,
+		check.LEVEL_WARNING:  r.Warnings,
+		check.LEVEL_ERROR:    r.Errors,
+		check.LEVEL_CRITICAL: r.Criticals,
+	}
+
+	levels := []uint8{
+		check.LEVEL_NOTICE,
+		check.LEVEL_WARNING,
+		check.LEVEL_ERROR,
+		check.LEVEL_CRITICAL,
+	}
+
+	for _, level := range levels {
+		alerts := categories[level]
+
+		if len(alerts) == 0 {
+			continue
+		}
+
+		for _, alert := range alerts {
+			if options.GetB(OPT_NO_COLOR) {
+				if alert.Line.Skip {
+					fmtc.Printf("X ")
+				} else {
+					fmtc.Printf(fallbackLevel[level] + " ")
+				}
+			} else {
+				if alert.Line.Skip {
+					fmtc.Printf("{s-}%s{!}", "•")
+				} else {
+					fmtc.Printf(fgColor[level]+"%s{!}", "•")
+				}
+			}
+		}
+	}
+
+	fmtc.NewLine()
+}
+
 // renderHeader render header
 func renderHeader(level uint8, count int) {
 	header := headers[level] + fmt.Sprintf(" (%d)", count)
@@ -237,49 +282,4 @@ func renderSummary(r *check.Report) {
 	}
 
 	fmtc.Println(strings.Join(result, "{s-} • {!}"))
-}
-
-// renderTinyReport render tiny report (useful for mass check)
-func renderTinyReport(s *spec.Spec, r *check.Report) {
-	fmtc.Printf("%24s: ", s.GetFileName())
-
-	categories := map[uint8][]check.Alert{
-		check.LEVEL_NOTICE:   r.Notices,
-		check.LEVEL_WARNING:  r.Warnings,
-		check.LEVEL_ERROR:    r.Errors,
-		check.LEVEL_CRITICAL: r.Criticals,
-	}
-
-	levels := []uint8{
-		check.LEVEL_NOTICE,
-		check.LEVEL_WARNING,
-		check.LEVEL_ERROR,
-		check.LEVEL_CRITICAL,
-	}
-
-	for _, level := range levels {
-		alerts := categories[level]
-
-		if len(alerts) == 0 {
-			continue
-		}
-
-		for _, alert := range alerts {
-			if options.GetB(OPT_NO_COLOR) {
-				if alert.Line.Skip {
-					fmtc.Printf("X ")
-				} else {
-					fmtc.Printf(fallbackLevel[level] + " ")
-				}
-			} else {
-				if alert.Line.Skip {
-					fmtc.Printf("{s-}%s{!}", "•")
-				} else {
-					fmtc.Printf(fgColor[level]+"%s{!}", "•")
-				}
-			}
-		}
-	}
-
-	fmtc.NewLine()
 }

@@ -60,7 +60,10 @@ rm -rf %{buildroot}
 
 %changelog
 * Sun May 06 2018 Anton Novojilov <andy@essentialkaos.com> - 2.0.0-0
-- Added short format output
+- Added short format support
+- Added JSON format support
+- Added XML format support
+- Fixed bug with help content generation
 - Code refactoring
 
 * Thu Apr 05 2018 Anton Novojilov <andy@essentialkaos.com> - 1.3.0-0

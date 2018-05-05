@@ -46,6 +46,9 @@ const (
 	FORMAT_SUMMARY = "summary"
 	FORMAT_SHORT   = "short"
 	FORMAT_TINY    = "tiny"
+
+	FORMAT_JSON = "json"
+	FORMAT_XML  = "xml"
 )
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -120,9 +123,15 @@ func process(file string) {
 	report := check.Check(s, !options.GetB(OPT_NO_LINT), options.GetS(OPT_LINT_CONFIG))
 
 	if report.IsPerfect() {
-		if options.GetS(OPT_FORMAT) == FORMAT_TINY {
+		switch options.GetS(OPT_FORMAT) {
+		case FORMAT_TINY:
 			fmtc.Printf("%24s: {g}✔ {!}\n", s.GetFileName())
-		} else {
+		case FORMAT_JSON:
+			fmtc.Println("{}")
+		case FORMAT_XML:
+			fmtc.Println(`<?xml version="1.0" encoding="UTF-8"?>`)
+			fmtc.Println("<alerts>\n</alerts>")
+		default:
 			fmtc.Println("{g}This spec is perfect!{!}")
 		}
 
@@ -136,6 +145,10 @@ func process(file string) {
 		renderTinyReport(s, report)
 	case FORMAT_SHORT:
 		renderShortReport(report)
+	case FORMAT_JSON:
+		renderJSONReport(report)
+	case FORMAT_XML:
+		renderXMLReport(report)
 	default:
 		renderFullReport(report)
 	}
@@ -221,9 +234,9 @@ func printErrorAndExit(f string, a ...interface{}) {
 
 // showUsage show usage info
 func showUsage() {
-	info := usage.NewInfo("spec-file")
+	info := usage.NewInfo("", "spec-file")
 
-	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny|short){!}", "format")
+	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny|short|json|xml){!}", "format")
 	info.AddOption(OPT_LINT_CONFIG, "Path to rpmlint configuration file", "file")
 	info.AddOption(OPT_ERROR_LEVEL, "Return non-zero exit code if alert level greater than given {s-}(notice|warning|error|critical){!}", "level")
 	info.AddOption(OPT_NO_LINT, "Disable rpmlint checks")
@@ -232,6 +245,7 @@ func showUsage() {
 	info.AddOption(OPT_VER, "Show version")
 
 	info.AddExample("app.spec", "Check spec and print extended report")
+
 	info.AddExample(
 		"--no-lint app.spec",
 		"Check spec without rpmlint and print extended report",
@@ -239,6 +253,11 @@ func showUsage() {
 
 	info.AddExample("--format tiny app.spec", "Check spec and print tiny report")
 	info.AddExample("--format summary app.spec", "Check spec and print summary")
+
+	info.AddExample(
+		"--format json app.spec 1> report.json",
+		"Check spec, generate report in JSON format and save as report.json",
+	)
 
 	info.Render()
 }

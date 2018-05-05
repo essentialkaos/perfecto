@@ -55,9 +55,9 @@ type Spec struct {
 
 // Line contains line data and index
 type Line struct {
-	Index int
-	Text  string
-	Skip  bool
+	Index int    `json:"index"`
+	Text  string `json:"text"`
+	Skip  bool   `json:"skip"`
 }
 
 // Header header contains header info and data

@@ -27,17 +27,17 @@ const (
 
 // Report contain alerts
 type Report struct {
-	Notices   []Alert
-	Warnings  []Alert
-	Errors    []Alert
-	Criticals []Alert
+	Notices   []Alert `json:"notices,omitempty"`
+	Warnings  []Alert `json:"warnings,omitempty"`
+	Errors    []Alert `json:"errors,omitempty"`
+	Criticals []Alert `json:"criticals,omitempty"`
 }
 
 // Alert contain basic alert info
 type Alert struct {
-	Level uint8
-	Info  string
-	Line  spec.Line
+	Level uint8     `json:"level"`
+	Info  string    `json:"info"`
+	Line  spec.Line `json:"line"`
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
