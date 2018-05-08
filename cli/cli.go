@@ -173,6 +173,7 @@ func process(file string) {
 // getExitCode
 func getExitCode(r *check.Report) int {
 	var maxLevel int
+	var nonZero bool
 
 	switch {
 	case countAlerts(r.Criticals) != 0:
@@ -184,10 +185,6 @@ func getExitCode(r *check.Report) int {
 	case countAlerts(r.Notices) != 0:
 		maxLevel = 1
 	}
-
-	fmtc.Println(maxLevel, options.GetS(OPT_ERROR_LEVEL))
-
-	var nonZero bool
 
 	switch options.GetS(OPT_ERROR_LEVEL) {
 	case LEVEL_NOTICE:
