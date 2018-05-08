@@ -26,7 +26,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "2.0.0"
+	VER  = "2.0.1"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -51,8 +51,17 @@ const (
 	FORMAT_XML  = "xml"
 )
 
+// Levels
+const (
+	LEVEL_NOTICE   = "notice"
+	LEVEL_WARNING  = "warning"
+	LEVEL_ERROR    = "error"
+	LEVEL_CRITICAL = "critical"
+)
+
 // ////////////////////////////////////////////////////////////////////////////////// //
 
+// options map
 var optMap = options.Map{
 	OPT_FORMAT:      {Type: options.STRING},
 	OPT_LINT_CONFIG: {Type: options.STRING},
@@ -176,16 +185,18 @@ func getExitCode(r *check.Report) int {
 		maxLevel = 1
 	}
 
+	fmtc.Println(maxLevel, options.GetS(OPT_ERROR_LEVEL))
+
 	var nonZero bool
 
 	switch options.GetS(OPT_ERROR_LEVEL) {
-	case "notice":
+	case LEVEL_NOTICE:
 		nonZero = maxLevel >= 1
-	case "warning":
+	case LEVEL_WARNING:
 		nonZero = maxLevel >= 2
-	case "errror":
+	case LEVEL_ERROR:
 		nonZero = maxLevel >= 3
-	case "critical":
+	case LEVEL_CRITICAL:
 		nonZero = maxLevel == 4
 	default:
 		nonZero = maxLevel != 0
