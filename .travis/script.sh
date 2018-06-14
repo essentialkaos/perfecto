@@ -17,6 +17,15 @@ installCodeclimateTestReporter() {
     exit 1
   fi
 
+  echo "Installing latest version of goveralls..."
+
+  go get -v github.com/mattn/goveralls
+
+  if [[ $? -ne 0 ]] ; then
+    echo "[ERROR] Can't install goveralls"
+    exit 1
+  fi
+
   echo ""
 }
 
@@ -48,6 +57,7 @@ testWithCover() {
 
   echo -e "\nSending coverage data to Codebeat..."
 
+  goveralls -service travis-ci -repotoken $COVERALLS_TOKEN -coverprofile coverage.txt
   codeclimate-test-reporter < coverage.txt
 }
 
