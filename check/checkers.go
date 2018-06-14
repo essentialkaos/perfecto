@@ -379,6 +379,8 @@ func checkForHeaderTags(s *spec.Spec) []Alert {
 	return result
 }
 
+// codebeat:disable[BLOCK_NESTING]
+
 // checkForUnescapedPercent check changelog and descriptions for unescaped percent symbol
 func checkForUnescapedPercent(s *spec.Spec) []Alert {
 	var result []Alert
@@ -397,6 +399,8 @@ func checkForUnescapedPercent(s *spec.Spec) []Alert {
 
 	return result
 }
+
+// codebeat:enable[BLOCK_NESTING]
 
 // checkForMacroDefenitionPosition check for macro defined after description
 func checkForMacroDefenitionPosition(s *spec.Spec) []Alert {

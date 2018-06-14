@@ -8,7 +8,7 @@ main() {
 }
 
 installCodeclimateTestReporter() {
-  echo "Installing latest version of codeclimate-test-reporter..."
+  echo "Installing latest version of codeclimate-test-reporter…"
 
   npm install -g codeclimate-test-reporter
 
@@ -17,7 +17,7 @@ installCodeclimateTestReporter() {
     exit 1
   fi
 
-  echo "Installing latest version of goveralls..."
+  echo "Installing latest version of goveralls…"
 
   go get -v github.com/mattn/goveralls
 
@@ -55,9 +55,12 @@ testWithCover() {
     exit 1
   fi
 
-  echo -e "\nSending coverage data to Codebeat..."
+  echo -e "\nSending coverage data to Coveralls…"
 
   goveralls -service travis-ci -repotoken $COVERALLS_TOKEN -coverprofile coverage.txt
+
+  echo -e "\nSending coverage data to Codebeat…"
+
   codeclimate-test-reporter < coverage.txt
 }
 
