@@ -25,7 +25,7 @@ Before the initial install allows git to use redirects for [pkg.re](https://gith
 git config --global http.https://pkg.re.followRedirects true
 ```
 
-Make sure you have a working Go 1.7+ workspace ([instructions](https://golang.org/doc/install)), then:
+Make sure you have a working Go 1.8+ workspace ([instructions](https://golang.org/doc/install)), then:
 
 ```
 go get github.com/essentialkaos/perfecto
@@ -41,14 +41,14 @@ go get -u github.com/essentialkaos/perfecto
 #### From ESSENTIAL KAOS Public repo for RHEL6/CentOS6
 
 ```bash
-[sudo] yum install -y https://yum.kaos.st/6/release/x86_64/kaos-repo-9.0-0.el6.noarch.rpm
+[sudo] yum install -y https://yum.kaos.st/6/release/x86_64/kaos-repo-9.1-0.el6.noarch.rpm
 [sudo] yum install perfecto
 ```
 
 #### From ESSENTIAL KAOS Public repo for RHEL7/CentOS7
 
 ```bash
-[sudo] yum install -y https://yum.kaos.st/7/release/x86_64/kaos-repo-9.0-0.el7.noarch.rpm
+[sudo] yum install -y https://yum.kaos.st/7/release/x86_64/kaos-repo-9.1-0.el7.noarch.rpm
 [sudo] yum install perfecto
 ```
 
@@ -81,11 +81,11 @@ script:
 ### Usage
 
 ```
-Usage: spec-file {options}
+Usage: perfecto {options} spec-file
 
 Options
 
-  --format, -f format        Output format (summary|tiny)
+  --format, -f format        Output format (summary|tiny|short|json|xml)
   --lint-config, -c file     Path to rpmlint configuration file
   --error-level, -e level    Return non-zero exit code if alert level greater than given (notice|warning|error|critical)
   --no-lint, -nl             Disable rpmlint checks
@@ -95,17 +95,20 @@ Options
 
 Examples
 
-  spec-file app.spec
+  perfecto app.spec
   Check spec and print extended report
 
-  spec-file --no-lint app.spec
+  perfecto --no-lint app.spec
   Check spec without rpmlint and print extended report
 
-  spec-file --format tiny app.spec
+  perfecto --format tiny app.spec
   Check spec and print tiny report
 
-  spec-file --format summary app.spec
+  perfecto --format summary app.spec
   Check spec and print summary
+
+  perfecto --format json app.spec 1> report.json
+  Check spec, generate report in JSON format and save as report.json
 
 ```
 
