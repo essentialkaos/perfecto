@@ -387,8 +387,10 @@ func checkForUnescapedPercent(s *spec.Spec) []Alert {
 
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {
-			if contains(line, "%") && !contains(line, "%%") {
-				result = append(result, Alert{LEVEL_ERROR, "Symbol % must be escaped by another % (i.e % → %%)", line})
+			for _, word := range strings.Fields(line.Text) {
+				if strings.HasPrefix(word, "%") && !strings.HasPrefix(word, "%%") {
+					result = append(result, Alert{LEVEL_ERROR, "Symbol % must be escaped by another % (i.e % → %%)", line})
+				}
 			}
 		}
 	}

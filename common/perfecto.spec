@@ -10,7 +10,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         2.0.1
+Version:         2.0.2
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -59,6 +59,9 @@ rm -rf %{buildroot}
 ################################################################################
 
 %changelog
+* Fri Jun 15 2018 Anton Novojilov <andy@essentialkaos.com> - 2.0.2-0
+- Improved check for unescaped percent symbol
+
 * Wed May 09 2018 Anton Novojilov <andy@essentialkaos.com> - 2.0.1-0
 - Fixed bug with wrong exit code when '--error-level error' is used
 
