@@ -19,6 +19,8 @@ matrix:
   allow_failures:
     - go: tip
 
+cache: apt
+
 before_install:
   - echo "deb http://us.archive.ubuntu.com/ubuntu xenial main universe" | sudo tee -a /etc/apt/sources.list
   - sudo apt-get update -qq
