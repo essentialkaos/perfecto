@@ -301,7 +301,49 @@ func (sc *CheckSuite) TestCheckForSetupArguments(c *chk.C) {
 	c.Assert(alerts[0].Line.Index, chk.Equals, 31)
 }
 
+func (sc *CheckSuite) TestRPMLint(c *chk.C) {
+	s, err := spec.Read("../testdata/test.spec")
+
+	c.Assert(s, chk.NotNil)
+	c.Assert(err, chk.IsNil)
+
+	r := Check(s, true, "")
+
+	c.Assert(r, chk.NotNil)
+	c.Assert(r.IsPerfect(), chk.Equals, true)
+
+	s, err = spec.Read("../testdata/test_7.spec")
+
+	c.Assert(s, chk.NotNil)
+	c.Assert(err, chk.IsNil)
+
+	r = Check(s, true, "")
+
+	c.Assert(r, chk.NotNil)
+	c.Assert(r.IsPerfect(), chk.Equals, false)
+}
+
 func (sc *CheckSuite) TestAux(c *chk.C) {
 	// This test will fail if new checkers was added
 	c.Assert(getCheckers(), chk.HasLen, 17)
+
+	r := &Report{}
+	c.Assert(r.IsPerfect(), chk.Equals, true)
+	r = &Report{Notices: []Alert{Alert{}}}
+	c.Assert(r.IsPerfect(), chk.Equals, false)
+	r = &Report{Warnings: []Alert{Alert{}}}
+	c.Assert(r.IsPerfect(), chk.Equals, false)
+	r = &Report{Errors: []Alert{Alert{}}}
+	c.Assert(r.IsPerfect(), chk.Equals, false)
+	r = &Report{Criticals: []Alert{Alert{}}}
+	c.Assert(r.IsPerfect(), chk.Equals, false)
+
+	a := AlertSlice{Alert{}, Alert{}}
+	a.Swap(0, 1)
+	c.Assert(a.Len(), chk.Equals, 2)
+	c.Assert(a.Less(0, 1), chk.Equals, false)
+
+	al, _ := parseAlertLine("../testdata/test_7.spec: E: specfile-error warning: some error", &spec.Spec{})
+	c.Assert(al.Level, chk.Equals, LEVEL_ERROR)
+	c.Assert(al.Info, chk.Equals, "[rpmlint] some error")
 }
