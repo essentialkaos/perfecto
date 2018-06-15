@@ -3,19 +3,18 @@
 Summary:            Test spec for perfecto
 Name:               perfecto-spec
 Version:            1.0.0
-Release:            0%{?dist}
+Release1:           0%{?dist}
 Group:              System Environment/Base
 License:            MIT
 URL:                https://domain.com
-
-BuildRoot:          %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Source0:            https://domain.com/%{name}-%{version}.tar.gz
 
 ################################################################################
 
 %description
-Test spec for perfecto app.
+Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus
+id quod maxime placeat facere possimus, omnis voluptas assumenda est.
 
 ################################################################################
 
@@ -25,7 +24,7 @@ Summary:            Test subpackage for perfecto
 Group:              System Environment/Base
 
 %description magic
-Test subpackge for perfecto app.
+Test subpackge for perfecto app. 
 
 ################################################################################
 
@@ -65,6 +64,6 @@ rm -rf %{buildroot}
 
 ################################################################################
 
-%changelog
+%changelog1
 * Wed Jan 24 2018 Anton Novojilov <andy@essentialkaos.com> - 1.0.0-0
 - Test changelog record
