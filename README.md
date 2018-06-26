@@ -81,6 +81,8 @@ script:
 
 ### Using with Docker
 
+Install latest version of Docker, than:
+
 ```bash
 wget https://raw.githubusercontent.com/essentialkaos/perfecto/master/perfecto-docker
 chmod +x perfecto-docker
