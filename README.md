@@ -81,7 +81,7 @@ script:
 
 ### Using with Docker
 
-Install latest version of Docker, than:
+Install latest version of Docker, then:
 
 ```bash
 wget https://raw.githubusercontent.com/essentialkaos/perfecto/master/perfecto-docker
