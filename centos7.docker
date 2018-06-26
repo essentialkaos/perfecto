@@ -1,0 +1,26 @@
+FROM centos:7 as builder
+
+RUN mkdir -p "/go/src" && chmod -R 777 "/go"
+
+ENV GOPATH=/go
+
+WORKDIR /go/src/github.com/essentialkaos/perfecto
+
+COPY . .
+
+RUN yum -y -q install https://yum.kaos.st/7/release/x86_64/kaos-repo-9.1-0.el7.noarch.rpm && \
+    yum -y -q install make golang git && \
+    make deps && \
+    make all
+
+FROM centos:7
+
+COPY --from=builder /go/src/github.com/essentialkaos/perfecto/perfecto /usr/bin/
+
+RUN yum -y -q install https://yum.kaos.st/7/release/x86_64/kaos-repo-9.1-0.el7.noarch.rpm && \
+    yum -y -q install rpmlint
+
+VOLUME /perfecto
+WORKDIR /perfecto
+
+ENTRYPOINT ["perfecto"]

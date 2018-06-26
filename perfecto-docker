@@ -1,0 +1,82 @@
+#! /usr/bin/env bash
+
+################################################################################
+
+# Default image (String)
+DEFAULT_IMAGE="essentialkaos/perfecto:centos7"
+
+################################################################################
+
+# Main func
+#
+# Code: No
+# Echo: No
+main() {
+  if ! hasApp "docker" ; then
+    echo "You must install docker first"
+    exit 1
+  fi
+
+  if [[ $# -eq 0 ]] ; then
+    usage
+    exit 0
+  fi
+
+  check "$@"
+
+  exit $?
+}
+
+# Run perfecto check
+#
+# 1: 
+#
+# Code: No
+# Echo: No
+check() {
+  local image spec spec_dir spec_name
+
+  image="${IMAGE:-$DEFAULT_IMAGE}"
+  spec="$1"
+  
+  if [[ -r "$spec" ]] ; then
+    spec_dir="$(cd "$(dirname "$spec")" && pwd -P)"
+    spec_name=$(basename "$spec")
+  fi
+
+  if [[ -n "$spec_dir" ]] ; then
+    shift 1
+    docker run --rm -it -v "$spec_dir":/perfecto "$image" "$spec_name" "$@"
+  else
+    docker run --rm -it "$image" "$@"
+  fi
+
+  return $?
+}
+
+# Show usage info
+#
+# Code: No
+# Echo: No
+usage() {
+  local image="${IMAGE:-$DEFAULT_IMAGE}"
+
+  docker run --rm -it "$image" "--help"
+
+  return $?
+}
+
+# Check if some app is installed
+#
+# 1: Binray name (String)
+#
+# Code: Yes
+# Echo: No
+hasApp() {
+  type "$1" &> /dev/null
+  return $?
+}
+
+################################################################################
+
+main "$@"
