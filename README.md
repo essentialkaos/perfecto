@@ -86,7 +86,7 @@ Install latest version of Docker, then:
 ```bash
 wget https://raw.githubusercontent.com/essentialkaos/perfecto/master/perfecto-docker
 chmod +x perfecto-docker
-[sudo] mv perfecto-docker /usr/bin
+[sudo] mv perfecto-docker /usr/bin/
 perfecto-docker PATH_TO_YOUR_SPEC_HERE
 ```
 
