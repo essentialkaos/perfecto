@@ -79,6 +79,27 @@ script:
   - ./perfecto PATH_TO_YOUR_SPEC_HERE
 ```
 
+or this:
+
+```yaml
+sudo: required
+
+services:
+  - docker
+
+env:
+  global:
+    - IMAGE=essentialkaos/perfecto:centos7
+
+before_install:
+  - docker pull "$IMAGE"
+  - wget https://raw.githubusercontent.com/essentialkaos/perfecto/master/perfecto-docker
+  - chmod +x perfecto-docker
+
+script:
+  - ./perfecto-docker PATH_TO_YOUR_SPEC_HERE
+```
+
 ### Using with Docker
 
 Install latest version of Docker, then:
