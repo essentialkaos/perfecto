@@ -29,29 +29,26 @@ main() {
 
 # Run perfecto check
 #
-# 1: 
+# *: Specs
 #
 # Code: No
 # Echo: No
 check() {
-  local image spec spec_dir spec_name
+  local image tmp_dir args status
 
   image="${IMAGE:-$DEFAULT_IMAGE}"
-  spec="$1"
+  tmp_dir=$(mktemp -d -t 'pfdkr-XXXXXXXXXXXXX')
+
+  args=$(processArgs "$tmp_dir" "$@")
   
-  if [[ -r "$spec" ]] ; then
-    spec_dir="$(cd "$(dirname "$spec")" && pwd -P)"
-    spec_name=$(basename "$spec")
-  fi
+  # shellcheck disable=SC2086
+  docker run --rm -it -v "$tmp_dir":/perfecto "$image" ${args}
 
-  if [[ -n "$spec_dir" ]] ; then
-    shift 1
-    docker run --rm -it -v "$spec_dir":/perfecto "$image" "$spec_name" "$@"
-  else
-    docker run --rm -it "$image" "$@"
-  fi
+  status=$?
 
-  return $?
+  rm -rf "$tmp_dir"
+
+  return $status
 }
 
 # Show usage info
@@ -64,6 +61,34 @@ usage() {
   docker run --rm -it "$image" "--help"
 
   return $?
+}
+
+# Process arguments
+#
+# 1: Path to temporary directory (String)
+# *: Specs
+#
+# Code: No
+# Echo: No
+processArgs() {
+  local tmp_dir="$1"
+  local arg spec_name result
+
+  shift 1
+
+  for arg in "$@" ; do
+    if [[ ! -r "$arg" ]] ; then
+      result="$result $arg"
+      continue
+    fi
+
+    cp "$arg" "$tmp_dir/" &>/dev/null
+
+    spec_name=$(basename "$arg")
+    result="$result $spec_name"
+  done
+
+  echo "$result"
 }
 
 # Check if some app is installed
