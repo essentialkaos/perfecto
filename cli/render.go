@@ -9,6 +9,7 @@ package cli
 
 import (
 	"fmt"
+	"path"
 	"strconv"
 	"strings"
 
@@ -65,6 +66,40 @@ var fallbackLevel = map[uint8]string{
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
+
+// renderError render error for given format
+func renderError(format, file string, err error) {
+	filename := strings.Replace(path.Base(file), ".spec", "", -1)
+
+	switch format {
+	case FORMAT_TINY:
+		fmtc.Printf("%24s: {r}✖ {!} %v\n", filename, err)
+	case FORMAT_JSON:
+		fmt.Printf("{\"error\":\"%v\"}\n", err)
+	case FORMAT_XML:
+		fmt.Println(`<?xml version="1.0" encoding="UTF-8"?>`)
+		fmt.Println("<alerts>")
+		fmt.Printf("  <error>%v</error>\n", err)
+		fmt.Println("</alerts>")
+	case "", FORMAT_SUMMARY, FORMAT_SHORT:
+		printError(err.Error())
+	}
+}
+
+// renderPerfect render message about perfect spec
+func renderPerfect(format, file string) {
+	switch format {
+	case FORMAT_TINY:
+		fmtc.Printf("%24s: {g}✔ {!}\n", file)
+	case FORMAT_JSON:
+		fmt.Println("{}")
+	case FORMAT_XML:
+		fmt.Println(`<?xml version="1.0" encoding="UTF-8"?>`)
+		fmt.Println("<alerts>\n</alerts>")
+	case "", FORMAT_SUMMARY, FORMAT_SHORT:
+		fmtc.Println("{g}This spec is perfect!{!}")
+	}
+}
 
 // renderFullReport render all alerts from report
 func renderFullReport(r *check.Report) {
