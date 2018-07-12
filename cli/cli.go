@@ -12,7 +12,9 @@ import (
 
 	"pkg.re/essentialkaos/ek.v9/env"
 	"pkg.re/essentialkaos/ek.v9/fmtc"
+	"pkg.re/essentialkaos/ek.v9/mathutil"
 	"pkg.re/essentialkaos/ek.v9/options"
+	"pkg.re/essentialkaos/ek.v9/sliceutil"
 	"pkg.re/essentialkaos/ek.v9/strutil"
 	"pkg.re/essentialkaos/ek.v9/usage"
 	"pkg.re/essentialkaos/ek.v9/usage/update"
@@ -26,7 +28,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "2.0.2"
+	VER  = "2.1.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -98,7 +100,7 @@ func Init() {
 		return
 	}
 
-	process(args[0])
+	process(args)
 }
 
 // configureUI configure UI on start
@@ -118,36 +120,47 @@ func configureUI() {
 }
 
 // process start spec file processing
-func process(file string) {
-	s, err := spec.Read(file)
-
-	if err != nil {
-		printErrorAndExit(err.Error())
-	}
+func process(files []string) {
+	var exitCode int
 
 	if !options.GetB(OPT_NO_LINT) && !isLinterInstalled() {
 		printErrorAndExit("Can't run linter: rpmlint not installed. Install rpmlint or use option '--no-lint'.")
 	}
 
-	report := check.Check(s, !options.GetB(OPT_NO_LINT), options.GetS(OPT_LINT_CONFIG))
 	format := options.GetS(OPT_FORMAT)
 
-	if report.IsPerfect() {
-		switch format {
-		case FORMAT_TINY:
-			fmtc.Printf("%24s: {g}✔ {!}\n", s.GetFileName())
-		case FORMAT_JSON:
-			fmtc.Println("{}")
-		case FORMAT_XML:
-			fmtc.Println(`<?xml version="1.0" encoding="UTF-8"?>`)
-			fmtc.Println("<alerts>\n</alerts>")
-		case "", FORMAT_SUMMARY, FORMAT_SHORT:
-			fmtc.Println("{g}This spec is perfect!{!}")
-		default:
-			printErrorAndExit("Output format \"%s\" is not supported", format)
-		}
+	if !sliceutil.Contains([]string{FORMAT_TINY, FORMAT_SHORT, FORMAT_SUMMARY, FORMAT_JSON, FORMAT_XML, ""}, format) {
+		printErrorAndExit("Output format \"%s\" is not supported", format)
+	}
 
-		os.Exit(0)
+	if len(files) > 1 {
+		format = FORMAT_TINY
+	}
+
+	for _, file := range files {
+		ec := checkSpec(file, format)
+		exitCode = mathutil.Max(ec, exitCode)
+	}
+
+	os.Exit(exitCode)
+}
+
+// codebeat:disable[ABC]
+
+// checkSpec check spec file
+func checkSpec(file, format string) int {
+	s, err := spec.Read(file)
+
+	if err != nil {
+		renderError(format, file, err)
+		return 1
+	}
+
+	report := check.Check(s, !options.GetB(OPT_NO_LINT), options.GetS(OPT_LINT_CONFIG))
+
+	if report.IsPerfect() {
+		renderPerfect(format, s.GetFileName())
+		return 0
 	}
 
 	switch format {
@@ -163,14 +176,14 @@ func process(file string) {
 		renderXMLReport(report)
 	case "":
 		renderFullReport(report)
-	default:
-		printErrorAndExit("Output format \"%s\" is not supported", format)
 	}
 
-	os.Exit(getExitCode(report))
+	return getExitCode(report)
 }
 
-// getExitCode
+// codebeat:enable[ABC]
+
+// getExitCode return exit code based on report data
 func getExitCode(r *check.Report) int {
 	var maxLevel int
 	var nonZero bool
@@ -247,7 +260,7 @@ func printErrorAndExit(f string, a ...interface{}) {
 
 // showUsage show usage info
 func showUsage() {
-	info := usage.NewInfo("", "spec-file")
+	info := usage.NewInfo("", "file...")
 
 	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny|short|json|xml){!}", "format")
 	info.AddOption(OPT_LINT_CONFIG, "Path to rpmlint configuration file", "file")

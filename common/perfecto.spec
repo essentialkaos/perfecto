@@ -10,7 +10,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         2.0.2
+Version:         2.1.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -59,6 +59,9 @@ rm -rf %{buildroot}
 ################################################################################
 
 %changelog
+* Thu Jul 12 2018 Anton Novojilov <andy@essentialkaos.com> - 2.1.0-0
+- Added mass check feature
+
 * Fri Jun 15 2018 Anton Novojilov <andy@essentialkaos.com> - 2.0.2-0
 - Improved check for unescaped percent symbol
 
