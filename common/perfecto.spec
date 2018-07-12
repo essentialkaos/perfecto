@@ -10,7 +10,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         2.0.2
+Version:         2.1.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
