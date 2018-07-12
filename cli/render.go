@@ -73,7 +73,7 @@ func renderError(format, file string, err error) {
 
 	switch format {
 	case FORMAT_TINY:
-		fmtc.Printf("%24s: {r}✖ {!} %v\n", filename, err)
+		fmtc.Printf("%24s: {r}✖ ERROR: %v{!}\n", filename, err)
 	case FORMAT_JSON:
 		fmt.Printf("{\"error\":\"%v\"}\n", err)
 	case FORMAT_XML:
