@@ -145,6 +145,8 @@ func process(files []string) {
 	os.Exit(exitCode)
 }
 
+// codebeat:disable[ABC]
+
 // checkSpec check spec file
 func checkSpec(file, format string) int {
 	s, err := spec.Read(file)
@@ -178,6 +180,8 @@ func checkSpec(file, format string) int {
 
 	return getExitCode(report)
 }
+
+// codebeat:enable[ABC]
 
 // getExitCode return exit code based on report data
 func getExitCode(r *check.Report) int {
