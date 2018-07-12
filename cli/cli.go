@@ -129,7 +129,7 @@ func process(files []string) {
 
 	format := options.GetS(OPT_FORMAT)
 
-	if !sliceutil.Contains([]string{FORMAT_TINY, FORMAT_SHORT, FORMAT_SUMMARY, FORMAT_JSON, FORMAT_XML}, format) {
+	if !sliceutil.Contains([]string{FORMAT_TINY, FORMAT_SHORT, FORMAT_SUMMARY, FORMAT_JSON, FORMAT_XML, ""}, format) {
 		printErrorAndExit("Output format \"%s\" is not supported", format)
 	}
 
