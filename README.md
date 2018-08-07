@@ -93,7 +93,7 @@ env:
 
 before_install:
   - docker pull "$IMAGE"
-  - wget https://raw.githubusercontent.com/essentialkaos/perfecto/master/perfecto-docker
+  - wget https://kaos.sh/perfecto/perfecto-docker
   - chmod +x perfecto-docker
 
 script:
@@ -105,7 +105,7 @@ script:
 Install latest version of Docker, then:
 
 ```bash
-wget https://raw.githubusercontent.com/essentialkaos/perfecto/master/perfecto-docker
+wget https://kaos.sh/perfecto/perfecto-docker
 chmod +x perfecto-docker
 [sudo] mv perfecto-docker /usr/bin/
 perfecto-docker PATH_TO_YOUR_SPEC_HERE
