@@ -5,6 +5,7 @@
 <p align="center">
   <a href="https://goreportcard.com/report/github.com/essentialkaos/perfecto"><img src="https://goreportcard.com/badge/github.com/essentialkaos/perfecto"></a>
   <a href="https://codebeat.co/projects/github-com-essentialkaos-perfecto-master"><img alt="codebeat badge" src="https://codebeat.co/badges/74af2307-8aa2-48eb-afd5-2ae3620a1149" /></a>
+<a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fessentialkaos%2Fperfecto?ref=badge_shield" alt="FOSSA Status"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fessentialkaos%2Fperfecto.svg?type=shield"/></a>
   <a href="https://travis-ci.org/essentialkaos/perfecto"><img src="https://travis-ci.org/essentialkaos/perfecto.svg"></a>
   <a href='https://coveralls.io/github/essentialkaos/perfecto'><img src='https://coveralls.io/repos/github/essentialkaos/perfecto/badge.svg' alt='Coverage Status' /></a>
   <a href="#license"><img src="https://gh.kaos.st/ekol.svg"></a>
@@ -15,6 +16,9 @@ _perfecto_ is tool for checking perfectly written RPM specs. Currently, _perfect
 ![Screenshot](https://gh.kaos.st/perfecto.png)
 
 ![Screenshot](https://gh.kaos.st/perfecto2.png)
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fessentialkaos%2Fperfecto.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fessentialkaos%2Fperfecto?ref=badge_large)
 
 ### Installing
 
