@@ -267,7 +267,7 @@ func printErrorAndExit(f string, a ...interface{}) {
 
 // showUsage show usage info
 func showUsage() {
-	info := usage.NewInfo("", "file...")
+	info := usage.NewInfo("", "file…")
 
 	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny|short|json|xml){!}", "format")
 	info.AddOption(OPT_LINT_CONFIG, "Path to rpmlint configuration file", "file")
