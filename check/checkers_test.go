@@ -321,6 +321,40 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 
 	c.Assert(r, chk.NotNil)
 	c.Assert(r.IsPerfect(), chk.Equals, false)
+
+	rpmLintBin = "echo"
+	s = &spec.Spec{File: ""}
+	c.Assert(Lint(s, ""), chk.IsNil)
+
+	s = &spec.Spec{File: "test.spec"}
+	c.Assert(Lint(s, "test.conf"), chk.IsNil)
+}
+
+func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
+	i, s1, s2 := extractAlertData("test.spec: W: no-buildroot-tag")
+	c.Assert(i, chk.Equals, -1)
+	c.Assert(s1, chk.Equals, "W")
+	c.Assert(s2, chk.Equals, "no-buildroot-tag")
+
+	i, s1, s2 = extractAlertData("test.spec: E: specfile-error error: line 356: Unknown tag: Release1")
+	c.Assert(i, chk.Equals, 356)
+	c.Assert(s1, chk.Equals, "E")
+	c.Assert(s2, chk.Equals, "Unknown tag: Release1")
+
+	i, s1, s2 = extractAlertData("test.spec:67: W: macro-in-%changelog %record")
+	c.Assert(i, chk.Equals, 67)
+	c.Assert(s1, chk.Equals, "W")
+	c.Assert(s2, chk.Equals, "macro-in-%changelog %record")
+
+	i, s1, s2 = extractAlertData("test.spec: E: specfile-error error: line A: Unknown tag: Release1")
+	c.Assert(i, chk.Equals, -1)
+	c.Assert(s1, chk.Equals, "")
+	c.Assert(s2, chk.Equals, "")
+
+	i, s1, s2 = extractAlertData("test.spec:A: W: macro-in-%changelog %record")
+	c.Assert(i, chk.Equals, -1)
+	c.Assert(s1, chk.Equals, "")
+	c.Assert(s2, chk.Equals, "")
 }
 
 func (sc *CheckSuite) TestAux(c *chk.C) {

@@ -61,6 +61,7 @@ rm -rf %{buildroot}
 %changelog
 * Sun Nov 04 2018 Anton Novojilov <andy@essentialkaos.com> - 2.2.0-0
 - Added quiet mode (option -q/--quiet)
+- Improved RPMLint output parser
 
 * Thu Jul 12 2018 Anton Novojilov <andy@essentialkaos.com> - 2.1.0-0
 - Added mass check feature
