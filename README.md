@@ -114,7 +114,7 @@ perfecto-docker PATH_TO_YOUR_SPEC_HERE
 ### Usage
 
 ```
-Usage: perfecto {options} file...
+Usage: perfecto {options} file…
 
 Options
 
