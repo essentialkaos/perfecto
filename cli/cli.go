@@ -69,6 +69,7 @@ var optMap = options.Map{
 	OPT_FORMAT:      {Type: options.STRING},
 	OPT_LINT_CONFIG: {Type: options.STRING},
 	OPT_ERROR_LEVEL: {Type: options.STRING},
+	OPT_QUIET:       {Type: options.BOOL},
 	OPT_NO_LINT:     {Type: options.BOOL},
 	OPT_NO_COLOR:    {Type: options.BOOL},
 	OPT_HELP:        {Type: options.BOOL, Alias: "u:usage"},
@@ -160,7 +161,7 @@ func checkSpec(file, format string) int {
 	report := check.Check(s, !options.GetB(OPT_NO_LINT), options.GetS(OPT_LINT_CONFIG))
 
 	if report.IsPerfect() {
-		if options.GetB(OPT_QUIET) {
+		if !options.GetB(OPT_QUIET) {
 			renderPerfect(format, s.GetFileName())
 		}
 
