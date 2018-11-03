@@ -114,13 +114,14 @@ perfecto-docker PATH_TO_YOUR_SPEC_HERE
 ### Usage
 
 ```
-Usage: perfecto {options} spec-file
+Usage: perfecto {options} file...
 
 Options
 
   --format, -f format        Output format (summary|tiny|short|json|xml)
   --lint-config, -c file     Path to rpmlint configuration file
   --error-level, -e level    Return non-zero exit code if alert level greater than given (notice|warning|error|critical)
+  --quiet, -q                Suppress all normal output
   --no-lint, -nl             Disable rpmlint checks
   --no-color, -nc            Disable colors in output
   --help, -h                 Show this help message
