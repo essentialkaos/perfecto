@@ -145,11 +145,11 @@ func (sc *CheckSuite) TestCheckForMakeMacro(c *chk.C) {
 
 	c.Assert(alerts, chk.HasLen, 3)
 	c.Assert(alerts[0].Info, chk.Equals, "Use %{__make} macro instead of \"make\"")
-	c.Assert(alerts[0].Line.Index, chk.Equals, 34)
+	c.Assert(alerts[0].Line.Index, chk.Equals, 35)
 	c.Assert(alerts[1].Info, chk.Equals, "Don't forget to use %{?_smp_mflags} macro with make command")
-	c.Assert(alerts[1].Line.Index, chk.Equals, 34)
+	c.Assert(alerts[1].Line.Index, chk.Equals, 35)
 	c.Assert(alerts[2].Info, chk.Equals, "Use %{make_install} macro instead of \"make install\"")
-	c.Assert(alerts[2].Line.Index, chk.Equals, 39)
+	c.Assert(alerts[2].Line.Index, chk.Equals, 40)
 }
 
 func (sc *CheckSuite) TestCheckForHeaderTags(c *chk.C) {

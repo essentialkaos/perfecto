@@ -74,3 +74,4 @@ rm -rf %{buildroot}
 
 * Wed Jan 24 2018 Anton Novojilov <andy@essential-kaos.com> 1.0.0-0
 - Test changelog record
+#- Test changelog record
