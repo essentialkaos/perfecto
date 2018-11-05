@@ -1,9 +1,8 @@
 language: go
 
 go:
-  - 1.8.x
-  - 1.9.x
   - 1.10.x
+  - 1.11.x
   - tip
 
 os:
@@ -22,12 +21,22 @@ matrix:
 cache: apt
 
 before_install:
+  - wget https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz
+  - wget -O hadolint https://github.com/hadolint/hadolint/releases/download/v1.15.0/hadolint-Linux-x86_64
+  - tar xf shellcheck-latest.linux.x86_64.tar.xz
   - echo "deb http://us.archive.ubuntu.com/ubuntu xenial main universe" | sudo tee -a /etc/apt/sources.list
   - sudo apt-get update -qq
   - sudo apt-get install -y rpmlint
   - sudo ln -sf /usr/bin/python2.7 /usr/bin/python2.6
+  - chmod +x hadolint
+  - ./shellcheck-latest/shellcheck --version
+  - ./hadolint --version
+  - rpmlint --version
   - make deps
   - make deps-test 
 
 script:
   - .travis/script.sh
+  - bash -c 'shopt -s globstar; ./shellcheck-latest/shellcheck perfecto-docker'
+  - ./hadolint centos6.docker
+  - ./hadolint centos7.docker

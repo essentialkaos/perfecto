@@ -31,6 +31,7 @@ Test subpackge for perfecto app.
 %setup -qn %{name}-%{version}
 
 %build
+# make docs
 make
 
 %install

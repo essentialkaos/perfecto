@@ -17,9 +17,13 @@ import (
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
+var rpmLintBin = "rpmlint"
+
+// ////////////////////////////////////////////////////////////////////////////////// //
+
 // Lint run rpmlint and return alerts from it
 func Lint(s *spec.Spec, linterConfig string) []Alert {
-	cmd := exec.Command("rpmlint")
+	cmd := exec.Command(rpmLintBin)
 
 	if linterConfig != "" {
 		cmd.Args = append(cmd.Args, "-f", linterConfig)
@@ -29,7 +33,7 @@ func Lint(s *spec.Spec, linterConfig string) []Alert {
 
 	output, _ := cmd.Output()
 
-	if len(output) == 0 {
+	if len(output) < 2 {
 		return nil
 	}
 
@@ -59,8 +63,6 @@ func parseRPMLintOutput(output string, s *spec.Spec) []Alert {
 func parseAlertLine(text string, s *spec.Spec) (Alert, bool) {
 	line, level, desc := extractAlertData(text)
 
-	desc = strings.Replace(desc, "specfile-error error: ", "", -1)
-
 	if strings.Contains(desc, "specfile-error warning") {
 		level = "W"
 		desc = strings.Replace(desc, "specfile-error warning: ", "", -1)
@@ -80,17 +82,30 @@ func parseAlertLine(text string, s *spec.Spec) (Alert, bool) {
 
 // extractAlertData extract data from rpmlint alert
 func extractAlertData(text string) (int, string, string) {
-	lineSlice := strings.Split(text, ":")
-
-	if len(lineSlice) < 3 {
+	if strings.Count(text, ":") < 2 {
 		return -1, "", ""
 	}
 
+	lineSlice := strings.Split(text, ":")
+
+	// Alert with error type and line number in text of alert
+	if strings.Contains(text, "specfile-error error: line ") && len(lineSlice) > 4 {
+		line, err := strconv.Atoi(strings.Trim(lineSlice[3], "line "))
+
+		if err != nil {
+			return -1, "", ""
+		}
+
+		return line, "E", strings.TrimSpace(strings.Join(lineSlice[4:], ":"))
+	}
+
+	// Alert with type and without line number
 	if strings.HasPrefix(lineSlice[1], " ") {
 		level := strings.TrimSpace(lineSlice[1])
 		return -1, level, strings.TrimSpace(strings.Join(lineSlice[2:], ":"))
 	}
 
+	// Alert with type and line number
 	level := strings.TrimSpace(lineSlice[2])
 	line, err := strconv.Atoi(lineSlice[1])
 

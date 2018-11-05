@@ -28,7 +28,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "2.1.0"
+	VER  = "2.2.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -37,6 +37,7 @@ const (
 	OPT_FORMAT      = "f:format"
 	OPT_LINT_CONFIG = "c:lint-config"
 	OPT_ERROR_LEVEL = "e:error-level"
+	OPT_QUIET       = "q:quiet"
 	OPT_NO_LINT     = "nl:no-lint"
 	OPT_NO_COLOR    = "nc:no-color"
 	OPT_HELP        = "h:help"
@@ -68,6 +69,7 @@ var optMap = options.Map{
 	OPT_FORMAT:      {Type: options.STRING},
 	OPT_LINT_CONFIG: {Type: options.STRING},
 	OPT_ERROR_LEVEL: {Type: options.STRING},
+	OPT_QUIET:       {Type: options.BOOL},
 	OPT_NO_LINT:     {Type: options.BOOL},
 	OPT_NO_COLOR:    {Type: options.BOOL},
 	OPT_HELP:        {Type: options.BOOL, Alias: "u:usage"},
@@ -151,7 +153,7 @@ func process(files []string) {
 func checkSpec(file, format string) int {
 	s, err := spec.Read(file)
 
-	if err != nil {
+	if err != nil && !options.GetB(OPT_QUIET) {
 		renderError(format, file, err)
 		return 1
 	}
@@ -159,23 +161,28 @@ func checkSpec(file, format string) int {
 	report := check.Check(s, !options.GetB(OPT_NO_LINT), options.GetS(OPT_LINT_CONFIG))
 
 	if report.IsPerfect() {
-		renderPerfect(format, s.GetFileName())
+		if !options.GetB(OPT_QUIET) {
+			renderPerfect(format, s.GetFileName())
+		}
+
 		return 0
 	}
 
-	switch format {
-	case FORMAT_SUMMARY:
-		renderSummary(report)
-	case FORMAT_TINY:
-		renderTinyReport(s, report)
-	case FORMAT_SHORT:
-		renderShortReport(report)
-	case FORMAT_JSON:
-		renderJSONReport(report)
-	case FORMAT_XML:
-		renderXMLReport(report)
-	case "":
-		renderFullReport(report)
+	if !options.GetB(OPT_QUIET) {
+		switch format {
+		case FORMAT_SUMMARY:
+			renderSummary(report)
+		case FORMAT_TINY:
+			renderTinyReport(s, report)
+		case FORMAT_SHORT:
+			renderShortReport(report)
+		case FORMAT_JSON:
+			renderJSONReport(report)
+		case FORMAT_XML:
+			renderXMLReport(report)
+		case "":
+			renderFullReport(report)
+		}
 	}
 
 	return getExitCode(report)
@@ -260,11 +267,12 @@ func printErrorAndExit(f string, a ...interface{}) {
 
 // showUsage show usage info
 func showUsage() {
-	info := usage.NewInfo("", "file...")
+	info := usage.NewInfo("", "file…")
 
 	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny|short|json|xml){!}", "format")
 	info.AddOption(OPT_LINT_CONFIG, "Path to rpmlint configuration file", "file")
 	info.AddOption(OPT_ERROR_LEVEL, "Return non-zero exit code if alert level greater than given {s-}(notice|warning|error|critical){!}", "level")
+	info.AddOption(OPT_QUIET, "Suppress all normal output")
 	info.AddOption(OPT_NO_LINT, "Disable rpmlint checks")
 	info.AddOption(OPT_NO_COLOR, "Disable colors in output")
 	info.AddOption(OPT_HELP, "Show this help message")
