@@ -24,26 +24,29 @@ Before the initial install allows git to use redirects for [pkg.re](https://gith
 
 ```
 git config --global http.https://pkg.re.followRedirects true
+
 ```
 
 Make sure you have a working Go 1.8+ workspace ([instructions](https://golang.org/doc/install)), then:
 
 ```
 go get github.com/essentialkaos/perfecto
+
 ```
 
 For update to latest stable release, do:
 
 ```
 go get -u github.com/essentialkaos/perfecto
-```
 
+```
 
 #### From ESSENTIAL KAOS Public repo for RHEL6/CentOS6
 
 ```bash
 [sudo] yum install -y https://yum.kaos.st/6/release/x86_64/kaos-repo-9.1-0.el6.noarch.rpm
 [sudo] yum install perfecto
+
 ```
 
 #### From ESSENTIAL KAOS Public repo for RHEL7/CentOS7
@@ -51,6 +54,7 @@ go get -u github.com/essentialkaos/perfecto
 ```bash
 [sudo] yum install -y https://yum.kaos.st/7/release/x86_64/kaos-repo-9.1-0.el7.noarch.rpm
 [sudo] yum install perfecto
+
 ```
 
 #### Prebuilt binaries
@@ -59,6 +63,7 @@ You can download prebuilt binaries for Linux and OS X from [EK Apps Repository](
 
 ```bash
 bash <(curl -fsSL https://apps.kaos.st/get) perfecto
+
 ```
 
 ### Using on TravisCI
@@ -131,6 +136,7 @@ wget https://kaos.sh/perfecto/perfecto-docker
 chmod +x perfecto-docker
 [sudo] mv perfecto-docker /usr/bin/
 perfecto-docker PATH_TO_YOUR_SPEC_HERE
+
 ```
 
 ### Usage
