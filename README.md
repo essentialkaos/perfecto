@@ -38,7 +38,6 @@ For update to latest stable release, do:
 go get -u github.com/essentialkaos/perfecto
 ```
 
-
 #### From ESSENTIAL KAOS Public repo for RHEL6/CentOS6
 
 ```bash
@@ -55,7 +54,11 @@ go get -u github.com/essentialkaos/perfecto
 
 #### Prebuilt binaries
 
-You can download prebuilt binaries for Linux and OS X from [EK Apps Repository](https://apps.kaos.st/perfecto/latest).
+You can download prebuilt binaries for Linux and OS X from [EK Apps Repository](https://apps.kaos.st/perfecto/latest):
+
+```bash
+bash <(curl -fsSL https://apps.kaos.st/get) perfecto
+```
 
 ### Using on TravisCI
 
@@ -77,13 +80,12 @@ before_install:
 
 script:
   - ./perfecto PATH_TO_YOUR_SPEC_HERE
+
 ```
 
 or this:
 
 ```yaml
-sudo: required
-
 services:
   - docker
 
@@ -98,6 +100,25 @@ before_install:
 
 script:
   - ./perfecto-docker PATH_TO_YOUR_SPEC_HERE
+
+```
+
+or this:
+
+```yaml
+services:
+  - docker
+
+env:
+  global:
+    - IMAGE=essentialkaos/perfecto:centos7
+
+before_install:
+  - docker pull "$IMAGE"
+
+script:
+  - bash <(curl -fsSL https://kaos.sh/perfecto/perfecto-docker) PATH_TO_YOUR_SPEC_HERE
+
 ```
 
 ### Using with Docker
