@@ -91,6 +91,10 @@ func getCheckers() []Checker {
 
 // checkForUselessSpaces checks for useless spaces
 func checkForUselessSpaces(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
 	var result []Alert
 
 	for _, line := range s.Data {
@@ -112,6 +116,10 @@ func checkForUselessSpaces(s *spec.Spec) []Alert {
 
 // checkForLineLength checks changelog and description lines for 80 symbols limit
 func checkForLineLength(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
 	var result []Alert
 
 	sections := []string{
@@ -137,6 +145,10 @@ func checkForLineLength(s *spec.Spec) []Alert {
 
 // checkForDist checks for dist macro in release tag
 func checkForDist(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
 	var result []Alert
 
 	for _, header := range s.GetHeaders() {
@@ -158,6 +170,10 @@ func checkForDist(s *spec.Spec) []Alert {
 
 // checkForNonMacroPaths checks if standart path not used as macro
 func checkForNonMacroPaths(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
 	var result []Alert
 
 	sections := []string{
@@ -213,6 +229,10 @@ func checkForNonMacroPaths(s *spec.Spec) []Alert {
 
 // checkForBuildRoot checks for build root path used as $RPM_BUILD_ROOT
 func checkForBuildRoot(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
 	var result []Alert
 
 	sections := []string{
@@ -241,6 +261,10 @@ func checkForBuildRoot(s *spec.Spec) []Alert {
 
 // checkForDevNull checks for devnull redirect format
 func checkForDevNull(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
 	var result []Alert
 
 	sections := []string{
@@ -287,6 +311,10 @@ func checkForDevNull(s *spec.Spec) []Alert {
 
 // checkChangelogHeaders checks changelog for misformatted records
 func checkChangelogHeaders(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
 	var result []Alert
 
 	for _, section := range s.GetSections(spec.SECTION_CHANGELOG) {
@@ -316,6 +344,10 @@ func checkChangelogHeaders(s *spec.Spec) []Alert {
 
 // checkForMakeMacro checks if make used not as macro
 func checkForMakeMacro(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
 	var result []Alert
 
 	sections := []string{
@@ -359,6 +391,10 @@ func checkForMakeMacro(s *spec.Spec) []Alert {
 
 // checkForHeaderTags checks headers for required tags
 func checkForHeaderTags(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
 	var result []Alert
 
 	for _, header := range s.GetHeaders() {
@@ -384,6 +420,10 @@ func checkForHeaderTags(s *spec.Spec) []Alert {
 
 // checkForUnescapedPercent checks changelog and descriptions for unescaped percent symbol
 func checkForUnescapedPercent(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
 	var result []Alert
 
 	sections := []string{spec.SECTION_CHANGELOG}
@@ -405,8 +445,11 @@ func checkForUnescapedPercent(s *spec.Spec) []Alert {
 
 // checkForMacroDefenitionPosition checks for macro defined after description
 func checkForMacroDefenitionPosition(s *spec.Spec) []Alert {
-	var result []Alert
+	if len(s.Data) == 0 {
+		return nil
+	}
 
+	var result []Alert
 	var underDescription bool
 
 	for _, line := range s.Data {
@@ -430,6 +473,10 @@ func checkForMacroDefenitionPosition(s *spec.Spec) []Alert {
 
 // checkForSeparatorLength checks for separator length
 func checkForSeparatorLength(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
 	var result []Alert
 
 	for _, line := range s.Data {
@@ -443,6 +490,10 @@ func checkForSeparatorLength(s *spec.Spec) []Alert {
 
 // checkForDefAttr checks spec for %defattr macro in %files sections
 func checkForDefAttr(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
 	var result []Alert
 
 	for _, section := range s.GetSections(spec.SECTION_FILES) {
@@ -473,6 +524,10 @@ func checkForDefAttr(s *spec.Spec) []Alert {
 
 // checkForUselessBinaryMacro checks spec for useless binary macro
 func checkForUselessBinaryMacro(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
 	var result []Alert
 
 	for _, line := range s.Data {
@@ -488,6 +543,10 @@ func checkForUselessBinaryMacro(s *spec.Spec) []Alert {
 
 // checkForEmptySections checks spec for empty sections
 func checkForEmptySections(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
 	var result []Alert
 
 	sections := []string{
@@ -515,6 +574,10 @@ func checkForEmptySections(s *spec.Spec) []Alert {
 
 // checkForIndentInFilesSection checks spec for prefixes in %files section
 func checkForIndentInFilesSection(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
 	var result []Alert
 
 	for _, section := range s.GetSections(spec.SECTION_FILES) {
@@ -530,6 +593,10 @@ func checkForIndentInFilesSection(s *spec.Spec) []Alert {
 
 // checkForSetupArguments checks setup arguments
 func checkForSetupArguments(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
 	var result []Alert
 
 	for _, section := range s.GetSections(spec.SECTION_SETUP) {

@@ -36,6 +36,11 @@ func (s *SpecSuite) TestParsing(c *C) {
 	c.Assert(err, NotNil)
 	c.Assert(spec, IsNil)
 
+	spec, err = Read("../testdata/empty.spec")
+
+	c.Assert(err, NotNil)
+	c.Assert(spec, IsNil)
+
 	spec, err = Read("../testdata/test.spec")
 
 	c.Assert(err, IsNil)

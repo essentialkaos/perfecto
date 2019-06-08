@@ -325,6 +325,29 @@ func (sc *CheckSuite) TestCheckForEmptyLinesAtEnd(c *chk.C) {
 	c.Assert(alerts[0].Line.Index, chk.Equals, -1)
 }
 
+func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
+	s := &spec.Spec{}
+
+	c.Assert(checkForUselessSpaces(s), chk.IsNil)
+	c.Assert(checkForLineLength(s), chk.IsNil)
+	c.Assert(checkForDist(s), chk.IsNil)
+	c.Assert(checkForNonMacroPaths(s), chk.IsNil)
+	c.Assert(checkForBuildRoot(s), chk.IsNil)
+	c.Assert(checkForDevNull(s), chk.IsNil)
+	c.Assert(checkChangelogHeaders(s), chk.IsNil)
+	c.Assert(checkForMakeMacro(s), chk.IsNil)
+	c.Assert(checkForHeaderTags(s), chk.IsNil)
+	c.Assert(checkForUnescapedPercent(s), chk.IsNil)
+	c.Assert(checkForMacroDefenitionPosition(s), chk.IsNil)
+	c.Assert(checkForSeparatorLength(s), chk.IsNil)
+	c.Assert(checkForDefAttr(s), chk.IsNil)
+	c.Assert(checkForUselessBinaryMacro(s), chk.IsNil)
+	c.Assert(checkForEmptySections(s), chk.IsNil)
+	c.Assert(checkForIndentInFilesSection(s), chk.IsNil)
+	c.Assert(checkForSetupArguments(s), chk.IsNil)
+	c.Assert(checkForEmptyLinesAtEnd(s), chk.IsNil)
+}
+
 func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 	s, err := spec.Read("../testdata/test.spec")
 
