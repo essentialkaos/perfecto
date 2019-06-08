@@ -36,7 +36,7 @@ func (s *SpecSuite) TestParsing(c *C) {
 	c.Assert(err, NotNil)
 	c.Assert(spec, IsNil)
 
-	spec, err = Read("../testdata/empty.spec")
+	spec, err = readFile("../testdata/_unknown_")
 
 	c.Assert(err, NotNil)
 	c.Assert(spec, IsNil)
