@@ -126,7 +126,7 @@ script:
 Install latest version of Docker, then:
 
 ```bash
-wget https://kaos.sh/perfecto/perfecto-docker
+curl -o perfecto-docker https://kaos.sh/perfecto/perfecto-docker
 chmod +x perfecto-docker
 [sudo] mv perfecto-docker /usr/bin/
 perfecto-docker PATH_TO_YOUR_SPEC_HERE

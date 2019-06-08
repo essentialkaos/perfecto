@@ -83,6 +83,7 @@ func getCheckers() []Checker {
 		checkForEmptySections,
 		checkForIndentInFilesSection,
 		checkForSetupArguments,
+		checkForEmptyLinesAtEnd,
 	}
 }
 
@@ -356,7 +357,7 @@ func checkForMakeMacro(s *spec.Spec) []Alert {
 	return result
 }
 
-// checkForHeaderTags check headers for required tags
+// checkForHeaderTags checks headers for required tags
 func checkForHeaderTags(s *spec.Spec) []Alert {
 	var result []Alert
 
@@ -381,7 +382,7 @@ func checkForHeaderTags(s *spec.Spec) []Alert {
 
 // codebeat:disable[BLOCK_NESTING]
 
-// checkForUnescapedPercent check changelog and descriptions for unescaped percent symbol
+// checkForUnescapedPercent checks changelog and descriptions for unescaped percent symbol
 func checkForUnescapedPercent(s *spec.Spec) []Alert {
 	var result []Alert
 
@@ -402,7 +403,7 @@ func checkForUnescapedPercent(s *spec.Spec) []Alert {
 
 // codebeat:enable[BLOCK_NESTING]
 
-// checkForMacroDefenitionPosition check for macro defined after description
+// checkForMacroDefenitionPosition checks for macro defined after description
 func checkForMacroDefenitionPosition(s *spec.Spec) []Alert {
 	var result []Alert
 
@@ -427,7 +428,7 @@ func checkForMacroDefenitionPosition(s *spec.Spec) []Alert {
 	return result
 }
 
-// checkForSeparatorLength check for separator length
+// checkForSeparatorLength checks for separator length
 func checkForSeparatorLength(s *spec.Spec) []Alert {
 	var result []Alert
 
@@ -440,7 +441,7 @@ func checkForSeparatorLength(s *spec.Spec) []Alert {
 	return result
 }
 
-// checkForDefAttr check spec for %defattr macro in %files sections
+// checkForDefAttr checks spec for %defattr macro in %files sections
 func checkForDefAttr(s *spec.Spec) []Alert {
 	var result []Alert
 
@@ -470,7 +471,7 @@ func checkForDefAttr(s *spec.Spec) []Alert {
 	return result
 }
 
-// checkForUselessBinaryMacro check spec for useless binary macro
+// checkForUselessBinaryMacro checks spec for useless binary macro
 func checkForUselessBinaryMacro(s *spec.Spec) []Alert {
 	var result []Alert
 
@@ -485,7 +486,7 @@ func checkForUselessBinaryMacro(s *spec.Spec) []Alert {
 	return result
 }
 
-// checkForEmptySections check spec for empty sections
+// checkForEmptySections checks spec for empty sections
 func checkForEmptySections(s *spec.Spec) []Alert {
 	var result []Alert
 
@@ -512,7 +513,7 @@ func checkForEmptySections(s *spec.Spec) []Alert {
 	return result
 }
 
-// checkForIndentInFilesSection check spec for prefixes in %files section
+// checkForIndentInFilesSection checks spec for prefixes in %files section
 func checkForIndentInFilesSection(s *spec.Spec) []Alert {
 	var result []Alert
 
@@ -527,7 +528,7 @@ func checkForIndentInFilesSection(s *spec.Spec) []Alert {
 	return result
 }
 
-// checkForSetupArguments check setup arguments
+// checkForSetupArguments checks setup arguments
 func checkForSetupArguments(s *spec.Spec) []Alert {
 	var result []Alert
 
@@ -543,6 +544,36 @@ func checkForSetupArguments(s *spec.Spec) []Alert {
 	}
 
 	return result
+}
+
+// checkForEmptyLinesAtEnd checks spec for empty lines at the end
+func checkForEmptyLinesAtEnd(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
+	totalLines := len(s.Data)
+	lastLine := s.Data[totalLines-1]
+
+	if lastLine.Text != "" {
+		return []Alert{Alert{LEVEL_NOTICE, "Spec file should have empty line at the end", emptyLine}}
+	}
+
+	emptyLines := 0
+
+	for i := totalLines - 1; i > 0; i-- {
+		if s.Data[i].Text == "" {
+			emptyLines++
+		} else {
+			if emptyLines > 1 {
+				return []Alert{Alert{LEVEL_NOTICE, "Too much empty lines at the end of the spec", emptyLine}}
+			}
+
+			break
+		}
+	}
+
+	return nil
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //

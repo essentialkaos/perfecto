@@ -82,10 +82,10 @@ func (s *SpecSuite) TestHeaders(c *C) {
 	headers := spec.GetHeaders()
 	c.Assert(headers, HasLen, 2)
 	c.Assert(headers[0].Package, Equals, "")
-	c.Assert(headers[0].Subpackage, Equals, false)
+	c.Assert(headers[0].IsSubpackage, Equals, false)
 	c.Assert(headers[0].Data, HasLen, 13)
 	c.Assert(headers[1].Package, Equals, "magic")
-	c.Assert(headers[1].Subpackage, Equals, true)
+	c.Assert(headers[1].IsSubpackage, Equals, true)
 	c.Assert(headers[1].Data, HasLen, 4)
 
 	pkgName, subPkg := parsePackageName("%package magic")
