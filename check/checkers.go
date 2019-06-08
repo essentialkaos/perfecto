@@ -11,8 +11,8 @@ import (
 	"fmt"
 	"strings"
 
-	"pkg.re/essentialkaos/ek.v9/sliceutil"
-	"pkg.re/essentialkaos/ek.v9/strutil"
+	"pkg.re/essentialkaos/ek.v10/sliceutil"
+	"pkg.re/essentialkaos/ek.v10/strutil"
 
 	"github.com/essentialkaos/perfecto/spec"
 )
