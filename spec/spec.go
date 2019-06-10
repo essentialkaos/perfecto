@@ -10,13 +10,14 @@ package spec
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
 
-	"pkg.re/essentialkaos/ek.v9/fsutil"
-	"pkg.re/essentialkaos/ek.v9/path"
-	"pkg.re/essentialkaos/ek.v9/strutil"
+	"pkg.re/essentialkaos/ek.v10/fsutil"
+	"pkg.re/essentialkaos/ek.v10/path"
+	"pkg.re/essentialkaos/ek.v10/strutil"
 )
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -49,8 +50,8 @@ const (
 
 // Spec spec contains data from spec file
 type Spec struct {
-	File string
-	Data []Line
+	File string `json:"file"`
+	Data []Line `json:"data"`
 }
 
 // Line contains line data and index
@@ -62,18 +63,18 @@ type Line struct {
 
 // Header header contains header info and data
 type Header struct {
-	Package    string
-	Subpackage bool
-	Data       []Line
+	Package      string `json:"package"`
+	Data         []Line `json:"data"`
+	IsSubpackage bool   `json:"is_subpackage"`
 }
 
 // Section contains section info and data
 type Section struct {
-	Name  string
-	Args  []string
-	Data  []Line
-	Start int
-	End   int
+	Name  string   `json:"name"`
+	Args  []string `json:"args"`
+	Data  []Line   `json:"data"`
+	Start int      `json:"start"`
+	End   int      `json:"end"`
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -211,10 +212,22 @@ func readFile(file string) (*Spec, error) {
 	line, skip := 1, 0
 	spec := &Spec{File: file}
 	r := bufio.NewReader(fd)
-	s := bufio.NewScanner(r)
 
-	for s.Scan() {
-		text := strings.TrimRight(s.Text(), "\r\n")
+LOOP:
+	for {
+		text, err := r.ReadString('\n')
+
+		switch err {
+		case nil:
+			// nothing
+		case io.EOF:
+			spec.Data = append(spec.Data, Line{line, text, skip != 0})
+			break LOOP
+		default:
+			return nil, err
+		}
+
+		text = strings.TrimRight(text, "\r\n")
 
 		if isSkipTag(text) {
 			skip = extractSkipCount(text)
@@ -324,7 +337,7 @@ func extractHeaders(s *Spec) []*Header {
 				continue
 			} else if strings.HasPrefix(line.Text, "%package") {
 				name, sub := parsePackageName(line.Text)
-				header = &Header{Package: name, Subpackage: sub}
+				header = &Header{Package: name, IsSubpackage: sub}
 				start = index
 				continue
 			}
