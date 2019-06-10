@@ -10,7 +10,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         2.2.0
+Version:         2.3.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -20,7 +20,7 @@ Source0:         https://source.kaos.st/%{name}/%{name}-%{version}.tar.bz2
 
 BuildRoot:       %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:   golang >= 1.10
+BuildRequires:   golang >= 1.12
 
 Requires:        rpmlint
 
@@ -59,6 +59,12 @@ rm -rf %{buildroot}
 ################################################################################
 
 %changelog
+* Mon Jun 10 2019 Anton Novojilov <andy@essentialkaos.com> - 2.3.0-0
+- Added new checker for checking the number of empty lines at the end of
+  the spec
+- Improved spec parser
+- Minor code refactoring
+
 * Sun Nov 04 2018 Anton Novojilov <andy@essentialkaos.com> - 2.2.0-0
 - Added quiet mode (option -q/--quiet)
 - Improved RPMLint output parser
