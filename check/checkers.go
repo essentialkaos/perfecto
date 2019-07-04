@@ -296,7 +296,7 @@ func checkForDevNull(s *spec.Spec) []Alert {
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {
 			for _, v := range variations {
-				if strings.Contains(strings.Replace(line.Text, " ", "", -1), strings.Replace(v, " ", "", -1)) {
+				if strings.Contains(strutil.Exclude(line.Text, " "), strutil.Exclude(v, " ")) {
 					result = append(result, Alert{LEVEL_NOTICE, fmt.Sprintf("Use \"&>/dev/null || :\" instead of \"%s || :\"", v), line})
 				}
 			}

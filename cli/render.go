@@ -69,7 +69,7 @@ var fallbackLevel = map[uint8]string{
 
 // renderError render error for given format
 func renderError(format, file string, err error) {
-	filename := strings.Replace(path.Base(file), ".spec", "", -1)
+	filename := strutil.Exclude(path.Base(file), ".spec")
 
 	switch format {
 	case FORMAT_TINY:
