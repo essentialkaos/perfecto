@@ -9,6 +9,7 @@ package check
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"pkg.re/essentialkaos/ek.v10/sliceutil"
@@ -216,8 +217,8 @@ func checkForNonMacroPaths(s *spec.Spec) []Alert {
 			text := line.Text
 
 			for _, macro := range pathMacroSlice {
-				if strings.Contains(text, macro.Value) {
-					text = strings.Replace(text, macro.Value, "", -1)
+				re := regexp.MustCompile(macro.Value + `(\/|$|%)`)
+				if re.MatchString(text) {
 					result = append(result, Alert{LEVEL_WARNING, fmt.Sprintf("Path \"%s\" should be used as macro \"%s\"", macro.Value, macro.Name), line})
 				}
 			}
