@@ -41,6 +41,8 @@ export PATH="$PATH:/usr/sbin/test"
 install -pm file $RPM_BUILD_ROOT/usr/
 install -pm file %{buildroot}/etc/
 
+wget github.com/etcd-io/etcd/Documentation
+
 %{__sed} -i -e 's|/usr/bin/traceroute|/bin/traceroute|' %{buildroot}%{_sysconfdir}/file
 
 rm -f %{buildroot}/%{_usr}/file >/dev/null 2>&1 || :

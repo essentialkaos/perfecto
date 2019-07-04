@@ -2,7 +2,7 @@ package cli
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 //                                                                                    //
-//                     Copyright (c) 2009-2018 ESSENTIAL KAOS                         //
+//                     Copyright (c) 2009-2019 ESSENTIAL KAOS                         //
 //        Essential Kaos Open Source License <https://essentialkaos.com/ekol>         //
 //                                                                                    //
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -28,7 +28,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "2.3.0"
+	VER  = "2.3.1"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 

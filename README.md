@@ -1,7 +1,5 @@
 <p align="center"><a href="#readme"><img src="https://gh.kaos.st/perfecto.svg"/></a></p>
 
-<p align="center"><a href="#installing">Installing</a> • <a href="#using-on-travisci">Using on TravisCI</a> • <a href="#using-with-docker">Using with Docker</a> • <a href="#usage">Usage</a> • <a href="#build-status">Build Status</a> • <a href="#license">License</a></p>
-
 <p align="center">
   <a href="https://goreportcard.com/report/github.com/essentialkaos/perfecto"><img src="https://goreportcard.com/badge/github.com/essentialkaos/perfecto"></a>
   <a href="https://codebeat.co/projects/github-com-essentialkaos-perfecto-master"><img alt="codebeat badge" src="https://codebeat.co/badges/74af2307-8aa2-48eb-afd5-2ae3620a1149" /></a>
@@ -9,6 +7,10 @@
   <a href='https://coveralls.io/github/essentialkaos/perfecto'><img src='https://coveralls.io/repos/github/essentialkaos/perfecto/badge.svg' alt='Coverage Status' /></a>
   <a href="#license"><img src="https://gh.kaos.st/ekol.svg"></a>
 </p>
+
+<p align="center"><a href="#installing">Installing</a> • <a href="#using-on-travisci">Using on TravisCI</a> • <a href="#using-with-docker">Using with Docker</a> • <a href="#usage">Usage</a> • <a href="#build-status">Build Status</a> • <a href="#license">License</a></p>
+
+<br/>
 
 _perfecto_ is tool for checking perfectly written RPM specs. Currently, _perfecto_ used by default for checking specs for [EK Public Repository](https://yum.kaos.st).
 

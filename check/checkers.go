@@ -2,13 +2,14 @@ package check
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 //                                                                                    //
-//                     Copyright (c) 2009-2018 ESSENTIAL KAOS                         //
+//                     Copyright (c) 2009-2019 ESSENTIAL KAOS                         //
 //        Essential Kaos Open Source License <https://essentialkaos.com/ekol>         //
 //                                                                                    //
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"pkg.re/essentialkaos/ek.v10/sliceutil"
@@ -216,8 +217,8 @@ func checkForNonMacroPaths(s *spec.Spec) []Alert {
 			text := line.Text
 
 			for _, macro := range pathMacroSlice {
-				if strings.Contains(text, macro.Value) {
-					text = strings.Replace(text, macro.Value, "", -1)
+				re := regexp.MustCompile(macro.Value + `(\/|$|%)`)
+				if re.MatchString(text) {
 					result = append(result, Alert{LEVEL_WARNING, fmt.Sprintf("Path \"%s\" should be used as macro \"%s\"", macro.Value, macro.Name), line})
 				}
 			}
@@ -295,7 +296,7 @@ func checkForDevNull(s *spec.Spec) []Alert {
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {
 			for _, v := range variations {
-				if strings.Contains(strings.Replace(line.Text, " ", "", -1), strings.Replace(v, " ", "", -1)) {
+				if strings.Contains(strutil.Exclude(line.Text, " "), strutil.Exclude(v, " ")) {
 					result = append(result, Alert{LEVEL_NOTICE, fmt.Sprintf("Use \"&>/dev/null || :\" instead of \"%s || :\"", v), line})
 				}
 			}

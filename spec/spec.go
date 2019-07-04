@@ -2,7 +2,7 @@ package spec
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 //                                                                                    //
-//                     Copyright (c) 2009-2018 ESSENTIAL KAOS                         //
+//                     Copyright (c) 2009-2019 ESSENTIAL KAOS                         //
 //        Essential Kaos Open Source License <https://essentialkaos.com/ekol>         //
 //                                                                                    //
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -181,7 +181,7 @@ func (s *Spec) GetLine(index int) Line {
 
 // GetFileName return spec file name without extension
 func (s *Spec) GetFileName() string {
-	return strings.Replace(path.Base(s.File), ".spec", "", -1)
+	return strutil.Exclude(path.Base(s.File), ".spec")
 }
 
 // GetPackageName return package name if section is package specific

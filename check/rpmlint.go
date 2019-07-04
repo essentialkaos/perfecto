@@ -2,7 +2,7 @@ package check
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 //                                                                                    //
-//                     Copyright (c) 2009-2018 ESSENTIAL KAOS                         //
+//                     Copyright (c) 2009-2019 ESSENTIAL KAOS                         //
 //        Essential Kaos Open Source License <https://essentialkaos.com/ekol>         //
 //                                                                                    //
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -11,6 +11,8 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"pkg.re/essentialkaos/ek.v10/strutil"
 
 	"github.com/essentialkaos/perfecto/spec"
 )
@@ -65,7 +67,7 @@ func parseAlertLine(text string, s *spec.Spec) (Alert, bool) {
 
 	if strings.Contains(desc, "specfile-error warning") {
 		level = "W"
-		desc = strings.Replace(desc, "specfile-error warning: ", "", -1)
+		desc = strutil.Exclude(desc, "specfile-error warning: ")
 	}
 
 	desc = "[rpmlint] " + desc

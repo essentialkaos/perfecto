@@ -10,7 +10,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         2.3.0
+Version:         2.3.1
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -59,6 +59,9 @@ rm -rf %{buildroot}
 ################################################################################
 
 %changelog
+* Fri Jul 05 2019 Anton Novojilov <andy@essentialkaos.com> - 2.3.1-0
+- Fixed bug with checking default paths without macro
+
 * Mon Jun 10 2019 Anton Novojilov <andy@essentialkaos.com> - 2.3.0-0
 - Added new checker for checking the number of empty lines at the end of
   the spec
