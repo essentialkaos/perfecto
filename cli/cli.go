@@ -277,7 +277,7 @@ func printErrorAndExit(f string, a ...interface{}) {
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
-// showUsage print usage info
+// showUsage prints usage info
 func showUsage() {
 	genUsage().Render()
 }
@@ -331,7 +331,7 @@ func genCompletion() {
 	os.Exit(0)
 }
 
-// showAbout show info about version
+// showAbout shows info about version
 func showAbout() {
 	about := &usage.About{
 		App:           APP,
