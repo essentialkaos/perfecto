@@ -8,6 +8,7 @@ package cli
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 import (
+	"fmt"
 	"os"
 
 	"pkg.re/essentialkaos/ek.v10/env"
@@ -17,6 +18,9 @@ import (
 	"pkg.re/essentialkaos/ek.v10/sliceutil"
 	"pkg.re/essentialkaos/ek.v10/strutil"
 	"pkg.re/essentialkaos/ek.v10/usage"
+	"pkg.re/essentialkaos/ek.v10/usage/completion/bash"
+	"pkg.re/essentialkaos/ek.v10/usage/completion/fish"
+	"pkg.re/essentialkaos/ek.v10/usage/completion/zsh"
 	"pkg.re/essentialkaos/ek.v10/usage/update"
 
 	"github.com/essentialkaos/perfecto/check"
@@ -28,7 +32,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "2.3.1"
+	VER  = "2.4.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -42,6 +46,8 @@ const (
 	OPT_NO_COLOR    = "nc:no-color"
 	OPT_HELP        = "h:help"
 	OPT_VER         = "v:version"
+
+	OPT_COMPLETION = "completion"
 )
 
 // Supported formats
@@ -74,6 +80,8 @@ var optMap = options.Map{
 	OPT_NO_COLOR:    {Type: options.BOOL},
 	OPT_HELP:        {Type: options.BOOL, Alias: "u:usage"},
 	OPT_VER:         {Type: options.BOOL, Alias: "ver"},
+
+	OPT_COMPLETION: {},
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -88,6 +96,10 @@ func Init() {
 		}
 
 		os.Exit(1)
+	}
+
+	if options.Has(OPT_COMPLETION) {
+		genCompletion()
 	}
 
 	configureUI()
@@ -265,8 +277,13 @@ func printErrorAndExit(f string, a ...interface{}) {
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
-// showUsage show usage info
+// showUsage prints usage info
 func showUsage() {
+	genUsage().Render()
+}
+
+// genUsage generates usage info
+func genUsage() *usage.Info {
 	info := usage.NewInfo("", "file…")
 
 	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny|short|json|xml){!}", "format")
@@ -293,10 +310,28 @@ func showUsage() {
 		"Check spec, generate report in JSON format and save as report.json",
 	)
 
-	info.Render()
+	return info
 }
 
-// showAbout show info about version
+// genCompletion generates completion for different shells
+func genCompletion() {
+	info := genUsage()
+
+	switch options.GetS(OPT_COMPLETION) {
+	case "bash":
+		fmt.Printf(bash.Generate(info, "perfecto"))
+	case "fish":
+		fmt.Printf(fish.Generate(info, "perfecto"))
+	case "zsh":
+		fmt.Printf(zsh.Generate(info, optMap, "perfecto"))
+	default:
+		os.Exit(1)
+	}
+
+	os.Exit(0)
+}
+
+// showAbout shows info about version
 func showAbout() {
 	about := &usage.About{
 		App:           APP,
