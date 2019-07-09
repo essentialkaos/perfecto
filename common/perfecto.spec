@@ -10,7 +10,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         2.3.1
+Version:         2.4.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -59,6 +59,9 @@ rm -rf %{buildroot}
 ################################################################################
 
 %changelog
+* Tue Jul 09 2019 Anton Novojilov <andy@essentialkaos.com> - 2.4.0-0
+- Added check for bash loops syntax
+
 * Fri Jul 05 2019 Anton Novojilov <andy@essentialkaos.com> - 2.3.1-0
 - Fixed bug with checking default paths without macro
 

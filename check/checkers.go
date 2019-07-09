@@ -85,6 +85,7 @@ func getCheckers() []Checker {
 		checkForIndentInFilesSection,
 		checkForSetupArguments,
 		checkForEmptyLinesAtEnd,
+		checkBashLoops,
 	}
 }
 
@@ -642,6 +643,57 @@ func checkForEmptyLinesAtEnd(s *spec.Spec) []Alert {
 	}
 
 	return nil
+}
+
+// checkBashLoops checks bash loops format
+func checkBashLoops(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
+	var result []Alert
+
+	sections := []string{
+		spec.SECTION_BUILD,
+		spec.SECTION_CHECK,
+		spec.SECTION_INSTALL,
+		spec.SECTION_POST,
+		spec.SECTION_POSTTRANS,
+		spec.SECTION_POSTUN,
+		spec.SECTION_PRE,
+		spec.SECTION_PREP,
+		spec.SECTION_PRETRANS,
+		spec.SECTION_PREUN,
+		spec.SECTION_SETUP,
+		spec.SECTION_TRIGGERIN,
+		spec.SECTION_TRIGGERPOSTUN,
+		spec.SECTION_TRIGGERUN,
+		spec.SECTION_VERIFYSCRIPT,
+	}
+
+	for _, section := range s.GetSections(sections...) {
+		for _, line := range section.Data {
+			lineText := strings.TrimLeft(line.Text, "\t ")
+
+			if !strings.HasPrefix(lineText, "for") && !strings.HasPrefix(lineText, "while") {
+				continue
+			}
+
+			nextLine := s.GetLine(line.Index + 1)
+
+			if nextLine.Index == -1 {
+				continue
+			}
+
+			nextLineText := strings.TrimLeft(nextLine.Text, "\t ")
+
+			if !strings.HasSuffix(strings.Trim(nextLineText, " "), ";do") && nextLineText == "do" {
+				result = append(result, Alert{LEVEL_NOTICE, "Place 'do' keyword on the same line with for/while (for ... ; do)", line})
+			}
+		}
+	}
+
+	return result
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
