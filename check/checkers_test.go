@@ -361,6 +361,7 @@ func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
 	c.Assert(checkForIndentInFilesSection(s), chk.IsNil)
 	c.Assert(checkForSetupArguments(s), chk.IsNil)
 	c.Assert(checkForEmptyLinesAtEnd(s), chk.IsNil)
+	c.Assert(checkBashLoops(s), chk.IsNil)
 }
 
 func (sc *CheckSuite) TestRPMLint(c *chk.C) {

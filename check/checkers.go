@@ -680,11 +680,6 @@ func checkBashLoops(s *spec.Spec) []Alert {
 			}
 
 			nextLine := s.GetLine(line.Index + 1)
-
-			if nextLine.Index == -1 {
-				continue
-			}
-
 			nextLineText := strings.TrimLeft(nextLine.Text, "\t ")
 
 			if !strings.HasSuffix(strings.Trim(nextLineText, " "), ";do") && nextLineText == "do" {
