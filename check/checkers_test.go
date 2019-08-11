@@ -408,30 +408,39 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 }
 
 func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
-	i, s1, s2 := extractAlertData("test.spec: W: no-buildroot-tag")
-	c.Assert(i, chk.Equals, -1)
-	c.Assert(s1, chk.Equals, "W")
-	c.Assert(s2, chk.Equals, "no-buildroot-tag")
+	s, err := spec.Read("../testdata/test_7.spec")
 
-	i, s1, s2 = extractAlertData("test.spec: E: specfile-error error: line 356: Unknown tag: Release1")
-	c.Assert(i, chk.Equals, 356)
-	c.Assert(s1, chk.Equals, "E")
-	c.Assert(s2, chk.Equals, "Unknown tag: Release1")
+	c.Assert(s, chk.NotNil)
+	c.Assert(err, chk.IsNil)
 
-	i, s1, s2 = extractAlertData("test.spec:67: W: macro-in-%changelog %record")
-	c.Assert(i, chk.Equals, 67)
-	c.Assert(s1, chk.Equals, "W")
-	c.Assert(s2, chk.Equals, "macro-in-%changelog %record")
+	a, ok := parseAlertLine("test.spec: W: no-buildroot-tag", s)
 
-	i, s1, s2 = extractAlertData("test.spec: E: specfile-error error: line A: Unknown tag: Release1")
-	c.Assert(i, chk.Equals, -1)
-	c.Assert(s1, chk.Equals, "")
-	c.Assert(s2, chk.Equals, "")
+	c.Assert(ok, chk.Equals, true)
+	c.Assert(a.Level, chk.Equals, LEVEL_ERROR)
+	c.Assert(a.Info, chk.Equals, "[rpmlint] no-buildroot-tag")
+	c.Assert(a.Line.Index, chk.Equals, -1)
 
-	i, s1, s2 = extractAlertData("test.spec:A: W: macro-in-%changelog %record")
-	c.Assert(i, chk.Equals, -1)
-	c.Assert(s1, chk.Equals, "")
-	c.Assert(s2, chk.Equals, "")
+	a, ok = parseAlertLine("test.spec: E: specfile-error error: line 10: Unknown tag: Release1", s)
+
+	c.Assert(ok, chk.Equals, true)
+	c.Assert(a.Level, chk.Equals, LEVEL_CRITICAL)
+	c.Assert(a.Info, chk.Equals, "[rpmlint] Unknown tag: Release1")
+	c.Assert(a.Line.Index, chk.Equals, 10)
+
+	a, ok = parseAlertLine("test.spec:67: W: macro-in-%changelog %record", s)
+
+	c.Assert(ok, chk.Equals, true)
+	c.Assert(a.Level, chk.Equals, LEVEL_ERROR)
+	c.Assert(a.Info, chk.Equals, "[rpmlint] macro-in-%changelog %record")
+	c.Assert(a.Line.Index, chk.Equals, 67)
+
+	a, ok = parseAlertLine("test.spec: E: specfile-error error: line A: Unknown tag: Release1", s)
+
+	c.Assert(ok, chk.Equals, false)
+
+	a, ok = parseAlertLine("test.spec:A: W: macro-in-%changelog %record", s)
+
+	c.Assert(ok, chk.Equals, false)
 }
 
 func (sc *CheckSuite) TestAux(c *chk.C) {
