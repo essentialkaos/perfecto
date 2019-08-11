@@ -12,6 +12,7 @@ import (
 	"regexp"
 	"strings"
 
+	"pkg.re/essentialkaos/ek.v10/req"
 	"pkg.re/essentialkaos/ek.v10/sliceutil"
 	"pkg.re/essentialkaos/ek.v10/strutil"
 
@@ -86,6 +87,7 @@ func getCheckers() []Checker {
 		checkForSetupArguments,
 		checkForEmptyLinesAtEnd,
 		checkBashLoops,
+		checkURLForHTTPS,
 	}
 }
 
@@ -691,6 +693,42 @@ func checkBashLoops(s *spec.Spec) []Alert {
 	return result
 }
 
+// checkURLForHTTPS checks if source domain supports HTTPS
+func checkURLForHTTPS(s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
+	sources := s.GetSources()
+
+	var result []Alert
+
+	for _, line := range sources {
+		sourceText := strings.TrimLeft(line.Text, "\t ")
+		sourceURL := strutil.ReadField(sourceText, 1, true, " ")
+
+		if !strings.HasPrefix(sourceURL, "http://") {
+			continue
+		}
+
+		sourceDomain := extractSourceDomain(sourceURL)
+
+		if sourceDomain == "" {
+			continue
+		}
+
+		if isHostSupportsHTTPS(sourceDomain) {
+			result = append(result, Alert{
+				LEVEL_WARNING,
+				fmt.Sprintf("Domain %s supports HTTPS. Replace http by https in source URL.", sourceDomain),
+				line,
+			})
+		}
+	}
+
+	return result
+}
+
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // prefix is strings.HasPrefix wrapper
@@ -744,4 +782,20 @@ func containsTag(data []spec.Line, tag string) bool {
 	}
 
 	return false
+}
+
+// extractSourceDomain extracts domain name from source URL
+func extractSourceDomain(url string) string {
+	url = strutil.Exclude(url, "http://")
+	return strutil.ReadField(url, 0, false, "/")
+}
+
+// isHostSupportsHTTPS return true if domain supports HTTPS protocol
+func isHostSupportsHTTPS(domain string) bool {
+	_, err := req.Request{
+		URL:         "https://" + domain,
+		AutoDiscard: true,
+	}.Head()
+
+	return err == nil
 }

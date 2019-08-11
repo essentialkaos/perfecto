@@ -164,6 +164,11 @@ func (s *Spec) GetHeaders() []*Header {
 	return extractHeaders(s)
 }
 
+// GetSources returns slice with sources
+func (s *Spec) GetSources() []Line {
+	return extractSources(s)
+}
+
 // GetLine return spec line by index
 func (s *Spec) GetLine(index int) Line {
 	if index < 0 {
@@ -199,7 +204,7 @@ func (s *Section) GetPackageName() string {
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
-// readFile read and parse spec file
+// readFile reads and parses spec file
 func readFile(file string) (*Spec, error) {
 	fd, err := os.OpenFile(file, os.O_RDONLY, 0)
 
@@ -250,7 +255,7 @@ LOOP:
 	return spec, nil
 }
 
-// checkFile check file for errors
+// checkFile checks file for errors
 func checkFile(file string) error {
 	if !fsutil.IsExist(file) {
 		return fmt.Errorf("File %s doesn't exist", file)
@@ -271,7 +276,7 @@ func checkFile(file string) error {
 	return nil
 }
 
-// hasSection return true if spec contains given section
+// hasSection returns true if spec contains given section
 func hasSection(s *Spec, sectionName string) bool {
 	for _, line := range s.Data {
 		if strings.HasPrefix(line.Text, "%"+sectionName) {
@@ -282,7 +287,7 @@ func hasSection(s *Spec, sectionName string) bool {
 	return false
 }
 
-// extractSections extract data for given sections
+// extractSections extracts data for given sections
 func extractSections(s *Spec, names []string) []*Section {
 	var result []*Section
 	var section *Section
@@ -323,7 +328,7 @@ func extractSections(s *Spec, names []string) []*Section {
 	return result
 }
 
-// extractHeaders extract packages' headers
+// extractHeaders extracts packages' headers
 func extractHeaders(s *Spec) []*Header {
 	var result []*Header
 	var header *Header
@@ -355,7 +360,30 @@ func extractHeaders(s *Spec) []*Header {
 	return result
 }
 
-// isSectionHeader return if given string is package header
+// extractSources extracts sources from spec file
+func extractSources(s *Spec) []Line {
+	var result []Line
+
+	for _, line := range s.Data {
+		if line.Skip {
+			continue
+		}
+
+		if isSectionHeader(line.Text) {
+			break
+		}
+
+		lineText := strings.TrimLeft(line.Text, "\t ")
+
+		if strings.HasPrefix(lineText, "Source") {
+			result = append(result, line)
+		}
+	}
+
+	return result
+}
+
+// isSectionHeader returns if given string is package header
 func isSectionHeader(text string) bool {
 	for _, sectionName := range sections {
 		if strings.HasPrefix(text, "%"+sectionName) {
@@ -366,7 +394,7 @@ func isSectionHeader(text string) bool {
 	return false
 }
 
-// isHeaderTag return if given string is header tag
+// isHeaderTag returns if given string is header tag
 func isHeaderTag(text string) bool {
 	for _, tagName := range tags {
 		if strings.HasPrefix(text, tagName) {
@@ -377,7 +405,7 @@ func isHeaderTag(text string) bool {
 	return false
 }
 
-// parseSectionName parse section name
+// parseSectionName parses section name
 func parseSectionName(text string) (string, []string) {
 	if !strings.Contains(text, " ") {
 		return strings.TrimLeft(text, "%"), nil
@@ -388,7 +416,7 @@ func parseSectionName(text string) (string, []string) {
 	return strings.TrimLeft(sectionNameSlice[0], "%"), sectionNameSlice[1:]
 }
 
-// parsePackageName parse package name
+// parsePackageName parses package name
 func parsePackageName(text string) (string, bool) {
 	if strutil.ReadField(text, 1, true) == "-n" {
 		return strutil.ReadField(text, 2, true), false
@@ -397,7 +425,7 @@ func parsePackageName(text string) (string, bool) {
 	return strutil.ReadField(text, 1, true), true
 }
 
-// isSectionMatch return true if data contains name of any given sections
+// isSectionMatch returns true if data contains name of any given sections
 func isSectionMatch(data string, names []string) bool {
 	if len(names) == 0 {
 		return true
@@ -412,7 +440,7 @@ func isSectionMatch(data string, names []string) bool {
 	return false
 }
 
-// isSpec check that given file contains spec data
+// isSpec checks that given file contains spec data
 func isSpec(spec *Spec) bool {
 	var count int
 
@@ -444,12 +472,12 @@ func isSpec(spec *Spec) bool {
 	return count >= 3
 }
 
-// isSkipTag return true if text contains skip tag
+// isSkipTag returns true if text contains skip tag
 func isSkipTag(text string) bool {
 	return strings.Contains(text, "perfecto:absolve")
 }
 
-// extractSkipCount return number of lines to skip
+// extractSkipCount returns number of lines to skip
 func extractSkipCount(text string) int {
 	count := strutil.ReadField(text, 2, true)
 

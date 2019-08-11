@@ -340,6 +340,19 @@ func (sc *CheckSuite) TestCheckBashLoops(c *chk.C) {
 	c.Assert(alerts[1].Line.Index, chk.Equals, 49)
 }
 
+func (sc *CheckSuite) TestCheckURLForHTTPS(c *chk.C) {
+	s, err := spec.Read("../testdata/test_11.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts := checkURLForHTTPS(s)
+
+	c.Assert(alerts, chk.HasLen, 1)
+	c.Assert(alerts[0].Info, chk.Equals, "Domain kaos.st supports HTTPS. Replace http by https in source URL.")
+	c.Assert(alerts[0].Line.Index, chk.Equals, 13)
+}
+
 func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
 	s := &spec.Spec{}
 
@@ -362,6 +375,7 @@ func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
 	c.Assert(checkForSetupArguments(s), chk.IsNil)
 	c.Assert(checkForEmptyLinesAtEnd(s), chk.IsNil)
 	c.Assert(checkBashLoops(s), chk.IsNil)
+	c.Assert(checkURLForHTTPS(s), chk.IsNil)
 }
 
 func (sc *CheckSuite) TestRPMLint(c *chk.C) {
@@ -422,7 +436,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 
 func (sc *CheckSuite) TestAux(c *chk.C) {
 	// This test will fail if new checkers was added
-	c.Assert(getCheckers(), chk.HasLen, 19)
+	c.Assert(getCheckers(), chk.HasLen, 20)
 
 	r := &Report{}
 	c.Assert(r.IsPerfect(), chk.Equals, true)

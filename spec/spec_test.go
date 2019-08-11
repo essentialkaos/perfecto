@@ -50,7 +50,7 @@ func (s *SpecSuite) TestParsing(c *C) {
 
 	c.Assert(spec.GetLine(-1), DeepEquals, Line{-1, "", false})
 	c.Assert(spec.GetLine(99), DeepEquals, Line{-1, "", false})
-	c.Assert(spec.GetLine(36), DeepEquals, Line{36, "%{__make} %{?_smp_mflags}", false})
+	c.Assert(spec.GetLine(39), DeepEquals, Line{39, "%{__make} %{?_smp_mflags}", false})
 }
 
 func (s *SpecSuite) TestSections(c *C) {
@@ -67,8 +67,8 @@ func (s *SpecSuite) TestSections(c *C) {
 	sections = spec.GetSections(SECTION_BUILD)
 	c.Assert(sections, HasLen, 1)
 	c.Assert(sections[0].Data, HasLen, 2)
-	c.Assert(sections[0].Start, Equals, 35)
-	c.Assert(sections[0].End, Equals, 37)
+	c.Assert(sections[0].Start, Equals, 38)
+	c.Assert(sections[0].End, Equals, 40)
 	sections = spec.GetSections(SECTION_SETUP)
 	c.Assert(sections[0].Name, Equals, "setup")
 	c.Assert(sections[0].Args, DeepEquals, []string{"-qn", "%{name}-%{version}"})
@@ -88,7 +88,7 @@ func (s *SpecSuite) TestHeaders(c *C) {
 	c.Assert(headers, HasLen, 2)
 	c.Assert(headers[0].Package, Equals, "")
 	c.Assert(headers[0].IsSubpackage, Equals, false)
-	c.Assert(headers[0].Data, HasLen, 13)
+	c.Assert(headers[0].Data, HasLen, 16)
 	c.Assert(headers[1].Package, Equals, "magic")
 	c.Assert(headers[1].IsSubpackage, Equals, true)
 	c.Assert(headers[1].Data, HasLen, 4)
@@ -99,6 +99,17 @@ func (s *SpecSuite) TestHeaders(c *C) {
 	pkgName, subPkg = parsePackageName("%package -n magic")
 	c.Assert(pkgName, Equals, "magic")
 	c.Assert(subPkg, Equals, false)
+}
+
+func (s *SpecSuite) TestSourceExtractor(c *C) {
+	spec, err := Read("../testdata/test.spec")
+
+	c.Assert(err, IsNil)
+	c.Assert(spec, NotNil)
+
+	sources := spec.GetSources()
+
+	c.Assert(sources, HasLen, 1)
 }
 
 func (s *SpecSuite) TestSkipTag(c *C) {

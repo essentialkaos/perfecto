@@ -10,7 +10,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         2.4.0
+Version:         2.5.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -87,6 +87,9 @@ fi
 ################################################################################
 
 %changelog
+* Sun Aug 11 2019 Anton Novojilov <andy@essentialkaos.com> - 2.5.0-0
+- Added check for HTTPS support on a source domain
+
 * Tue Jul 09 2019 Anton Novojilov <andy@essentialkaos.com> - 2.4.0-0
 - Added check for bash loops syntax
 - Added completions generators
