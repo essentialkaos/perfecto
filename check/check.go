@@ -77,7 +77,8 @@ func Check(s *spec.Spec, lint bool, linterConfig string) *Report {
 	checkers := getCheckers()
 
 	if lint {
-		appendLinterAlerts(s, report, linterConfig)
+		alerts := Lint(s, linterConfig)
+		appendLinterAlerts(report, alerts)
 	}
 
 	for _, checker := range checkers {
@@ -110,9 +111,7 @@ func Check(s *spec.Spec, lint bool, linterConfig string) *Report {
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // appendLinterAlerts append rpmlint alerts to report
-func appendLinterAlerts(s *spec.Spec, r *Report, linterConfig string) {
-	alerts := Lint(s, linterConfig)
-
+func appendLinterAlerts(r *Report, alerts []Alert) {
 	if len(alerts) == 0 {
 		return
 	}
