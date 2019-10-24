@@ -10,7 +10,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         2.5.0
+Version:         2.6.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -20,7 +20,7 @@ Source0:         https://source.kaos.st/%{name}/%{name}-%{version}.tar.bz2
 
 BuildRoot:       %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:   golang >= 1.12
+BuildRequires:   golang >= 1.13
 
 Requires:        rpmlint
 
@@ -87,6 +87,9 @@ fi
 ################################################################################
 
 %changelog
+* Fri Oct 25 2019 Anton Novojilov <andy@essentialkaos.com> - 2.6.0-0
+- ek package updated to the latest version
+
 * Sun Aug 11 2019 Anton Novojilov <andy@essentialkaos.com> - 2.5.0-0
 - Added check for HTTPS support on a source domain
 
