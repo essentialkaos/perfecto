@@ -87,12 +87,10 @@ fi
 ################################################################################
 
 %changelog
-* Fri Oct 25 2019 Anton Novojilov <andy@essentialkaos.com> - 2.6.0-0
-- ek package updated to the latest version
-- Added cache for HTTPS checks
-
-* Sun Aug 11 2019 Anton Novojilov <andy@essentialkaos.com> - 2.5.0-0
+* Fri Oct 25 2019 Anton Novojilov <andy@essentialkaos.com> - 2.5.0-0
 - Added check for HTTPS support on a source domain
+- Added cache for HTTPS checks
+- ek package updated to the latest version
 
 * Tue Jul 09 2019 Anton Novojilov <andy@essentialkaos.com> - 2.4.0-0
 - Added check for bash loops syntax
