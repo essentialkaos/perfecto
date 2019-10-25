@@ -88,6 +88,7 @@ fi
 
 %changelog
 * Fri Oct 25 2019 Anton Novojilov <andy@essentialkaos.com> - 2.5.0-0
+- Added option for disabling some checks for entire spec
 - Added check for HTTPS support on a source domain
 - Added cache for HTTPS checks
 - ek package updated to the latest version

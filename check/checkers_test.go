@@ -272,7 +272,7 @@ func (sc *CheckSuite) TestCheckForSetupArguments(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForSetupArguments(s)
+	alerts := checkForSetupOptions(s)
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Arguments \"-q -c -n\" can be simplified to \"-qcn\"")
@@ -283,7 +283,7 @@ func (sc *CheckSuite) TestCheckForSetupArguments(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts = checkForSetupArguments(s)
+	alerts = checkForSetupOptions(s)
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Arguments \"-c -n\" can be simplified to \"-cn\"")
@@ -294,7 +294,7 @@ func (sc *CheckSuite) TestCheckForSetupArguments(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts = checkForSetupArguments(s)
+	alerts = checkForSetupOptions(s)
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Arguments \"-q -n\" can be simplified to \"-qn\"")
@@ -372,7 +372,7 @@ func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
 	c.Assert(checkForUselessBinaryMacro(s), chk.IsNil)
 	c.Assert(checkForEmptySections(s), chk.IsNil)
 	c.Assert(checkForIndentInFilesSection(s), chk.IsNil)
-	c.Assert(checkForSetupArguments(s), chk.IsNil)
+	c.Assert(checkForSetupOptions(s), chk.IsNil)
 	c.Assert(checkForEmptyLinesAtEnd(s), chk.IsNil)
 	c.Assert(checkBashLoops(s), chk.IsNil)
 	c.Assert(checkURLForHTTPS(s), chk.IsNil)

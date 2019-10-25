@@ -182,13 +182,13 @@ func renderTinyReport(s *spec.Spec, r *check.Report) {
 
 		for _, alert := range alerts {
 			if options.GetB(OPT_NO_COLOR) {
-				if alert.Line.Skip {
+				if alert.Absolve {
 					fmtc.Printf("X ")
 				} else {
 					fmtc.Printf(fallbackLevel[level] + " ")
 				}
 			} else {
-				if alert.Line.Skip {
+				if alert.Absolve {
 					fmtc.Printf("{s-}%s{!}", "•")
 				} else {
 					fmtc.Printf(fgColor[level]+"%s{!}", "•")
@@ -241,7 +241,7 @@ func renderAlert(alert check.Alert) {
 	fmtc.Printf(fg + "│ {!}")
 
 	if alert.Line.Index != -1 {
-		if alert.Line.Skip {
+		if alert.Absolve {
 			fmtc.Printf(hl+"[%d]{!} {s}[A]{!} "+fg+"%s{!}\n", alert.Line.Index, alert.Info)
 		} else {
 			fmtc.Printf(hl+"[%d]{!} "+fg+"%s{!}\n", alert.Line.Index, alert.Info)
@@ -266,7 +266,7 @@ func renderShortAlert(alert check.Alert) {
 	}
 
 	if alert.Line.Index != -1 {
-		if alert.Line.Skip {
+		if alert.Absolve {
 			fmtc.Printf(hl+"[%d]{!} {s}[A]{!} "+fg+"%s{!}\n", alert.Line.Index, alert.Info)
 		} else {
 			fmtc.Printf(hl+"[%d]{!} "+fg+"%s{!}\n", alert.Line.Index, alert.Info)
