@@ -275,7 +275,7 @@ func (sc *CheckSuite) TestCheckForSetupArguments(c *chk.C) {
 	alerts := checkForSetupOptions(s)
 
 	c.Assert(alerts, chk.HasLen, 1)
-	c.Assert(alerts[0].Info, chk.Equals, "Arguments \"-q -c -n\" can be simplified to \"-qcn\"")
+	c.Assert(alerts[0].Info, chk.Equals, "Options \"-q -c -n\" can be simplified to \"-qcn\"")
 	c.Assert(alerts[0].Line.Index, chk.Equals, 33)
 
 	s, err = spec.Read("../testdata/test_5.spec")
@@ -286,7 +286,7 @@ func (sc *CheckSuite) TestCheckForSetupArguments(c *chk.C) {
 	alerts = checkForSetupOptions(s)
 
 	c.Assert(alerts, chk.HasLen, 1)
-	c.Assert(alerts[0].Info, chk.Equals, "Arguments \"-c -n\" can be simplified to \"-cn\"")
+	c.Assert(alerts[0].Info, chk.Equals, "Options \"-c -n\" can be simplified to \"-cn\"")
 	c.Assert(alerts[0].Line.Index, chk.Equals, 41)
 
 	s, err = spec.Read("../testdata/test_6.spec")
@@ -297,7 +297,7 @@ func (sc *CheckSuite) TestCheckForSetupArguments(c *chk.C) {
 	alerts = checkForSetupOptions(s)
 
 	c.Assert(alerts, chk.HasLen, 1)
-	c.Assert(alerts[0].Info, chk.Equals, "Arguments \"-q -n\" can be simplified to \"-qn\"")
+	c.Assert(alerts[0].Info, chk.Equals, "Options \"-q -n\" can be simplified to \"-qn\"")
 	c.Assert(alerts[0].Line.Index, chk.Equals, 31)
 }
 
@@ -384,7 +384,7 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 	c.Assert(s, chk.NotNil)
 	c.Assert(err, chk.IsNil)
 
-	r := Check(s, true, "")
+	r := Check(s, true, "", nil)
 
 	c.Assert(r, chk.NotNil)
 	c.Assert(r.IsPerfect(), chk.Equals, true)
@@ -394,10 +394,21 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 	c.Assert(s, chk.NotNil)
 	c.Assert(err, chk.IsNil)
 
-	r = Check(s, true, "")
+	r = Check(s, true, "", nil)
 
 	c.Assert(r, chk.NotNil)
 	c.Assert(r.IsPerfect(), chk.Equals, false)
+
+	s, err = spec.Read("../testdata/test_11.spec")
+
+	c.Assert(s, chk.NotNil)
+	c.Assert(err, chk.IsNil)
+
+	r = Check(s, true, "", []string{"PF20"})
+
+	c.Assert(r, chk.NotNil)
+	c.Assert(r.Warnings, chk.HasLen, 2)
+	c.Assert(r.Warnings[0].Absolve, chk.Equals, true)
 
 	rpmLintBin = "echo"
 	s = &spec.Spec{File: ""}
