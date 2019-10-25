@@ -10,6 +10,8 @@ package check
 import (
 	"sort"
 
+	"pkg.re/essentialkaos/ek.v11/sliceutil"
+
 	"github.com/essentialkaos/perfecto/spec"
 )
 
@@ -35,9 +37,10 @@ type Report struct {
 
 // Alert contain basic alert info
 type Alert struct {
-	Level uint8     `json:"level"`
-	Info  string    `json:"info"`
-	Line  spec.Line `json:"line"`
+	Level   uint8     `json:"level"`
+	Info    string    `json:"info"`
+	Line    spec.Line `json:"line"`
+	Absolve bool      `json:"absolve"`
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -49,6 +52,13 @@ func (s AlertSlice) Len() int      { return len(s) }
 func (s AlertSlice) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
 func (s AlertSlice) Less(i, j int) bool {
 	return s[i].Line.Index < s[j].Line.Index
+}
+
+// ////////////////////////////////////////////////////////////////////////////////// //
+
+// NewAlert creates new alert
+func NewAlert(level uint8, info string, line spec.Line) Alert {
+	return Alert{level, info, line, false}
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -72,22 +82,29 @@ func (r *Report) IsPerfect() bool {
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // Check check spec
-func Check(s *spec.Spec, lint bool, linterConfig string) *Report {
+func Check(s *spec.Spec, lint bool, linterConfig string, absolved []string) *Report {
 	report := &Report{}
 	checkers := getCheckers()
 
 	if lint {
-		appendLinterAlerts(s, report, linterConfig)
+		alerts := Lint(s, linterConfig)
+		appendLinterAlerts(report, alerts)
 	}
 
-	for _, checker := range checkers {
+	for id, checker := range checkers {
 		alerts := checker(s)
 
 		if len(alerts) == 0 {
 			continue
 		}
 
+		absolve := sliceutil.Contains(absolved, id)
+
 		for _, alert := range alerts {
+			if absolve || alert.Line.Skip {
+				alert.Absolve = true
+			}
+
 			switch alert.Level {
 			case LEVEL_NOTICE:
 				report.Notices = append(report.Notices, alert)
@@ -110,9 +127,7 @@ func Check(s *spec.Spec, lint bool, linterConfig string) *Report {
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // appendLinterAlerts append rpmlint alerts to report
-func appendLinterAlerts(s *spec.Spec, r *Report, linterConfig string) {
-	alerts := Lint(s, linterConfig)
-
+func appendLinterAlerts(r *Report, alerts []Alert) {
 	if len(alerts) == 0 {
 		return
 	}

@@ -272,10 +272,10 @@ func (sc *CheckSuite) TestCheckForSetupArguments(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForSetupArguments(s)
+	alerts := checkForSetupOptions(s)
 
 	c.Assert(alerts, chk.HasLen, 1)
-	c.Assert(alerts[0].Info, chk.Equals, "Arguments \"-q -c -n\" can be simplified to \"-qcn\"")
+	c.Assert(alerts[0].Info, chk.Equals, "Options \"-q -c -n\" can be simplified to \"-qcn\"")
 	c.Assert(alerts[0].Line.Index, chk.Equals, 33)
 
 	s, err = spec.Read("../testdata/test_5.spec")
@@ -283,10 +283,10 @@ func (sc *CheckSuite) TestCheckForSetupArguments(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts = checkForSetupArguments(s)
+	alerts = checkForSetupOptions(s)
 
 	c.Assert(alerts, chk.HasLen, 1)
-	c.Assert(alerts[0].Info, chk.Equals, "Arguments \"-c -n\" can be simplified to \"-cn\"")
+	c.Assert(alerts[0].Info, chk.Equals, "Options \"-c -n\" can be simplified to \"-cn\"")
 	c.Assert(alerts[0].Line.Index, chk.Equals, 41)
 
 	s, err = spec.Read("../testdata/test_6.spec")
@@ -294,10 +294,10 @@ func (sc *CheckSuite) TestCheckForSetupArguments(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts = checkForSetupArguments(s)
+	alerts = checkForSetupOptions(s)
 
 	c.Assert(alerts, chk.HasLen, 1)
-	c.Assert(alerts[0].Info, chk.Equals, "Arguments \"-q -n\" can be simplified to \"-qn\"")
+	c.Assert(alerts[0].Info, chk.Equals, "Options \"-q -n\" can be simplified to \"-qn\"")
 	c.Assert(alerts[0].Line.Index, chk.Equals, 31)
 }
 
@@ -340,6 +340,19 @@ func (sc *CheckSuite) TestCheckBashLoops(c *chk.C) {
 	c.Assert(alerts[1].Line.Index, chk.Equals, 49)
 }
 
+func (sc *CheckSuite) TestCheckURLForHTTPS(c *chk.C) {
+	s, err := spec.Read("../testdata/test_11.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts := checkURLForHTTPS(s)
+
+	c.Assert(alerts, chk.HasLen, 2)
+	c.Assert(alerts[0].Info, chk.Equals, "Domain kaos.st supports HTTPS. Replace http by https in source URL.")
+	c.Assert(alerts[0].Line.Index, chk.Equals, 13)
+}
+
 func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
 	s := &spec.Spec{}
 
@@ -359,9 +372,10 @@ func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
 	c.Assert(checkForUselessBinaryMacro(s), chk.IsNil)
 	c.Assert(checkForEmptySections(s), chk.IsNil)
 	c.Assert(checkForIndentInFilesSection(s), chk.IsNil)
-	c.Assert(checkForSetupArguments(s), chk.IsNil)
+	c.Assert(checkForSetupOptions(s), chk.IsNil)
 	c.Assert(checkForEmptyLinesAtEnd(s), chk.IsNil)
 	c.Assert(checkBashLoops(s), chk.IsNil)
+	c.Assert(checkURLForHTTPS(s), chk.IsNil)
 }
 
 func (sc *CheckSuite) TestRPMLint(c *chk.C) {
@@ -370,7 +384,7 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 	c.Assert(s, chk.NotNil)
 	c.Assert(err, chk.IsNil)
 
-	r := Check(s, true, "")
+	r := Check(s, true, "", nil)
 
 	c.Assert(r, chk.NotNil)
 	c.Assert(r.IsPerfect(), chk.Equals, true)
@@ -380,10 +394,21 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 	c.Assert(s, chk.NotNil)
 	c.Assert(err, chk.IsNil)
 
-	r = Check(s, true, "")
+	r = Check(s, true, "", nil)
 
 	c.Assert(r, chk.NotNil)
 	c.Assert(r.IsPerfect(), chk.Equals, false)
+
+	s, err = spec.Read("../testdata/test_11.spec")
+
+	c.Assert(s, chk.NotNil)
+	c.Assert(err, chk.IsNil)
+
+	r = Check(s, true, "", []string{"PF20"})
+
+	c.Assert(r, chk.NotNil)
+	c.Assert(r.Warnings, chk.HasLen, 2)
+	c.Assert(r.Warnings[0].Absolve, chk.Equals, true)
 
 	rpmLintBin = "echo"
 	s = &spec.Spec{File: ""}
@@ -394,35 +419,55 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 }
 
 func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
-	i, s1, s2 := extractAlertData("test.spec: W: no-buildroot-tag")
-	c.Assert(i, chk.Equals, -1)
-	c.Assert(s1, chk.Equals, "W")
-	c.Assert(s2, chk.Equals, "no-buildroot-tag")
+	report := &Report{}
+	alerts := []Alert{}
 
-	i, s1, s2 = extractAlertData("test.spec: E: specfile-error error: line 356: Unknown tag: Release1")
-	c.Assert(i, chk.Equals, 356)
-	c.Assert(s1, chk.Equals, "E")
-	c.Assert(s2, chk.Equals, "Unknown tag: Release1")
+	s, err := spec.Read("../testdata/test_7.spec")
 
-	i, s1, s2 = extractAlertData("test.spec:67: W: macro-in-%changelog %record")
-	c.Assert(i, chk.Equals, 67)
-	c.Assert(s1, chk.Equals, "W")
-	c.Assert(s2, chk.Equals, "macro-in-%changelog %record")
+	c.Assert(s, chk.NotNil)
+	c.Assert(err, chk.IsNil)
 
-	i, s1, s2 = extractAlertData("test.spec: E: specfile-error error: line A: Unknown tag: Release1")
-	c.Assert(i, chk.Equals, -1)
-	c.Assert(s1, chk.Equals, "")
-	c.Assert(s2, chk.Equals, "")
+	a, ok := parseAlertLine("test.spec: W: no-buildroot-tag", s)
 
-	i, s1, s2 = extractAlertData("test.spec:A: W: macro-in-%changelog %record")
-	c.Assert(i, chk.Equals, -1)
-	c.Assert(s1, chk.Equals, "")
-	c.Assert(s2, chk.Equals, "")
+	c.Assert(ok, chk.Equals, true)
+	c.Assert(a.Level, chk.Equals, LEVEL_ERROR)
+	c.Assert(a.Info, chk.Equals, "[rpmlint] no-buildroot-tag")
+	c.Assert(a.Line.Index, chk.Equals, -1)
+	alerts = append(alerts, a)
+
+	a, ok = parseAlertLine("test.spec: E: specfile-error error: line 10: Unknown tag: Release1", s)
+
+	c.Assert(ok, chk.Equals, true)
+	c.Assert(a.Level, chk.Equals, LEVEL_CRITICAL)
+	c.Assert(a.Info, chk.Equals, "[rpmlint] Unknown tag: Release1")
+	c.Assert(a.Line.Index, chk.Equals, 10)
+	alerts = append(alerts, a)
+
+	a, ok = parseAlertLine("test.spec:67: W: macro-in-%changelog %record", s)
+
+	c.Assert(ok, chk.Equals, true)
+	c.Assert(a.Level, chk.Equals, LEVEL_ERROR)
+	c.Assert(a.Info, chk.Equals, "[rpmlint] macro-in-%changelog %record")
+	c.Assert(a.Line.Index, chk.Equals, 67)
+	alerts = append(alerts, a)
+
+	a, ok = parseAlertLine("test.spec: E: specfile-error error: line A: Unknown tag: Release1", s)
+
+	c.Assert(ok, chk.Equals, false)
+
+	a, ok = parseAlertLine("test.spec:A: W: macro-in-%changelog %record", s)
+
+	c.Assert(ok, chk.Equals, false)
+
+	appendLinterAlerts(report, alerts)
+
+	c.Assert(report.Errors, chk.HasLen, 2)
+	c.Assert(report.Criticals, chk.HasLen, 1)
 }
 
 func (sc *CheckSuite) TestAux(c *chk.C) {
 	// This test will fail if new checkers was added
-	c.Assert(getCheckers(), chk.HasLen, 19)
+	c.Assert(getCheckers(), chk.HasLen, 20)
 
 	r := &Report{}
 	c.Assert(r.IsPerfect(), chk.Equals, true)

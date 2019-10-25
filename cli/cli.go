@@ -10,18 +10,19 @@ package cli
 import (
 	"fmt"
 	"os"
+	"strings"
 
-	"pkg.re/essentialkaos/ek.v10/env"
-	"pkg.re/essentialkaos/ek.v10/fmtc"
-	"pkg.re/essentialkaos/ek.v10/mathutil"
-	"pkg.re/essentialkaos/ek.v10/options"
-	"pkg.re/essentialkaos/ek.v10/sliceutil"
-	"pkg.re/essentialkaos/ek.v10/strutil"
-	"pkg.re/essentialkaos/ek.v10/usage"
-	"pkg.re/essentialkaos/ek.v10/usage/completion/bash"
-	"pkg.re/essentialkaos/ek.v10/usage/completion/fish"
-	"pkg.re/essentialkaos/ek.v10/usage/completion/zsh"
-	"pkg.re/essentialkaos/ek.v10/usage/update"
+	"pkg.re/essentialkaos/ek.v11/env"
+	"pkg.re/essentialkaos/ek.v11/fmtc"
+	"pkg.re/essentialkaos/ek.v11/mathutil"
+	"pkg.re/essentialkaos/ek.v11/options"
+	"pkg.re/essentialkaos/ek.v11/sliceutil"
+	"pkg.re/essentialkaos/ek.v11/strutil"
+	"pkg.re/essentialkaos/ek.v11/usage"
+	"pkg.re/essentialkaos/ek.v11/usage/completion/bash"
+	"pkg.re/essentialkaos/ek.v11/usage/completion/fish"
+	"pkg.re/essentialkaos/ek.v11/usage/completion/zsh"
+	"pkg.re/essentialkaos/ek.v11/usage/update"
 
 	"github.com/essentialkaos/perfecto/check"
 	"github.com/essentialkaos/perfecto/spec"
@@ -32,7 +33,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "2.4.0"
+	VER  = "2.5.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -41,6 +42,7 @@ const (
 	OPT_FORMAT      = "f:format"
 	OPT_LINT_CONFIG = "c:lint-config"
 	OPT_ERROR_LEVEL = "e:error-level"
+	OPT_ABSOLVE     = "A:absolve"
 	OPT_QUIET       = "q:quiet"
 	OPT_NO_LINT     = "nl:no-lint"
 	OPT_NO_COLOR    = "nc:no-color"
@@ -72,6 +74,7 @@ const (
 
 // options map
 var optMap = options.Map{
+	OPT_ABSOLVE:     {Mergeble: true},
 	OPT_FORMAT:      {Type: options.STRING},
 	OPT_LINT_CONFIG: {Type: options.STRING},
 	OPT_ERROR_LEVEL: {Type: options.STRING},
@@ -170,7 +173,11 @@ func checkSpec(file, format string) int {
 		return 1
 	}
 
-	report := check.Check(s, !options.GetB(OPT_NO_LINT), options.GetS(OPT_LINT_CONFIG))
+	report := check.Check(
+		s, !options.GetB(OPT_NO_LINT),
+		options.GetS(OPT_LINT_CONFIG),
+		strings.Split(options.GetS(OPT_ABSOLVE), ","),
+	)
 
 	if report.IsPerfect() {
 		if !options.GetB(OPT_QUIET) {
@@ -286,6 +293,7 @@ func showUsage() {
 func genUsage() *usage.Info {
 	info := usage.NewInfo("", "file…")
 
+	info.AddOption(OPT_ABSOLVE, "Disable some checks by their ID", "id…")
 	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny|short|json|xml){!}", "format")
 	info.AddOption(OPT_LINT_CONFIG, "Path to rpmlint configuration file", "file")
 	info.AddOption(OPT_ERROR_LEVEL, "Return non-zero exit code if alert level greater than given {s-}(notice|warning|error|critical){!}", "level")

@@ -10,10 +10,13 @@ URL:                https://domain.com
 
 BuildRoot:          %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-Source0:            https://domain.com/%{name}-%{version}.tar.gz
+Source0:            http://kaos.st/%{name}-%{version}-1.tar.gz
 
 # perfecto:absolve
-Source1:            http://domain.com/%{name}-%{version}.tar.gz
+Source1:            http://kaos.st/%{name}-%{version}-2.tar.gz
+Source2:            http://kaos.st/%{name}-%{version}-3.tar.gz
+Source3:            %{name}-%{version}-3.tar.gz
+Source4:            http://
 
 ################################################################################
 

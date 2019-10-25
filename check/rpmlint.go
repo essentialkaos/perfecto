@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"pkg.re/essentialkaos/ek.v10/strutil"
+	"pkg.re/essentialkaos/ek.v11/strutil"
 
 	"github.com/essentialkaos/perfecto/spec"
 )
@@ -74,9 +74,9 @@ func parseAlertLine(text string, s *spec.Spec) (Alert, bool) {
 
 	switch level {
 	case "W":
-		return Alert{LEVEL_ERROR, desc, s.GetLine(line)}, true
+		return NewAlert(LEVEL_ERROR, desc, s.GetLine(line)), true
 	case "E":
-		return Alert{LEVEL_CRITICAL, desc, s.GetLine(line)}, true
+		return NewAlert(LEVEL_CRITICAL, desc, s.GetLine(line)), true
 	}
 
 	return Alert{}, false

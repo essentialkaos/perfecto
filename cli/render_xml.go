@@ -45,7 +45,7 @@ func renderAlertsAsXML(category string, alerts []check.Alert) {
 	fmt.Printf("  <%s>\n", category)
 
 	for _, alert := range alerts {
-		fmt.Println("    <alert>")
+		fmt.Printf("    <alert absolve=\"%t\">\n", alert.Absolve)
 		fmt.Printf("      <info>%s</info>\n", escapeStringForXML(alert.Info))
 
 		if alert.Line.Index != -1 {
