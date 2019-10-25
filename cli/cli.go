@@ -33,7 +33,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "2.5.0"
+	VER  = "2.5.1"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -250,7 +250,7 @@ func countAlerts(alerts []check.Alert) int {
 	var counter int
 
 	for _, alert := range alerts {
-		if !alert.Line.Skip {
+		if !alert.Absolve {
 			counter++
 		}
 	}
