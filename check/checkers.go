@@ -704,7 +704,7 @@ func checkURLForHTTPS(s *spec.Spec) []Alert {
 	}
 
 	if httpCheckCache == nil {
-		httpCheckCache = cache.New(time.Minute, 0)
+		httpCheckCache = cache.New(time.Hour, 0)
 	}
 
 	sources := s.GetSources()
