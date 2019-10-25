@@ -11,7 +11,9 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 
+	"pkg.re/essentialkaos/ek.v11/cache"
 	"pkg.re/essentialkaos/ek.v11/req"
 	"pkg.re/essentialkaos/ek.v11/sliceutil"
 	"pkg.re/essentialkaos/ek.v11/strutil"
@@ -24,12 +26,14 @@ import (
 // Checker is spec check function
 type Checker func(s *spec.Spec) []Alert
 
-// ////////////////////////////////////////////////////////////////////////////////// //
-
 type macro struct {
 	Value string
 	Name  string
 }
+
+// ////////////////////////////////////////////////////////////////////////////////// //
+
+var httpCheckCache *cache.Store
 
 var pathMacroSlice = []macro{
 	{"/etc/init", "%{_initddir}"},
@@ -699,6 +703,10 @@ func checkURLForHTTPS(s *spec.Spec) []Alert {
 		return nil
 	}
 
+	if httpCheckCache == nil {
+		httpCheckCache = cache.New(time.Minute, 0)
+	}
+
 	sources := s.GetSources()
 
 	var result []Alert
@@ -792,10 +800,18 @@ func extractSourceDomain(url string) string {
 
 // isHostSupportsHTTPS return true if domain supports HTTPS protocol
 func isHostSupportsHTTPS(domain string) bool {
+	if httpCheckCache.Has(domain) {
+		return httpCheckCache.Get(domain).(bool)
+	}
+
 	_, err := req.Request{
 		URL:         "https://" + domain,
 		AutoDiscard: true,
 	}.Head()
 
-	return err == nil
+	supported := err == nil
+
+	httpCheckCache.Set(domain, supported)
+
+	return supported
 }
