@@ -348,7 +348,7 @@ func (sc *CheckSuite) TestCheckURLForHTTPS(c *chk.C) {
 
 	alerts := checkURLForHTTPS(s)
 
-	c.Assert(alerts, chk.HasLen, 1)
+	c.Assert(alerts, chk.HasLen, 2)
 	c.Assert(alerts[0].Info, chk.Equals, "Domain kaos.st supports HTTPS. Replace http by https in source URL.")
 	c.Assert(alerts[0].Line.Index, chk.Equals, 13)
 }

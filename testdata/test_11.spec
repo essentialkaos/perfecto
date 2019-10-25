@@ -14,8 +14,9 @@ Source0:            http://kaos.st/%{name}-%{version}-1.tar.gz
 
 # perfecto:absolve
 Source1:            http://kaos.st/%{name}-%{version}-2.tar.gz
-Source2:            %{name}-%{version}-3.tar.gz
-Source3:            http://
+Source2:            http://kaos.st/%{name}-%{version}-3.tar.gz
+Source3:            %{name}-%{version}-3.tar.gz
+Source4:            http://
 
 ################################################################################
 
