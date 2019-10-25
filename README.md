@@ -20,26 +20,26 @@ _perfecto_ is tool for checking perfectly written RPM specs. Currently, _perfect
 
 ### Checks
 
-* `PF1`: Checks all spec data for useless spaces;
-* `PF2`: Checks all spec data for lines longer than 80 symbols;
-* `PF3`: Checks release tag for using `%{?dist}` macro;
-* `PF4`: Checks all scriptlets for using paths instead of macroses;
-* `PF5`: Checks `install` and `clean` scriptlets for problems with `%{buildroot}` macro;
-* `PF6`: Checks all scriptlets for dissimilar redirect to `/dev/null`;
-* `PF7`: Checks changelog for misformatted records;
-* `PF8`: Checks `build`, `install` and `check` scriptlets for using `make` which can be simplified;
-* `PF9`: Checks header for required tags;
-* `PF10`: Checks all spec data for unescaped percentage symbol;
-* `PF11`: Checks position of `%global` and `%define` keywords;
-* `PF12`: Checks length of separator comments;
-* `PF13`: Checks `files` section for `%defattr`;
-* `PF14`: Checks all spec data for useless binaries macroses;
-* `PF15`: Checks all spec data for empty sections;
-* `PF16`: Checks `files` section for indentations;
-* `PF17`: Checks `setup` section options;
-* `PF18`: Checks all spec data for empty lines at the end;
-* `PF19`: Checks bash loops formatting;
-* `PF20`: Checks sources URLs for HTTPS support.
+* `PF1` Checks all spec data for useless spaces;
+* `PF2` Checks all spec data for lines longer than 80 symbols;
+* `PF3` Checks release tag for using `%{?dist}` macro;
+* `PF4` Checks all scriptlets for using paths instead of macroses;
+* `PF5` Checks `install` and `clean` scriptlets for problems with `%{buildroot}` macro;
+* `PF6` Checks all scriptlets for dissimilar redirect to `/dev/null`;
+* `PF7` Checks changelog for misformatted records;
+* `PF8` Checks `build`, `install` and `check` scriptlets for using `make` which can be simplified;
+* `PF9` Checks header for required tags;
+* `PF10` Checks all spec data for unescaped percentage symbol;
+* `PF11` Checks position of `%global` and `%define` keywords;
+* `PF12` Checks length of separator comments;
+* `PF13` Checks `files` section for `%defattr`;
+* `PF14` Checks all spec data for useless binaries macroses;
+* `PF15` Checks all spec data for empty sections;
+* `PF16` Checks `files` section for indentations;
+* `PF17` Checks `setup` section options;
+* `PF18` Checks all spec data for empty lines at the end;
+* `PF19` Checks bash loops formatting;
+* `PF20` Checks sources URLs for HTTPS support.
 
 ### Installing
 
