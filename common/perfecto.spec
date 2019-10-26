@@ -10,7 +10,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         2.5.1
+Version:         3.0.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -87,6 +87,10 @@ fi
 ################################################################################
 
 %changelog
+* Sat Oct 26 2019 Anton Novojilov <andy@essentialkaos.com> - 3.0.0-0
+- Improved all renderers
+- Added check ID to output
+
 * Sat Oct 26 2019 Anton Novojilov <andy@essentialkaos.com> - 2.5.1-0
 - Fixed bug with counting absolved alerts
 

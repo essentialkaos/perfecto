@@ -24,10 +24,10 @@ import (
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 var levelsPrefixes = map[uint8]string{
-	check.LEVEL_NOTICE:   "(N)",
-	check.LEVEL_WARNING:  "(W)",
-	check.LEVEL_ERROR:    "(E)",
-	check.LEVEL_CRITICAL: "(C)",
+	check.LEVEL_NOTICE:   "<N>",
+	check.LEVEL_WARNING:  "<W>",
+	check.LEVEL_ERROR:    "<E>",
+	check.LEVEL_CRITICAL: "<C>",
 }
 
 var bgColor = map[uint8]string{
@@ -241,18 +241,24 @@ func renderAlert(alert check.Alert) {
 	fmtc.Printf(fg + "│ {!}")
 
 	if alert.Line.Index != -1 {
-		if alert.Absolve {
-			fmtc.Printf(hl+"[%d]{!} {s}[A]{!} "+fg+"%s{!}\n", alert.Line.Index, alert.Info)
-		} else {
-			fmtc.Printf(hl+"[%d]{!} "+fg+"%s{!}\n", alert.Line.Index, alert.Info)
-		}
-
-		if alert.Line.Text != "" {
-			text := strutil.Ellipsis(alert.Line.Text, 86)
-			fmtc.Printf(fg+"│ {s-}%s{!}\n", text)
-		}
+		fmtc.Printf(hl+"[%d]{!} ", alert.Line.Index)
 	} else {
-		fmtc.Printf(hl+"[global]{!} "+fg+"%s{!}\n", alert.Info)
+		fmtc.Printf(hl + "[global]{!} ")
+	}
+
+	if alert.Absolve {
+		fmtc.Printf("{s}[A]{!} ")
+	}
+
+	if alert.ID != "" {
+		fmtc.Printf(fg+"(%s) %s{!}\n", alert.ID, alert.Info)
+	} else {
+		fmtc.Printf(fg+"(rpmlint) %s{!}\n", alert.Info)
+	}
+
+	if alert.Line.Text != "" {
+		text := strutil.Ellipsis(alert.Line.Text, 86)
+		fmtc.Printf(fg+"│ {s-}%s{!}\n", text)
 	}
 }
 
@@ -266,13 +272,19 @@ func renderShortAlert(alert check.Alert) {
 	}
 
 	if alert.Line.Index != -1 {
-		if alert.Absolve {
-			fmtc.Printf(hl+"[%d]{!} {s}[A]{!} "+fg+"%s{!}\n", alert.Line.Index, alert.Info)
-		} else {
-			fmtc.Printf(hl+"[%d]{!} "+fg+"%s{!}\n", alert.Line.Index, alert.Info)
-		}
+		fmtc.Printf(hl+"[%d]{!} ", alert.Line.Index)
 	} else {
-		fmtc.Printf(hl+"[global]{!} "+fg+"%s{!}\n", alert.Info)
+		fmtc.Printf(hl + "[global]{!} ")
+	}
+
+	if alert.Absolve {
+		fmtc.Printf("{s}[A]{!} ")
+	}
+
+	if alert.ID != "" {
+		fmtc.Printf(fg+"(%s) %s{!}\n", alert.ID, alert.Info)
+	} else {
+		fmtc.Printf(fg+"(rpmlint) %s{!}\n", alert.Info)
 	}
 }
 

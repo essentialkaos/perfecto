@@ -33,7 +33,7 @@ func (sc *CheckSuite) TestCheckForUselessSpaces(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForUselessSpaces(s)
+	alerts := checkForUselessSpaces("", s)
 
 	c.Assert(alerts, chk.HasLen, 2)
 	c.Assert(alerts[0].Info, chk.Equals, "Line contains spaces at the end of line")
@@ -48,7 +48,7 @@ func (sc *CheckSuite) TestCheckForLineLength(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForLineLength(s)
+	alerts := checkForLineLength("", s)
 
 	c.Assert(alerts, chk.HasLen, 2)
 	c.Assert(alerts[0].Info, chk.Equals, "Line is longer than 80 symbols")
@@ -62,7 +62,7 @@ func (sc *CheckSuite) TestCheckForDist(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForDist(s)
+	alerts := checkForDist("", s)
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Release tag must contains %{?dist} as part of release")
@@ -75,7 +75,7 @@ func (sc *CheckSuite) TestCheckForNonMacroPaths(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForNonMacroPaths(s)
+	alerts := checkForNonMacroPaths("", s)
 
 	c.Assert(alerts, chk.HasLen, 2)
 	c.Assert(alerts[0].Info, chk.Equals, "Path \"/usr\" should be used as macro \"%{_usr}\"")
@@ -90,7 +90,7 @@ func (sc *CheckSuite) TestCheckForBuildRoot(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForBuildRoot(s)
+	alerts := checkForBuildRoot("", s)
 
 	c.Assert(alerts, chk.HasLen, 2)
 	c.Assert(alerts[0].Info, chk.Equals, "Build root path must be used as macro %{buildroot}")
@@ -105,7 +105,7 @@ func (sc *CheckSuite) TestCheckForDevNull(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForDevNull(s)
+	alerts := checkForDevNull("", s)
 
 	c.Assert(alerts, chk.HasLen, 5)
 	c.Assert(alerts[0].Info, chk.Equals, "Use \"&>/dev/null || :\" instead of \">/dev/null 2>&1 || :\"")
@@ -126,7 +126,7 @@ func (sc *CheckSuite) TestCheckChangelogHeaders(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkChangelogHeaders(s)
+	alerts := checkChangelogHeaders("", s)
 
 	c.Assert(alerts, chk.HasLen, 2)
 	c.Assert(alerts[0].Info, chk.Equals, "Changelog record header must contain release")
@@ -141,7 +141,7 @@ func (sc *CheckSuite) TestCheckForMakeMacro(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForMakeMacro(s)
+	alerts := checkForMakeMacro("", s)
 
 	c.Assert(alerts, chk.HasLen, 3)
 	c.Assert(alerts[0].Info, chk.Equals, "Use %{__make} macro instead of \"make\"")
@@ -158,14 +158,14 @@ func (sc *CheckSuite) TestCheckForHeaderTags(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	c.Assert(checkForHeaderTags(s), chk.HasLen, 0)
+	c.Assert(checkForHeaderTags("", s), chk.HasLen, 0)
 
 	s, err = spec.Read("../testdata/test_3.spec")
 
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForHeaderTags(s)
+	alerts := checkForHeaderTags("", s)
 
 	c.Assert(alerts, chk.HasLen, 3)
 	c.Assert(alerts[0].Info, chk.Equals, "Main package must contain URL tag")
@@ -179,7 +179,7 @@ func (sc *CheckSuite) TestCheckForUnescapedPercent(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForUnescapedPercent(s)
+	alerts := checkForUnescapedPercent("", s)
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Symbol % must be escaped by another % (i.e % → %%)")
@@ -192,7 +192,7 @@ func (sc *CheckSuite) TestCheckForMacroDefenitionPosition(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForMacroDefenitionPosition(s)
+	alerts := checkForMacroDefenitionPosition("", s)
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Move %define and %global to top of your spec")
@@ -205,7 +205,7 @@ func (sc *CheckSuite) TestCheckForSeparatorLength(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForSeparatorLength(s)
+	alerts := checkForSeparatorLength("", s)
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Separator must be 80 symbols long")
@@ -218,7 +218,7 @@ func (sc *CheckSuite) TestCheckForDefAttr(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForDefAttr(s)
+	alerts := checkForDefAttr("", s)
 
 	c.Assert(alerts, chk.HasLen, 2)
 	c.Assert(alerts[0].Info, chk.Equals, "%files section must contains %defattr macro")
@@ -233,7 +233,7 @@ func (sc *CheckSuite) TestCheckForUselessBinaryMacro(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForUselessBinaryMacro(s)
+	alerts := checkForUselessBinaryMacro("", s)
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Useless macro %{__rm} used for executing rm binary")
@@ -246,7 +246,7 @@ func (sc *CheckSuite) TestCheckForEmptySections(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForEmptySections(s)
+	alerts := checkForEmptySections("", s)
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Section %check is empty")
@@ -259,7 +259,7 @@ func (sc *CheckSuite) TestCheckForIndentInFilesSection(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForIndentInFilesSection(s)
+	alerts := checkForIndentInFilesSection("", s)
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Don't use indent in %files section")
@@ -272,7 +272,7 @@ func (sc *CheckSuite) TestCheckForSetupArguments(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForSetupOptions(s)
+	alerts := checkForSetupOptions("", s)
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Options \"-q -c -n\" can be simplified to \"-qcn\"")
@@ -283,7 +283,7 @@ func (sc *CheckSuite) TestCheckForSetupArguments(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts = checkForSetupOptions(s)
+	alerts = checkForSetupOptions("", s)
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Options \"-c -n\" can be simplified to \"-cn\"")
@@ -294,7 +294,7 @@ func (sc *CheckSuite) TestCheckForSetupArguments(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts = checkForSetupOptions(s)
+	alerts = checkForSetupOptions("", s)
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Options \"-q -n\" can be simplified to \"-qn\"")
@@ -307,7 +307,7 @@ func (sc *CheckSuite) TestCheckForEmptyLinesAtEnd(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForEmptyLinesAtEnd(s)
+	alerts := checkForEmptyLinesAtEnd("", s)
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Spec file should have empty line at the end")
@@ -318,7 +318,7 @@ func (sc *CheckSuite) TestCheckForEmptyLinesAtEnd(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts = checkForEmptyLinesAtEnd(s)
+	alerts = checkForEmptyLinesAtEnd("", s)
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Too much empty lines at the end of the spec")
@@ -331,7 +331,7 @@ func (sc *CheckSuite) TestCheckBashLoops(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkBashLoops(s)
+	alerts := checkBashLoops("", s)
 
 	c.Assert(alerts, chk.HasLen, 2)
 	c.Assert(alerts[0].Info, chk.Equals, "Place 'do' keyword on the same line with for/while (for ... ; do)")
@@ -346,7 +346,7 @@ func (sc *CheckSuite) TestCheckURLForHTTPS(c *chk.C) {
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkURLForHTTPS(s)
+	alerts := checkURLForHTTPS("", s)
 
 	c.Assert(alerts, chk.HasLen, 2)
 	c.Assert(alerts[0].Info, chk.Equals, "Domain kaos.st supports HTTPS. Replace http by https in source URL.")
@@ -356,26 +356,26 @@ func (sc *CheckSuite) TestCheckURLForHTTPS(c *chk.C) {
 func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
 	s := &spec.Spec{}
 
-	c.Assert(checkForUselessSpaces(s), chk.IsNil)
-	c.Assert(checkForLineLength(s), chk.IsNil)
-	c.Assert(checkForDist(s), chk.IsNil)
-	c.Assert(checkForNonMacroPaths(s), chk.IsNil)
-	c.Assert(checkForBuildRoot(s), chk.IsNil)
-	c.Assert(checkForDevNull(s), chk.IsNil)
-	c.Assert(checkChangelogHeaders(s), chk.IsNil)
-	c.Assert(checkForMakeMacro(s), chk.IsNil)
-	c.Assert(checkForHeaderTags(s), chk.IsNil)
-	c.Assert(checkForUnescapedPercent(s), chk.IsNil)
-	c.Assert(checkForMacroDefenitionPosition(s), chk.IsNil)
-	c.Assert(checkForSeparatorLength(s), chk.IsNil)
-	c.Assert(checkForDefAttr(s), chk.IsNil)
-	c.Assert(checkForUselessBinaryMacro(s), chk.IsNil)
-	c.Assert(checkForEmptySections(s), chk.IsNil)
-	c.Assert(checkForIndentInFilesSection(s), chk.IsNil)
-	c.Assert(checkForSetupOptions(s), chk.IsNil)
-	c.Assert(checkForEmptyLinesAtEnd(s), chk.IsNil)
-	c.Assert(checkBashLoops(s), chk.IsNil)
-	c.Assert(checkURLForHTTPS(s), chk.IsNil)
+	c.Assert(checkForUselessSpaces("", s), chk.IsNil)
+	c.Assert(checkForLineLength("", s), chk.IsNil)
+	c.Assert(checkForDist("", s), chk.IsNil)
+	c.Assert(checkForNonMacroPaths("", s), chk.IsNil)
+	c.Assert(checkForBuildRoot("", s), chk.IsNil)
+	c.Assert(checkForDevNull("", s), chk.IsNil)
+	c.Assert(checkChangelogHeaders("", s), chk.IsNil)
+	c.Assert(checkForMakeMacro("", s), chk.IsNil)
+	c.Assert(checkForHeaderTags("", s), chk.IsNil)
+	c.Assert(checkForUnescapedPercent("", s), chk.IsNil)
+	c.Assert(checkForMacroDefenitionPosition("", s), chk.IsNil)
+	c.Assert(checkForSeparatorLength("", s), chk.IsNil)
+	c.Assert(checkForDefAttr("", s), chk.IsNil)
+	c.Assert(checkForUselessBinaryMacro("", s), chk.IsNil)
+	c.Assert(checkForEmptySections("", s), chk.IsNil)
+	c.Assert(checkForIndentInFilesSection("", s), chk.IsNil)
+	c.Assert(checkForSetupOptions("", s), chk.IsNil)
+	c.Assert(checkForEmptyLinesAtEnd("", s), chk.IsNil)
+	c.Assert(checkBashLoops("", s), chk.IsNil)
+	c.Assert(checkURLForHTTPS("", s), chk.IsNil)
 }
 
 func (sc *CheckSuite) TestRPMLint(c *chk.C) {
@@ -430,24 +430,27 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 	a, ok := parseAlertLine("test.spec: W: no-buildroot-tag", s)
 
 	c.Assert(ok, chk.Equals, true)
+	c.Assert(a.ID, chk.Equals, "")
 	c.Assert(a.Level, chk.Equals, LEVEL_ERROR)
-	c.Assert(a.Info, chk.Equals, "[rpmlint] no-buildroot-tag")
+	c.Assert(a.Info, chk.Equals, "no-buildroot-tag")
 	c.Assert(a.Line.Index, chk.Equals, -1)
 	alerts = append(alerts, a)
 
 	a, ok = parseAlertLine("test.spec: E: specfile-error error: line 10: Unknown tag: Release1", s)
 
 	c.Assert(ok, chk.Equals, true)
+	c.Assert(a.ID, chk.Equals, "")
 	c.Assert(a.Level, chk.Equals, LEVEL_CRITICAL)
-	c.Assert(a.Info, chk.Equals, "[rpmlint] Unknown tag: Release1")
+	c.Assert(a.Info, chk.Equals, "Unknown tag: Release1")
 	c.Assert(a.Line.Index, chk.Equals, 10)
 	alerts = append(alerts, a)
 
 	a, ok = parseAlertLine("test.spec:67: W: macro-in-%changelog %record", s)
 
 	c.Assert(ok, chk.Equals, true)
+	c.Assert(a.ID, chk.Equals, "")
 	c.Assert(a.Level, chk.Equals, LEVEL_ERROR)
-	c.Assert(a.Info, chk.Equals, "[rpmlint] macro-in-%changelog %record")
+	c.Assert(a.Info, chk.Equals, "macro-in-%changelog %record")
 	c.Assert(a.Line.Index, chk.Equals, 67)
 	alerts = append(alerts, a)
 
@@ -487,5 +490,5 @@ func (sc *CheckSuite) TestAux(c *chk.C) {
 
 	al, _ := parseAlertLine("../testdata/test_7.spec: E: specfile-error warning: some error", &spec.Spec{})
 	c.Assert(al.Level, chk.Equals, LEVEL_ERROR)
-	c.Assert(al.Info, chk.Equals, "[rpmlint] some error")
+	c.Assert(al.Info, chk.Equals, "some error")
 }

@@ -37,6 +37,7 @@ type Report struct {
 
 // Alert contain basic alert info
 type Alert struct {
+	ID      string    `json:"id"`
 	Level   uint8     `json:"level"`
 	Info    string    `json:"info"`
 	Line    spec.Line `json:"line"`
@@ -57,8 +58,8 @@ func (s AlertSlice) Less(i, j int) bool {
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // NewAlert creates new alert
-func NewAlert(level uint8, info string, line spec.Line) Alert {
-	return Alert{level, info, line, false}
+func NewAlert(id string, level uint8, info string, line spec.Line) Alert {
+	return Alert{id, level, info, line, false}
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -92,7 +93,7 @@ func Check(s *spec.Spec, lint bool, linterConfig string, absolved []string) *Rep
 	}
 
 	for id, checker := range checkers {
-		alerts := checker(s)
+		alerts := checker(id, s)
 
 		if len(alerts) == 0 {
 			continue
