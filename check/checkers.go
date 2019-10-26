@@ -92,6 +92,7 @@ func getCheckers() map[string]Checker {
 		"PF18": checkForEmptyLinesAtEnd,
 		"PF19": checkBashLoops,
 		"PF20": checkURLForHTTPS,
+		"PF21": checkForCheckMacro,
 	}
 }
 
@@ -735,6 +736,33 @@ func checkURLForHTTPS(id string, s *spec.Spec) []Alert {
 	}
 
 	return result
+}
+
+// checkForCheckMacro checks check section for a macro which allows skipping the check
+func checkForCheckMacro(id string, s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
+	if !s.HasSection(spec.SECTION_CHECK) {
+		return nil
+	}
+
+	for _, section := range s.GetSections(spec.SECTION_CHECK) {
+		if section.IsEmpty() {
+			return nil
+		}
+
+		for _, line := range section.Data {
+			if contains(line, "?_without_check") && contains(line, "?_with_check") {
+				return nil
+			}
+		}
+	}
+
+	return []Alert{
+		NewAlert(id, LEVEL_WARNING, "Use %{_without_check} and %{_with_check} macroses for controlling tests execution", emptyLine),
+	}
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //

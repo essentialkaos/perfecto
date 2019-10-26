@@ -50,7 +50,7 @@ func (s *SpecSuite) TestParsing(c *C) {
 
 	c.Assert(spec.GetLine(-1), DeepEquals, Line{-1, "", false})
 	c.Assert(spec.GetLine(99), DeepEquals, Line{-1, "", false})
-	c.Assert(spec.GetLine(39), DeepEquals, Line{39, "%{__make} %{?_smp_mflags}", false})
+	c.Assert(spec.GetLine(43), DeepEquals, Line{43, "%{__make} %{?_smp_mflags}", false})
 }
 
 func (s *SpecSuite) TestSections(c *C) {
@@ -60,15 +60,16 @@ func (s *SpecSuite) TestSections(c *C) {
 	c.Assert(spec, NotNil)
 
 	c.Assert(spec.HasSection(SECTION_BUILD), Equals, true)
-	c.Assert(spec.HasSection(SECTION_CHECK), Equals, false)
+	c.Assert(spec.HasSection(SECTION_PRETRANS), Equals, false)
 
 	sections := spec.GetSections()
-	c.Assert(sections, HasLen, 14)
+	c.Assert(sections, HasLen, 15)
 	sections = spec.GetSections(SECTION_BUILD)
 	c.Assert(sections, HasLen, 1)
 	c.Assert(sections[0].Data, HasLen, 2)
-	c.Assert(sections[0].Start, Equals, 38)
-	c.Assert(sections[0].End, Equals, 40)
+	c.Assert(sections[0].Start, Equals, 42)
+	c.Assert(sections[0].End, Equals, 44)
+	c.Assert(sections[0].IsEmpty(), Equals, false)
 	sections = spec.GetSections(SECTION_SETUP)
 	c.Assert(sections[0].Name, Equals, "setup")
 	c.Assert(sections[0].Args, DeepEquals, []string{"-qn", "%{name}-%{version}"})
@@ -76,6 +77,18 @@ func (s *SpecSuite) TestSections(c *C) {
 	sections = spec.GetSections(SECTION_FILES)
 	c.Assert(sections, HasLen, 2)
 	c.Assert(sections[1].GetPackageName(), Equals, "magic")
+
+	spec, err = Read("../testdata/test_12.spec")
+
+	c.Assert(err, IsNil)
+	c.Assert(spec, NotNil)
+
+	c.Assert(spec.HasSection(SECTION_CHECK), Equals, true)
+
+	sections = spec.GetSections(SECTION_CHECK)
+
+	c.Assert(sections, HasLen, 1)
+	c.Assert(sections[0].IsEmpty(), Equals, true)
 }
 
 func (s *SpecSuite) TestHeaders(c *C) {

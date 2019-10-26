@@ -353,6 +353,28 @@ func (sc *CheckSuite) TestCheckURLForHTTPS(c *chk.C) {
 	c.Assert(alerts[0].Line.Index, chk.Equals, 13)
 }
 
+func (sc *CheckSuite) TestCheckForCheckMacro(c *chk.C) {
+	s, err := spec.Read("../testdata/test_11.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts := checkForCheckMacro("", s)
+
+	c.Assert(alerts, chk.HasLen, 1)
+	c.Assert(alerts[0].Info, chk.Equals, "Use %{_without_check} and %{_with_check} macroses for controlling tests execution")
+	c.Assert(alerts[0].Line.Index, chk.Equals, -1)
+
+	s, err = spec.Read("../testdata/test_12.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts = checkForCheckMacro("", s)
+
+	c.Assert(alerts, chk.HasLen, 0)
+}
+
 func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
 	s := &spec.Spec{}
 
@@ -376,6 +398,7 @@ func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
 	c.Assert(checkForEmptyLinesAtEnd("", s), chk.IsNil)
 	c.Assert(checkBashLoops("", s), chk.IsNil)
 	c.Assert(checkURLForHTTPS("", s), chk.IsNil)
+	c.Assert(checkForCheckMacro("", s), chk.IsNil)
 }
 
 func (sc *CheckSuite) TestRPMLint(c *chk.C) {
@@ -404,10 +427,10 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 	c.Assert(s, chk.NotNil)
 	c.Assert(err, chk.IsNil)
 
-	r = Check(s, true, "", []string{"PF20"})
+	r = Check(s, true, "", []string{"PF20", "PF21"})
 
 	c.Assert(r, chk.NotNil)
-	c.Assert(r.Warnings, chk.HasLen, 2)
+	c.Assert(r.Warnings, chk.HasLen, 3)
 	c.Assert(r.Warnings[0].Absolve, chk.Equals, true)
 
 	rpmLintBin = "echo"
@@ -470,7 +493,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 
 func (sc *CheckSuite) TestAux(c *chk.C) {
 	// This test will fail if new checkers was added
-	c.Assert(getCheckers(), chk.HasLen, 20)
+	c.Assert(getCheckers(), chk.HasLen, 21)
 
 	r := &Report{}
 	c.Assert(r.IsPerfect(), chk.Equals, true)

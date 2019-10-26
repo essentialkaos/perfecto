@@ -1,9 +1,5 @@
 ################################################################################
 
-%{!?_without_check: %define _with_check 1}
-
-################################################################################
-
 Summary:            Test spec for perfecto
 Name:               perfecto-spec
 Version:            1.0.0
@@ -14,10 +10,7 @@ URL:                https://domain.com
 
 BuildRoot:          %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-Source0:            https://domain.com/%{name}-%{version}.tar.gz
-
-# perfecto:absolve
-Source1:            http://domain.com/%{name}-%{version}.tar.gz
+Source0:            https://kaos.st/%{name}-%{version}-1.tar.gz
 
 ################################################################################
 
@@ -48,13 +41,9 @@ rm -rf %{buildroot}
 %{make_install} PREFIX=%{buildroot}%{_prefix}
 
 %clean
-# perfecto:absolve 2
 rm -rf %{buildroot}
 
 %check
-%if %{?_with_check:1}%{?_without_check:0}
-%{make} check
-%endif
 
 %post
 %{__chkconfig} --add %{name} &>/dev/null || :
