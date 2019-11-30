@@ -375,30 +375,25 @@ func (sc *CheckSuite) TestCheckForCheckMacro(c *chk.C) {
 	c.Assert(alerts, chk.HasLen, 0)
 }
 
+func (sc *CheckSuite) TestCheckIfClause(c *chk.C) {
+	s, err := spec.Read("../testdata/test_13.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts := checkIfClause("", s)
+
+	c.Assert(alerts, chk.HasLen, 1)
+	c.Assert(alerts[0].Info, chk.Equals, "Use two equals symbols for comparison in %if clause")
+	c.Assert(alerts[0].Line.Index, chk.Equals, 55)
+}
+
 func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
 	s := &spec.Spec{}
 
-	c.Assert(checkForUselessSpaces("", s), chk.IsNil)
-	c.Assert(checkForLineLength("", s), chk.IsNil)
-	c.Assert(checkForDist("", s), chk.IsNil)
-	c.Assert(checkForNonMacroPaths("", s), chk.IsNil)
-	c.Assert(checkForBuildRoot("", s), chk.IsNil)
-	c.Assert(checkForDevNull("", s), chk.IsNil)
-	c.Assert(checkChangelogHeaders("", s), chk.IsNil)
-	c.Assert(checkForMakeMacro("", s), chk.IsNil)
-	c.Assert(checkForHeaderTags("", s), chk.IsNil)
-	c.Assert(checkForUnescapedPercent("", s), chk.IsNil)
-	c.Assert(checkForMacroDefenitionPosition("", s), chk.IsNil)
-	c.Assert(checkForSeparatorLength("", s), chk.IsNil)
-	c.Assert(checkForDefAttr("", s), chk.IsNil)
-	c.Assert(checkForUselessBinaryMacro("", s), chk.IsNil)
-	c.Assert(checkForEmptySections("", s), chk.IsNil)
-	c.Assert(checkForIndentInFilesSection("", s), chk.IsNil)
-	c.Assert(checkForSetupOptions("", s), chk.IsNil)
-	c.Assert(checkForEmptyLinesAtEnd("", s), chk.IsNil)
-	c.Assert(checkBashLoops("", s), chk.IsNil)
-	c.Assert(checkURLForHTTPS("", s), chk.IsNil)
-	c.Assert(checkForCheckMacro("", s), chk.IsNil)
+	for _, checker := range getCheckers() {
+		c.Assert(checker("", s), chk.IsNil)
+	}
 }
 
 func (sc *CheckSuite) TestRPMLint(c *chk.C) {
@@ -493,7 +488,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 
 func (sc *CheckSuite) TestAux(c *chk.C) {
 	// This test will fail if new checkers was added
-	c.Assert(getCheckers(), chk.HasLen, 21)
+	c.Assert(getCheckers(), chk.HasLen, 22)
 
 	r := &Report{}
 	c.Assert(r.IsPerfect(), chk.Equals, true)
