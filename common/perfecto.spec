@@ -92,6 +92,7 @@ fi
 - Added check ID to output
 - Added check for checking check scriptlet for using _without_check
   and _with_check macroses
+- Added check for single equals symbol in %if clause
 
 * Sat Oct 26 2019 Anton Novojilov <andy@essentialkaos.com> - 2.5.1-0
 - Fixed bug with counting absolved alerts
