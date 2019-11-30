@@ -8,6 +8,7 @@ package spec
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 import (
+	"io/ioutil"
 	"testing"
 
 	. "pkg.re/check.v1"
@@ -24,6 +25,19 @@ type SpecSuite struct{}
 var _ = Suite(&SpecSuite{})
 
 // ////////////////////////////////////////////////////////////////////////////////// //
+
+func (s *SpecSuite) TestFileCheck(c *C) {
+	tmpDir := c.MkDir()
+	tmpFile1 := tmpDir + "test1.spec"
+	tmpFile2 := tmpDir + "test2.spec"
+
+	ioutil.WriteFile(tmpFile1, []byte(""), 0644)
+	ioutil.WriteFile(tmpFile2, []byte("TEST"), 0200)
+
+	c.Assert(checkFile(tmpDir), NotNil)
+	c.Assert(checkFile(tmpFile1), NotNil)
+	c.Assert(checkFile(tmpFile2), NotNil)
+}
 
 func (s *SpecSuite) TestParsing(c *C) {
 	spec, err := Read("../testdata/test1.spec")

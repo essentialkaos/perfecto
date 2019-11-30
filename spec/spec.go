@@ -10,7 +10,6 @@ package spec
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -234,14 +233,9 @@ LOOP:
 	for {
 		text, err := r.ReadString('\n')
 
-		switch err {
-		case nil:
-			// nothing
-		case io.EOF:
+		if err != nil {
 			spec.Data = append(spec.Data, Line{line, text, skip != 0})
 			break LOOP
-		default:
-			return nil, err
 		}
 
 		text = strings.TrimRight(text, "\r\n")
