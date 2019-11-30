@@ -772,33 +772,13 @@ func checkIfClause(id string, s *spec.Spec) []Alert {
 
 	var result []Alert
 
-	sections := []string{
-		spec.SECTION_BUILD,
-		spec.SECTION_CHECK,
-		spec.SECTION_INSTALL,
-		spec.SECTION_POST,
-		spec.SECTION_POSTTRANS,
-		spec.SECTION_POSTUN,
-		spec.SECTION_PRE,
-		spec.SECTION_PREP,
-		spec.SECTION_PRETRANS,
-		spec.SECTION_PREUN,
-		spec.SECTION_SETUP,
-		spec.SECTION_TRIGGERIN,
-		spec.SECTION_TRIGGERPOSTUN,
-		spec.SECTION_TRIGGERUN,
-		spec.SECTION_VERIFYSCRIPT,
-	}
+	for _, line := range s.Data {
+		if !prefix(line, "%if ") {
+			continue
+		}
 
-	for _, section := range s.GetSections(sections...) {
-		for _, line := range section.Data {
-			if !prefix(line, "%if ") {
-				continue
-			}
-
-			if contains(line, " = ") {
-				result = append(result, NewAlert(id, LEVEL_ERROR, "Use two equals symbols for comparison in %if clause", line))
-			}
+		if contains(line, " = ") {
+			result = append(result, NewAlert(id, LEVEL_ERROR, "Use two equals symbols for comparison in %if clause", line))
 		}
 	}
 
