@@ -681,16 +681,14 @@ func checkBashLoops(id string, s *spec.Spec) []Alert {
 
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {
-			lineText := strings.TrimLeft(line.Text, "\t ")
-
-			if !strings.HasPrefix(lineText, "for") && !strings.HasPrefix(lineText, "while") {
+			if !prefix(line, "for") && !prefix(line, "while") {
 				continue
 			}
 
 			nextLine := s.GetLine(line.Index + 1)
 			nextLineText := strings.TrimLeft(nextLine.Text, "\t ")
 
-			if !strings.HasSuffix(strings.Trim(nextLineText, " "), ";do") && nextLineText == "do" {
+			if !suffix(nextLine, ";do") && nextLineText == "do" {
 				result = append(result, NewAlert(id, LEVEL_NOTICE, "Place 'do' keyword on the same line with for/while (for ... ; do)", line))
 			}
 		}
@@ -812,6 +810,11 @@ func checkIfClause(id string, s *spec.Spec) []Alert {
 // prefix is strings.HasPrefix wrapper
 func prefix(line spec.Line, value string) bool {
 	return strings.HasPrefix(strings.TrimLeft(line.Text, "\t "), value)
+}
+
+// suffix is strings.HasSuffix wrapper
+func suffix(line spec.Line, value string) bool {
+	return strings.HasSuffix(strings.TrimLeft(line.Text, "\t "), value)
 }
 
 // contains is strings.Contains wrapper
