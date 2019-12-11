@@ -52,7 +52,7 @@ rm -rf %{buildroot}
 rm -rf %{buildroot}
 
 %check
-%if %{?_with_check:1}%{?_without_check:0}
+%if 0%{?rhel} = 8
 %{make} check
 %endif
 

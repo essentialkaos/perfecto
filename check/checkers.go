@@ -24,7 +24,7 @@ import (
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // Checker is spec check function
-type Checker func(s *spec.Spec) []Alert
+type Checker func(id string, s *spec.Spec) []Alert
 
 type macro struct {
 	Value string
@@ -92,13 +92,15 @@ func getCheckers() map[string]Checker {
 		"PF18": checkForEmptyLinesAtEnd,
 		"PF19": checkBashLoops,
 		"PF20": checkURLForHTTPS,
+		"PF21": checkForCheckMacro,
+		"PF22": checkIfClause,
 	}
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // checkForUselessSpaces checks for useless spaces
-func checkForUselessSpaces(s *spec.Spec) []Alert {
+func checkForUselessSpaces(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -109,12 +111,12 @@ func checkForUselessSpaces(s *spec.Spec) []Alert {
 		if contains(line, " ") {
 			if strings.TrimSpace(line.Text) == "" {
 				impLine := spec.Line{line.Index, strings.Replace(line.Text, " ", "▒", -1), line.Skip}
-				result = append(result, NewAlert(LEVEL_NOTICE, "Line contains useless spaces", impLine))
+				result = append(result, NewAlert(id, LEVEL_NOTICE, "Line contains useless spaces", impLine))
 			} else if strings.TrimRight(line.Text, " ") != line.Text {
 				cleanLine := strings.TrimRight(line.Text, " ")
 				spaces := len(line.Text) - len(cleanLine)
 				impLine := spec.Line{line.Index, cleanLine + strings.Repeat("▒", spaces), line.Skip}
-				result = append(result, NewAlert(LEVEL_NOTICE, "Line contains spaces at the end of line", impLine))
+				result = append(result, NewAlert(id, LEVEL_NOTICE, "Line contains spaces at the end of line", impLine))
 			}
 		}
 	}
@@ -123,7 +125,7 @@ func checkForUselessSpaces(s *spec.Spec) []Alert {
 }
 
 // checkForLineLength checks changelog and description lines for 80 symbols limit
-func checkForLineLength(s *spec.Spec) []Alert {
+func checkForLineLength(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -143,7 +145,7 @@ func checkForLineLength(s *spec.Spec) []Alert {
 			}
 
 			if strutil.Len(line.Text) > 80 {
-				result = append(result, NewAlert(LEVEL_WARNING, "Line is longer than 80 symbols", line))
+				result = append(result, NewAlert(id, LEVEL_WARNING, "Line is longer than 80 symbols", line))
 			}
 		}
 	}
@@ -152,7 +154,7 @@ func checkForLineLength(s *spec.Spec) []Alert {
 }
 
 // checkForDist checks for dist macro in release tag
-func checkForDist(s *spec.Spec) []Alert {
+func checkForDist(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -167,7 +169,7 @@ func checkForDist(s *spec.Spec) []Alert {
 
 			if prefix(line, "Release:") {
 				if !contains(line, "%{?dist}") {
-					result = append(result, NewAlert(LEVEL_ERROR, "Release tag must contains %{?dist} as part of release", line))
+					result = append(result, NewAlert(id, LEVEL_ERROR, "Release tag must contains %{?dist} as part of release", line))
 				}
 			}
 		}
@@ -177,7 +179,7 @@ func checkForDist(s *spec.Spec) []Alert {
 }
 
 // checkForNonMacroPaths checks if standart path not used as macro
-func checkForNonMacroPaths(s *spec.Spec) []Alert {
+func checkForNonMacroPaths(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -226,7 +228,7 @@ func checkForNonMacroPaths(s *spec.Spec) []Alert {
 			for _, macro := range pathMacroSlice {
 				re := regexp.MustCompile(macro.Value + `(\/|$|%)`)
 				if re.MatchString(text) {
-					result = append(result, NewAlert(LEVEL_WARNING, fmt.Sprintf("Path \"%s\" should be used as macro \"%s\"", macro.Value, macro.Name), line))
+					result = append(result, NewAlert(id, LEVEL_WARNING, fmt.Sprintf("Path \"%s\" should be used as macro \"%s\"", macro.Value, macro.Name), line))
 				}
 			}
 		}
@@ -236,7 +238,7 @@ func checkForNonMacroPaths(s *spec.Spec) []Alert {
 }
 
 // checkForBuildRoot checks for build root path used as $RPM_BUILD_ROOT
-func checkForBuildRoot(s *spec.Spec) []Alert {
+func checkForBuildRoot(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -255,11 +257,11 @@ func checkForBuildRoot(s *spec.Spec) []Alert {
 			}
 
 			if contains(line, "$RPM_BUILD_ROOT") {
-				result = append(result, NewAlert(LEVEL_ERROR, "Build root path must be used as macro %{buildroot}", line))
+				result = append(result, NewAlert(id, LEVEL_ERROR, "Build root path must be used as macro %{buildroot}", line))
 			}
 
 			if contains(line, "%{buildroot}/%{_") {
-				result = append(result, NewAlert(LEVEL_WARNING, "Slash after %{buildroot} macro is useless", line))
+				result = append(result, NewAlert(id, LEVEL_WARNING, "Slash after %{buildroot} macro is useless", line))
 			}
 		}
 	}
@@ -268,7 +270,7 @@ func checkForBuildRoot(s *spec.Spec) []Alert {
 }
 
 // checkForDevNull checks for devnull redirect format
-func checkForDevNull(s *spec.Spec) []Alert {
+func checkForDevNull(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -304,12 +306,12 @@ func checkForDevNull(s *spec.Spec) []Alert {
 		for _, line := range section.Data {
 			for _, v := range variations {
 				if strings.Contains(strutil.Exclude(line.Text, " "), strutil.Exclude(v, " ")) {
-					result = append(result, NewAlert(LEVEL_NOTICE, fmt.Sprintf("Use \"&>/dev/null || :\" instead of \"%s || :\"", v), line))
+					result = append(result, NewAlert(id, LEVEL_NOTICE, fmt.Sprintf("Use \"&>/dev/null || :\" instead of \"%s || :\"", v), line))
 				}
 			}
 
 			if contains(line, "|| exit 0") {
-				result = append(result, NewAlert(LEVEL_NOTICE, "Use \" || :\" instead of \" || exit 0\"", line))
+				result = append(result, NewAlert(id, LEVEL_NOTICE, "Use \" || :\" instead of \" || exit 0\"", line))
 			}
 		}
 	}
@@ -318,7 +320,7 @@ func checkForDevNull(s *spec.Spec) []Alert {
 }
 
 // checkChangelogHeaders checks changelog for misformatted records
-func checkChangelogHeaders(s *spec.Spec) []Alert {
+func checkChangelogHeaders(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -337,11 +339,11 @@ func checkChangelogHeaders(s *spec.Spec) []Alert {
 			}
 
 			if !contains(line, " - ") {
-				result = append(result, NewAlert(LEVEL_WARNING, "Misformatted changelog record header", line))
+				result = append(result, NewAlert(id, LEVEL_WARNING, "Misformatted changelog record header", line))
 			} else {
 				separator := strings.Index(line.Text, " - ")
 				if !strings.Contains(strutil.Substr(line.Text, separator+3, 999999), "-") {
-					result = append(result, NewAlert(LEVEL_WARNING, "Changelog record header must contain release", line))
+					result = append(result, NewAlert(id, LEVEL_WARNING, "Changelog record header must contain release", line))
 				}
 			}
 		}
@@ -351,7 +353,7 @@ func checkChangelogHeaders(s *spec.Spec) []Alert {
 }
 
 // checkForMakeMacro checks if make used not as macro
-func checkForMakeMacro(s *spec.Spec) []Alert {
+func checkForMakeMacro(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -375,19 +377,19 @@ func checkForMakeMacro(s *spec.Spec) []Alert {
 			}
 
 			if prefix(line, "make") {
-				result = append(result, NewAlert(LEVEL_WARNING, "Use %{__make} macro instead of \"make\"", line))
+				result = append(result, NewAlert(id, LEVEL_WARNING, "Use %{__make} macro instead of \"make\"", line))
 			}
 
 			if section.Name == spec.SECTION_INSTALL && containsField(line, "install") && contains(line, "DESTDIR") {
 				if prefix(line, "make") || prefix(line, "%{__make}") {
-					result = append(result, NewAlert(LEVEL_WARNING, "Use %{make_install} macro instead of \"make install\"", line))
+					result = append(result, NewAlert(id, LEVEL_WARNING, "Use %{make_install} macro instead of \"make install\"", line))
 				}
 			}
 
 			if section.Name == spec.SECTION_BUILD && !contains(line, "%{?_smp_mflags}") {
 				if prefix(line, "make") || prefix(line, "%{__make}") {
 					if line.Text == "make" || line.Text == "%{__make}" || containsField(line, "all") {
-						result = append(result, NewAlert(LEVEL_WARNING, "Don't forget to use %{?_smp_mflags} macro with make command", line))
+						result = append(result, NewAlert(id, LEVEL_WARNING, "Don't forget to use %{?_smp_mflags} macro with make command", line))
 					}
 				}
 			}
@@ -398,7 +400,7 @@ func checkForMakeMacro(s *spec.Spec) []Alert {
 }
 
 // checkForHeaderTags checks headers for required tags
-func checkForHeaderTags(s *spec.Spec) []Alert {
+func checkForHeaderTags(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -408,15 +410,15 @@ func checkForHeaderTags(s *spec.Spec) []Alert {
 	for _, header := range s.GetHeaders() {
 		if header.Package == "" {
 			if !containsTag(header.Data, "URL:") {
-				result = append(result, NewAlert(LEVEL_ERROR, "Main package must contain URL tag", emptyLine))
+				result = append(result, NewAlert(id, LEVEL_ERROR, "Main package must contain URL tag", emptyLine))
 			}
 		}
 
 		if !containsTag(header.Data, "Group:") {
 			if header.Package == "" {
-				result = append(result, NewAlert(LEVEL_WARNING, "Main package must contain Group tag", emptyLine))
+				result = append(result, NewAlert(id, LEVEL_WARNING, "Main package must contain Group tag", emptyLine))
 			} else {
-				result = append(result, NewAlert(LEVEL_WARNING, fmt.Sprintf("Package %s must contain Group tag", header.Package), emptyLine))
+				result = append(result, NewAlert(id, LEVEL_WARNING, fmt.Sprintf("Package %s must contain Group tag", header.Package), emptyLine))
 			}
 		}
 	}
@@ -427,7 +429,7 @@ func checkForHeaderTags(s *spec.Spec) []Alert {
 // codebeat:disable[BLOCK_NESTING]
 
 // checkForUnescapedPercent checks changelog and descriptions for unescaped percent symbol
-func checkForUnescapedPercent(s *spec.Spec) []Alert {
+func checkForUnescapedPercent(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -440,7 +442,7 @@ func checkForUnescapedPercent(s *spec.Spec) []Alert {
 		for _, line := range section.Data {
 			for _, word := range strings.Fields(line.Text) {
 				if strings.HasPrefix(word, "%") && !strings.HasPrefix(word, "%%") {
-					result = append(result, NewAlert(LEVEL_ERROR, "Symbol % must be escaped by another % (i.e % → %%)", line))
+					result = append(result, NewAlert(id, LEVEL_ERROR, "Symbol % must be escaped by another % (i.e % → %%)", line))
 				}
 			}
 		}
@@ -452,7 +454,7 @@ func checkForUnescapedPercent(s *spec.Spec) []Alert {
 // codebeat:enable[BLOCK_NESTING]
 
 // checkForMacroDefenitionPosition checks for macro defined after description
-func checkForMacroDefenitionPosition(s *spec.Spec) []Alert {
+func checkForMacroDefenitionPosition(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -471,7 +473,7 @@ func checkForMacroDefenitionPosition(s *spec.Spec) []Alert {
 
 		if underDescription {
 			if contains(line, "%global ") || contains(line, "%define ") {
-				result = append(result, NewAlert(LEVEL_WARNING, "Move %define and %global to top of your spec", line))
+				result = append(result, NewAlert(id, LEVEL_WARNING, "Move %define and %global to top of your spec", line))
 			}
 		}
 	}
@@ -480,7 +482,7 @@ func checkForMacroDefenitionPosition(s *spec.Spec) []Alert {
 }
 
 // checkForSeparatorLength checks for separator length
-func checkForSeparatorLength(s *spec.Spec) []Alert {
+func checkForSeparatorLength(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -489,7 +491,7 @@ func checkForSeparatorLength(s *spec.Spec) []Alert {
 
 	for _, line := range s.Data {
 		if contains(line, "#") && strings.Trim(line.Text, "#") == "" && strings.Count(line.Text, "#") != 80 {
-			result = append(result, NewAlert(LEVEL_NOTICE, "Separator must be 80 symbols long", line))
+			result = append(result, NewAlert(id, LEVEL_NOTICE, "Separator must be 80 symbols long", line))
 		}
 	}
 
@@ -497,7 +499,7 @@ func checkForSeparatorLength(s *spec.Spec) []Alert {
 }
 
 // checkForDefAttr checks spec for %defattr macro in %files sections
-func checkForDefAttr(s *spec.Spec) []Alert {
+func checkForDefAttr(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -521,9 +523,9 @@ func checkForDefAttr(s *spec.Spec) []Alert {
 
 		switch packageName {
 		case "":
-			result = append(result, NewAlert(LEVEL_ERROR, "%files section must contains %defattr macro", emptyLine))
+			result = append(result, NewAlert(id, LEVEL_ERROR, "%files section must contains %defattr macro", emptyLine))
 		default:
-			result = append(result, NewAlert(LEVEL_ERROR, "%files section for package "+packageName+" must contains %defattr macro", emptyLine))
+			result = append(result, NewAlert(id, LEVEL_ERROR, "%files section for package "+packageName+" must contains %defattr macro", emptyLine))
 		}
 	}
 
@@ -531,7 +533,7 @@ func checkForDefAttr(s *spec.Spec) []Alert {
 }
 
 // checkForUselessBinaryMacro checks spec for useless binary macro
-func checkForUselessBinaryMacro(s *spec.Spec) []Alert {
+func checkForUselessBinaryMacro(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -541,7 +543,7 @@ func checkForUselessBinaryMacro(s *spec.Spec) []Alert {
 	for _, line := range s.Data {
 		for _, binary := range binariesAsMacro {
 			if contains(line, "%{__"+binary+"}") {
-				result = append(result, NewAlert(LEVEL_NOTICE, fmt.Sprintf("Useless macro %%{__%s} used for executing %s binary", binary, binary), line))
+				result = append(result, NewAlert(id, LEVEL_NOTICE, fmt.Sprintf("Useless macro %%{__%s} used for executing %s binary", binary, binary), line))
 			}
 		}
 	}
@@ -550,7 +552,7 @@ func checkForUselessBinaryMacro(s *spec.Spec) []Alert {
 }
 
 // checkForEmptySections checks spec for empty sections
-func checkForEmptySections(s *spec.Spec) []Alert {
+func checkForEmptySections(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -573,7 +575,7 @@ func checkForEmptySections(s *spec.Spec) []Alert {
 
 	for _, section := range s.GetSections(sections...) {
 		if len(section.Args) == 0 && isEmptyData(section.Data) {
-			result = append(result, NewAlert(LEVEL_ERROR, fmt.Sprintf("Section %%%s is empty", section.Name), s.GetLine(section.Start)))
+			result = append(result, NewAlert(id, LEVEL_ERROR, fmt.Sprintf("Section %%%s is empty", section.Name), s.GetLine(section.Start)))
 		}
 	}
 
@@ -581,7 +583,7 @@ func checkForEmptySections(s *spec.Spec) []Alert {
 }
 
 // checkForIndentInFilesSection checks spec for prefixes in %files section
-func checkForIndentInFilesSection(s *spec.Spec) []Alert {
+func checkForIndentInFilesSection(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -591,7 +593,7 @@ func checkForIndentInFilesSection(s *spec.Spec) []Alert {
 	for _, section := range s.GetSections(spec.SECTION_FILES) {
 		for _, line := range section.Data {
 			if strings.HasPrefix(line.Text, " ") || strings.HasPrefix(line.Text, "\t") {
-				result = append(result, NewAlert(LEVEL_NOTICE, "Don't use indent in %files section", line))
+				result = append(result, NewAlert(id, LEVEL_NOTICE, "Don't use indent in %files section", line))
 			}
 		}
 	}
@@ -600,7 +602,7 @@ func checkForIndentInFilesSection(s *spec.Spec) []Alert {
 }
 
 // checkForSetupOptions checks setup arguments
-func checkForSetupOptions(s *spec.Spec) []Alert {
+func checkForSetupOptions(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -610,11 +612,11 @@ func checkForSetupOptions(s *spec.Spec) []Alert {
 	for _, section := range s.GetSections(spec.SECTION_SETUP) {
 		switch {
 		case containsArgs(section, "-q", "-c", "-n"):
-			result = append(result, NewAlert(LEVEL_NOTICE, "Options \"-q -c -n\" can be simplified to \"-qcn\"", s.GetLine(section.Start)))
+			result = append(result, NewAlert(id, LEVEL_NOTICE, "Options \"-q -c -n\" can be simplified to \"-qcn\"", s.GetLine(section.Start)))
 		case containsArgs(section, "-q", "-n"):
-			result = append(result, NewAlert(LEVEL_NOTICE, "Options \"-q -n\" can be simplified to \"-qn\"", s.GetLine(section.Start)))
+			result = append(result, NewAlert(id, LEVEL_NOTICE, "Options \"-q -n\" can be simplified to \"-qn\"", s.GetLine(section.Start)))
 		case containsArgs(section, "-c", "-n"):
-			result = append(result, NewAlert(LEVEL_NOTICE, "Options \"-c -n\" can be simplified to \"-cn\"", s.GetLine(section.Start)))
+			result = append(result, NewAlert(id, LEVEL_NOTICE, "Options \"-c -n\" can be simplified to \"-cn\"", s.GetLine(section.Start)))
 		}
 	}
 
@@ -622,7 +624,7 @@ func checkForSetupOptions(s *spec.Spec) []Alert {
 }
 
 // checkForEmptyLinesAtEnd checks spec for empty lines at the end
-func checkForEmptyLinesAtEnd(s *spec.Spec) []Alert {
+func checkForEmptyLinesAtEnd(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -631,7 +633,7 @@ func checkForEmptyLinesAtEnd(s *spec.Spec) []Alert {
 	lastLine := s.Data[totalLines-1]
 
 	if lastLine.Text != "" {
-		return []Alert{NewAlert(LEVEL_NOTICE, "Spec file should have empty line at the end", emptyLine)}
+		return []Alert{NewAlert(id, LEVEL_NOTICE, "Spec file should have empty line at the end", emptyLine)}
 	}
 
 	emptyLines := 0
@@ -641,7 +643,7 @@ func checkForEmptyLinesAtEnd(s *spec.Spec) []Alert {
 			emptyLines++
 		} else {
 			if emptyLines > 1 {
-				return []Alert{NewAlert(LEVEL_NOTICE, "Too much empty lines at the end of the spec", emptyLine)}
+				return []Alert{NewAlert(id, LEVEL_NOTICE, "Too much empty lines at the end of the spec", emptyLine)}
 			}
 
 			break
@@ -652,7 +654,7 @@ func checkForEmptyLinesAtEnd(s *spec.Spec) []Alert {
 }
 
 // checkBashLoops checks bash loops format
-func checkBashLoops(s *spec.Spec) []Alert {
+func checkBashLoops(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -679,17 +681,15 @@ func checkBashLoops(s *spec.Spec) []Alert {
 
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {
-			lineText := strings.TrimLeft(line.Text, "\t ")
-
-			if !strings.HasPrefix(lineText, "for") && !strings.HasPrefix(lineText, "while") {
+			if !prefix(line, "for") && !prefix(line, "while") {
 				continue
 			}
 
 			nextLine := s.GetLine(line.Index + 1)
 			nextLineText := strings.TrimLeft(nextLine.Text, "\t ")
 
-			if !strings.HasSuffix(strings.Trim(nextLineText, " "), ";do") && nextLineText == "do" {
-				result = append(result, NewAlert(LEVEL_NOTICE, "Place 'do' keyword on the same line with for/while (for ... ; do)", line))
+			if !suffix(nextLine, ";do") && nextLineText == "do" {
+				result = append(result, NewAlert(id, LEVEL_NOTICE, "Place 'do' keyword on the same line with for/while (for ... ; do)", line))
 			}
 		}
 	}
@@ -698,7 +698,7 @@ func checkBashLoops(s *spec.Spec) []Alert {
 }
 
 // checkURLForHTTPS checks if source domain supports HTTPS
-func checkURLForHTTPS(s *spec.Spec) []Alert {
+func checkURLForHTTPS(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -727,10 +727,58 @@ func checkURLForHTTPS(s *spec.Spec) []Alert {
 
 		if isHostSupportsHTTPS(sourceDomain) {
 			result = append(result, NewAlert(
-				LEVEL_WARNING,
+				id, LEVEL_WARNING,
 				fmt.Sprintf("Domain %s supports HTTPS. Replace http by https in source URL.", sourceDomain),
 				line,
 			))
+		}
+	}
+
+	return result
+}
+
+// checkForCheckMacro checks check section for a macro which allows skipping the check
+func checkForCheckMacro(id string, s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
+	if !s.HasSection(spec.SECTION_CHECK) {
+		return nil
+	}
+
+	for _, section := range s.GetSections(spec.SECTION_CHECK) {
+		if section.IsEmpty() {
+			return nil
+		}
+
+		for _, line := range section.Data {
+			if contains(line, "?_without_check") && contains(line, "?_with_check") {
+				return nil
+			}
+		}
+	}
+
+	return []Alert{
+		NewAlert(id, LEVEL_WARNING, "Use %{_without_check} and %{_with_check} macroses for controlling tests execution", emptyLine),
+	}
+}
+
+// checkIfClause checks if clause for using single equals symbol instead of two
+func checkIfClause(id string, s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
+	var result []Alert
+
+	for _, line := range s.Data {
+		if !prefix(line, "%if ") {
+			continue
+		}
+
+		if contains(line, " = ") {
+			result = append(result, NewAlert(id, LEVEL_ERROR, "Use two equals symbols for comparison in %if clause", line))
 		}
 	}
 
@@ -741,7 +789,12 @@ func checkURLForHTTPS(s *spec.Spec) []Alert {
 
 // prefix is strings.HasPrefix wrapper
 func prefix(line spec.Line, value string) bool {
-	return strings.HasPrefix(strings.TrimLeft(line.Text, " "), value)
+	return strings.HasPrefix(strings.TrimLeft(line.Text, "\t "), value)
+}
+
+// suffix is strings.HasSuffix wrapper
+func suffix(line spec.Line, value string) bool {
+	return strings.HasSuffix(strings.TrimLeft(line.Text, "\t "), value)
 }
 
 // contains is strings.Contains wrapper

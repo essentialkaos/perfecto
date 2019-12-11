@@ -3,7 +3,7 @@
 <p align="center">
   <a href="https://goreportcard.com/report/github.com/essentialkaos/perfecto"><img src="https://goreportcard.com/badge/github.com/essentialkaos/perfecto"></a>
   <a href="https://codebeat.co/projects/github-com-essentialkaos-perfecto-master"><img alt="codebeat badge" src="https://codebeat.co/badges/74af2307-8aa2-48eb-afd5-2ae3620a1149" /></a>
-  <a href="https://travis-ci.org/essentialkaos/perfecto"><img src="https://travis-ci.org/essentialkaos/perfecto.svg"></a>
+  <a href="https://travis-ci.com/essentialkaos/perfecto"><img src="https://travis-ci.com/essentialkaos/perfecto.svg"></a>
   <a href='https://coveralls.io/github/essentialkaos/perfecto'><img src='https://coveralls.io/repos/github/essentialkaos/perfecto/badge.svg' alt='Coverage Status' /></a>
   <a href="#license"><img src="https://gh.kaos.st/ekol.svg"></a>
 </p>
@@ -20,26 +20,7 @@ _perfecto_ is tool for checking perfectly written RPM specs. Currently, _perfect
 
 ### Checks
 
-* `PF1` Checks all spec data for useless spaces;
-* `PF2` Checks all spec data for lines longer than 80 symbols;
-* `PF3` Checks release tag for using `%{?dist}` macro;
-* `PF4` Checks all scriptlets for using paths instead of macroses;
-* `PF5` Checks `install` and `clean` scriptlets for problems with `%{buildroot}` macro;
-* `PF6` Checks all scriptlets for dissimilar redirect to `/dev/null`;
-* `PF7` Checks changelog for misformatted records;
-* `PF8` Checks `build`, `install` and `check` scriptlets for using `make` which can be simplified;
-* `PF9` Checks header for required tags;
-* `PF10` Checks all spec data for unescaped percentage symbol;
-* `PF11` Checks position of `%global` and `%define` keywords;
-* `PF12` Checks length of separator comments;
-* `PF13` Checks `files` section for `%defattr`;
-* `PF14` Checks all spec data for useless binaries macroses;
-* `PF15` Checks all spec data for empty sections;
-* `PF16` Checks `files` section for indentations;
-* `PF17` Checks `setup` section options;
-* `PF18` Checks all spec data for empty lines at the end;
-* `PF19` Checks bash loops formatting;
-* `PF20` Checks sources URLs for HTTPS support.
+You can find additional information about every _perfecto_ check in [project wiki](https://github.com/essentialkaos/perfecto/wiki).
 
 ### Installing
 
@@ -197,8 +178,8 @@ Examples
 
 | Branch | Status |
 |--------|--------|
-| `master` | [![Build Status](https://travis-ci.org/essentialkaos/perfecto.svg?branch=master)](https://travis-ci.org/essentialkaos/perfecto) |
-| `develop` | [![Build Status](https://travis-ci.org/essentialkaos/perfecto.svg?branch=develop)](https://travis-ci.org/essentialkaos/perfecto) |
+| `master` | [![Build Status](https://travis-ci.com/essentialkaos/perfecto.svg?branch=master)](https://travis-ci.com/essentialkaos/perfecto) |
+| `develop` | [![Build Status](https://travis-ci.com/essentialkaos/perfecto.svg?branch=develop)](https://travis-ci.com/essentialkaos/perfecto) |
 
 ### License
 

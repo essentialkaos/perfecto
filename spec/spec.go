@@ -10,7 +10,6 @@ package spec
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -184,6 +183,8 @@ func (s *Spec) GetLine(index int) Line {
 	return Line{-1, "", false}
 }
 
+// ////////////////////////////////////////////////////////////////////////////////// //
+
 // GetFileName return spec file name without extension
 func (s *Spec) GetFileName() string {
 	return strutil.Exclude(path.Base(s.File), ".spec")
@@ -200,6 +201,16 @@ func (s *Section) GetPackageName() string {
 	}
 
 	return s.Args[0]
+}
+
+func (s *Section) IsEmpty() bool {
+	for _, line := range s.Data {
+		if strings.Trim(line.Text, " \t") != "" {
+			return false
+		}
+	}
+
+	return true
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -222,14 +233,9 @@ LOOP:
 	for {
 		text, err := r.ReadString('\n')
 
-		switch err {
-		case nil:
-			// nothing
-		case io.EOF:
+		if err != nil {
 			spec.Data = append(spec.Data, Line{line, text, skip != 0})
 			break LOOP
-		default:
-			return nil, err
 		}
 
 		text = strings.TrimRight(text, "\r\n")

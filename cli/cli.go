@@ -33,7 +33,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "2.5.1"
+	VER  = "3.0.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 

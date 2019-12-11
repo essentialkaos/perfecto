@@ -70,13 +70,11 @@ func parseAlertLine(text string, s *spec.Spec) (Alert, bool) {
 		desc = strutil.Exclude(desc, "specfile-error warning: ")
 	}
 
-	desc = "[rpmlint] " + desc
-
 	switch level {
 	case "W":
-		return NewAlert(LEVEL_ERROR, desc, s.GetLine(line)), true
+		return NewAlert("", LEVEL_ERROR, desc, s.GetLine(line)), true
 	case "E":
-		return NewAlert(LEVEL_CRITICAL, desc, s.GetLine(line)), true
+		return NewAlert("", LEVEL_CRITICAL, desc, s.GetLine(line)), true
 	}
 
 	return Alert{}, false
