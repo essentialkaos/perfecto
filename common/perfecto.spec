@@ -10,7 +10,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         3.0.0
+Version:         3.1.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -87,6 +87,9 @@ fi
 ################################################################################
 
 %changelog
+* Fri Dec 13 2019 Anton Novojilov <andy@essentialkaos.com> - 3.1.0-0
+- Added URL check to PF20
+
 * Sat Oct 26 2019 Anton Novojilov <andy@essentialkaos.com> - 3.0.0-0
 - Improved all renderers
 - Added check ID to output

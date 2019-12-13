@@ -707,28 +707,36 @@ func checkURLForHTTPS(id string, s *spec.Spec) []Alert {
 		httpCheckCache = cache.New(time.Hour, 0)
 	}
 
-	sources := s.GetSources()
-
 	var result []Alert
 
-	for _, line := range sources {
-		sourceText := strings.TrimLeft(line.Text, "\t ")
-		sourceURL := strutil.ReadField(sourceText, 1, true, " ")
+	urls := s.GetSources()
 
-		if !strings.HasPrefix(sourceURL, "http://") {
+	for _, header := range s.GetHeaders() {
+		for _, line := range header.Data {
+			if prefix(line, "URL:") {
+				urls = append(urls, line)
+			}
+		}
+	}
+
+	for _, line := range urls {
+		lineText := strings.TrimLeft(line.Text, "\t ")
+		url := strutil.ReadField(lineText, 1, true, " ")
+
+		if !strings.HasPrefix(url, "http://") {
 			continue
 		}
 
-		sourceDomain := extractSourceDomain(sourceURL)
+		domain := extractDomainFromURL(url)
 
-		if sourceDomain == "" {
+		if domain == "" {
 			continue
 		}
 
-		if isHostSupportsHTTPS(sourceDomain) {
+		if isHostSupportsHTTPS(domain) {
 			result = append(result, NewAlert(
 				id, LEVEL_WARNING,
-				fmt.Sprintf("Domain %s supports HTTPS. Replace http by https in source URL.", sourceDomain),
+				fmt.Sprintf("Domain %s supports HTTPS. Replace http by https in URL.", domain),
 				line,
 			))
 		}
@@ -845,8 +853,8 @@ func containsTag(data []spec.Line, tag string) bool {
 	return false
 }
 
-// extractSourceDomain extracts domain name from source URL
-func extractSourceDomain(url string) string {
+// extractDomainFromURL extracts domain name from source URL
+func extractDomainFromURL(url string) string {
 	url = strutil.Exclude(url, "http://")
 	return strutil.ReadField(url, 0, false, "/")
 }
