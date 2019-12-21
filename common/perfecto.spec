@@ -4,19 +4,25 @@
 
 ################################################################################
 
+%global crc_check pushd ../SOURCES ; sha512sum -c %{SOURCE100} ; popd
+
+################################################################################
+
 %define  debug_package %{nil}
 
 ################################################################################
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         3.1.0
+Version:         3.2.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
-URL:             https://github.com/essentialkaos/perfecto
+URL:             https://kaos.sh/perfecto
 
 Source0:         https://source.kaos.st/%{name}/%{name}-%{version}.tar.bz2
+
+Source100:       checksum.sha512
 
 BuildRoot:       %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -34,6 +40,8 @@ Tool for checking perfectly written RPM specs.
 ################################################################################
 
 %prep
+%{crc_check}
+
 %setup -q
 
 %build
@@ -87,6 +95,9 @@ fi
 ################################################################################
 
 %changelog
+* Sat Dec 21 2019 Anton Novojilov <andy@essentialkaos.com> - 3.2.0-0
+- Added printing links to wiki articles about failed checks
+
 * Fri Dec 13 2019 Anton Novojilov <andy@essentialkaos.com> - 3.1.0-0
 - Added URL check to PF20
 

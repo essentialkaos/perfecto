@@ -406,6 +406,7 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 
 	c.Assert(r, chk.NotNil)
 	c.Assert(r.IsPerfect(), chk.Equals, true)
+	c.Assert(r.IDs(), chk.HasLen, 0)
 
 	s, err = spec.Read("../testdata/test_7.spec")
 
@@ -416,6 +417,7 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 
 	c.Assert(r, chk.NotNil)
 	c.Assert(r.IsPerfect(), chk.Equals, false)
+	c.Assert(r.IDs(), chk.HasLen, 3)
 
 	s, err = spec.Read("../testdata/test_11.spec")
 

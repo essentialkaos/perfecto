@@ -11,6 +11,7 @@ import (
 	"sort"
 
 	"pkg.re/essentialkaos/ek.v11/sliceutil"
+	"pkg.re/essentialkaos/ek.v11/sortutil"
 
 	"github.com/essentialkaos/perfecto/spec"
 )
@@ -78,6 +79,45 @@ func (r *Report) IsPerfect() bool {
 	}
 
 	return true
+}
+
+// IDs returns slice with all mentioned checks ID's
+func (r *Report) IDs() []string {
+	ids := make(map[string]bool)
+
+	for _, a := range r.Notices {
+		ids[a.ID] = true
+	}
+
+	for _, a := range r.Warnings {
+		ids[a.ID] = true
+	}
+
+	for _, a := range r.Errors {
+		ids[a.ID] = true
+	}
+
+	for _, a := range r.Criticals {
+		ids[a.ID] = true
+	}
+
+	if len(ids) == 0 {
+		return nil
+	}
+
+	var result []string
+
+	for id := range ids {
+		if id == "" {
+			continue
+		}
+
+		result = append(result, id)
+	}
+
+	sortutil.StringsNatural(result)
+
+	return result
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
