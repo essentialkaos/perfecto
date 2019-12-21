@@ -417,7 +417,6 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 
 	c.Assert(r, chk.NotNil)
 	c.Assert(r.IsPerfect(), chk.Equals, false)
-	c.Assert(r.IDs(), chk.HasLen, 3)
 
 	s, err = spec.Read("../testdata/test_11.spec")
 
@@ -502,6 +501,15 @@ func (sc *CheckSuite) TestAux(c *chk.C) {
 	c.Assert(r.IsPerfect(), chk.Equals, false)
 	r = &Report{Criticals: []Alert{Alert{}}}
 	c.Assert(r.IsPerfect(), chk.Equals, false)
+
+	r = &Report{
+		Notices:   []Alert{Alert{}},
+		Warnings:  []Alert{Alert{ID: "PF0"}},
+		Errors:    []Alert{Alert{ID: "PF0"}},
+		Criticals: []Alert{Alert{ID: "PF0"}},
+	}
+
+	c.Assert(r.IDs(), chk.HasLen, 1)
 
 	a := AlertSlice{Alert{}, Alert{}}
 	a.Swap(0, 1)
