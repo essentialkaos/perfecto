@@ -388,6 +388,19 @@ func (sc *CheckSuite) TestCheckIfClause(c *chk.C) {
 	c.Assert(alerts[0].Line.Index, chk.Equals, 55)
 }
 
+func (sc *CheckSuite) TestCheckForUselessSlash(c *chk.C) {
+	s, err := spec.Read("../testdata/test_2.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts := checkForUselessSlash("", s)
+
+	c.Assert(alerts, chk.HasLen, 1)
+	c.Assert(alerts[0].Info, chk.Equals, "Slash between %{buildroot} and %{_usr} macroses is useless")
+	c.Assert(alerts[0].Line.Index, chk.Equals, 48)
+}
+
 func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
 	s := &spec.Spec{}
 
@@ -489,7 +502,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 
 func (sc *CheckSuite) TestAux(c *chk.C) {
 	// This test will fail if new checkers was added
-	c.Assert(getCheckers(), chk.HasLen, 22)
+	c.Assert(getCheckers(), chk.HasLen, 23)
 
 	r := &Report{}
 	c.Assert(r.IsPerfect(), chk.Equals, true)

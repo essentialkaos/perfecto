@@ -94,6 +94,7 @@ func getCheckers() map[string]Checker {
 		"PF20": checkURLForHTTPS,
 		"PF21": checkForCheckMacro,
 		"PF22": checkIfClause,
+		"PF23": checkForUselessSlash,
 	}
 }
 
@@ -790,6 +791,50 @@ func checkIfClause(id string, s *spec.Spec) []Alert {
 
 		if contains(line, " = ") {
 			result = append(result, NewAlert(id, LEVEL_ERROR, "Use two equals symbols for comparison in %if clause", line))
+		}
+	}
+
+	return result
+}
+
+// checkForUselessSlash checks for useless slash after %{buildroot} macro
+func checkForUselessSlash(id string, s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
+	var result []Alert
+
+	sections := []string{
+		spec.SECTION_BUILD,
+		spec.SECTION_CHECK,
+		spec.SECTION_INSTALL,
+		spec.SECTION_POST,
+		spec.SECTION_POSTTRANS,
+		spec.SECTION_POSTUN,
+		spec.SECTION_PRE,
+		spec.SECTION_PREP,
+		spec.SECTION_PRETRANS,
+		spec.SECTION_PREUN,
+		spec.SECTION_SETUP,
+		spec.SECTION_TRIGGERPOSTUN,
+		spec.SECTION_TRIGGERUN,
+		spec.SECTION_VERIFYSCRIPT,
+		spec.SECTION_VERIFYSCRIPT,
+	}
+
+	for _, section := range s.GetSections(sections...) {
+		for _, line := range section.Data {
+			if isComment(line) {
+				continue
+			}
+
+			for _, macro := range pathMacroSlice {
+				if contains(line, "%{buildroot}/"+macro.Name) {
+					desc := fmt.Sprintf("Slash between %%{buildroot} and %s macroses is useless", macro.Name)
+					result = append(result, NewAlert(id, LEVEL_WARNING, desc, line))
+				}
+			}
 		}
 	}
 
