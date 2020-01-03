@@ -31,7 +31,7 @@ Test subpackge for perfecto app.
 %setup -qn %{name}-%{version}
 
 %build
-%{__make} %{?_smp_mflags}
+gcc $RPM_OPT_FLAGS -o app app.c
 
 %install
 rm -rf %{buildroot}
@@ -39,7 +39,7 @@ rm -rf %{buildroot}
 export PATH="$PATH:/usr/sbin/test"
 
 install -pm file $RPM_BUILD_ROOT/usr/
-install -pm file %{buildroot}/etc/
+install -pm file2 %{buildroot}/etc/
 
 wget github.com/etcd-io/etcd/Documentation
 

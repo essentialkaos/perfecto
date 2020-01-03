@@ -76,7 +76,7 @@ func getCheckers() map[string]Checker {
 		"PF2":  checkForLineLength,
 		"PF3":  checkForDist,
 		"PF4":  checkForNonMacroPaths,
-		"PF5":  checkForBuildRoot,
+		"PF5":  checkForVariables,
 		"PF6":  checkForDevNull,
 		"PF7":  checkChangelogHeaders,
 		"PF8":  checkForMakeMacro,
@@ -237,8 +237,8 @@ func checkForNonMacroPaths(id string, s *spec.Spec) []Alert {
 	return result
 }
 
-// checkForBuildRoot checks for build root path used as $RPM_BUILD_ROOT
-func checkForBuildRoot(id string, s *spec.Spec) []Alert {
+// checkForVariables checks for using variables instead of macroses
+func checkForVariables(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -246,6 +246,7 @@ func checkForBuildRoot(id string, s *spec.Spec) []Alert {
 	var result []Alert
 
 	sections := []string{
+		spec.SECTION_BUILD,
 		spec.SECTION_INSTALL,
 		spec.SECTION_CLEAN,
 	}
@@ -258,10 +259,12 @@ func checkForBuildRoot(id string, s *spec.Spec) []Alert {
 
 			if contains(line, "$RPM_BUILD_ROOT") {
 				result = append(result, NewAlert(id, LEVEL_ERROR, "Build root path must be used as macro %{buildroot}", line))
+				continue
 			}
 
-			if contains(line, "%{buildroot}/%{_") {
-				result = append(result, NewAlert(id, LEVEL_WARNING, "Slash after %{buildroot} macro is useless", line))
+			if contains(line, "$RPM_OPT_FLAGS") {
+				result = append(result, NewAlert(id, LEVEL_ERROR, "Optimization flags must be used as macro %{optflags}", line))
+				continue
 			}
 		}
 	}

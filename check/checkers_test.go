@@ -84,19 +84,19 @@ func (sc *CheckSuite) TestCheckForNonMacroPaths(c *chk.C) {
 	c.Assert(alerts[1].Line.Index, chk.Equals, 42)
 }
 
-func (sc *CheckSuite) TestCheckForBuildRoot(c *chk.C) {
+func (sc *CheckSuite) TestCheckForVariables(c *chk.C) {
 	s, err := spec.Read("../testdata/test_2.spec")
 
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForBuildRoot("", s)
+	alerts := checkForVariables("", s)
 
 	c.Assert(alerts, chk.HasLen, 2)
-	c.Assert(alerts[0].Info, chk.Equals, "Build root path must be used as macro %{buildroot}")
-	c.Assert(alerts[0].Line.Index, chk.Equals, 41)
-	c.Assert(alerts[1].Info, chk.Equals, "Slash after %{buildroot} macro is useless")
-	c.Assert(alerts[1].Line.Index, chk.Equals, 48)
+	c.Assert(alerts[0].Info, chk.Equals, "Optimization flags must be used as macro %{optflags}")
+	c.Assert(alerts[0].Line.Index, chk.Equals, 34)
+	c.Assert(alerts[1].Info, chk.Equals, "Build root path must be used as macro %{buildroot}")
+	c.Assert(alerts[1].Line.Index, chk.Equals, 41)
 }
 
 func (sc *CheckSuite) TestCheckForDevNull(c *chk.C) {
