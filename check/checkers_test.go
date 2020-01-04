@@ -84,19 +84,19 @@ func (sc *CheckSuite) TestCheckForNonMacroPaths(c *chk.C) {
 	c.Assert(alerts[1].Line.Index, chk.Equals, 42)
 }
 
-func (sc *CheckSuite) TestCheckForBuildRoot(c *chk.C) {
+func (sc *CheckSuite) TestCheckForVariables(c *chk.C) {
 	s, err := spec.Read("../testdata/test_2.spec")
 
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForBuildRoot("", s)
+	alerts := checkForVariables("", s)
 
 	c.Assert(alerts, chk.HasLen, 2)
-	c.Assert(alerts[0].Info, chk.Equals, "Build root path must be used as macro %{buildroot}")
-	c.Assert(alerts[0].Line.Index, chk.Equals, 41)
-	c.Assert(alerts[1].Info, chk.Equals, "Slash after %{buildroot} macro is useless")
-	c.Assert(alerts[1].Line.Index, chk.Equals, 48)
+	c.Assert(alerts[0].Info, chk.Equals, "Optimization flags must be used as macro %{optflags}")
+	c.Assert(alerts[0].Line.Index, chk.Equals, 34)
+	c.Assert(alerts[1].Info, chk.Equals, "Build root path must be used as macro %{buildroot}")
+	c.Assert(alerts[1].Line.Index, chk.Equals, 41)
 }
 
 func (sc *CheckSuite) TestCheckForDevNull(c *chk.C) {
@@ -388,6 +388,19 @@ func (sc *CheckSuite) TestCheckIfClause(c *chk.C) {
 	c.Assert(alerts[0].Line.Index, chk.Equals, 55)
 }
 
+func (sc *CheckSuite) TestCheckForUselessSlash(c *chk.C) {
+	s, err := spec.Read("../testdata/test_2.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts := checkForUselessSlash("", s)
+
+	c.Assert(alerts, chk.HasLen, 1)
+	c.Assert(alerts[0].Info, chk.Equals, "Slash between %{buildroot} and %{_usr} macroses is useless")
+	c.Assert(alerts[0].Line.Index, chk.Equals, 48)
+}
+
 func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
 	s := &spec.Spec{}
 
@@ -406,6 +419,7 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 
 	c.Assert(r, chk.NotNil)
 	c.Assert(r.IsPerfect(), chk.Equals, true)
+	c.Assert(r.IDs(), chk.HasLen, 0)
 
 	s, err = spec.Read("../testdata/test_7.spec")
 
@@ -488,7 +502,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 
 func (sc *CheckSuite) TestAux(c *chk.C) {
 	// This test will fail if new checkers was added
-	c.Assert(getCheckers(), chk.HasLen, 22)
+	c.Assert(getCheckers(), chk.HasLen, 23)
 
 	r := &Report{}
 	c.Assert(r.IsPerfect(), chk.Equals, true)
@@ -500,6 +514,15 @@ func (sc *CheckSuite) TestAux(c *chk.C) {
 	c.Assert(r.IsPerfect(), chk.Equals, false)
 	r = &Report{Criticals: []Alert{Alert{}}}
 	c.Assert(r.IsPerfect(), chk.Equals, false)
+
+	r = &Report{
+		Notices:   []Alert{Alert{}},
+		Warnings:  []Alert{Alert{ID: "PF0"}},
+		Errors:    []Alert{Alert{ID: "PF0"}},
+		Criticals: []Alert{Alert{ID: "PF0"}},
+	}
+
+	c.Assert(r.IDs(), chk.HasLen, 1)
 
 	a := AlertSlice{Alert{}, Alert{}}
 	a.Swap(0, 1)

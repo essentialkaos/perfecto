@@ -14,12 +14,17 @@ import (
 	"strings"
 
 	"pkg.re/essentialkaos/ek.v11/fmtc"
+	"pkg.re/essentialkaos/ek.v11/fmtutil"
 	"pkg.re/essentialkaos/ek.v11/options"
 	"pkg.re/essentialkaos/ek.v11/strutil"
 
 	"github.com/essentialkaos/perfecto/check"
 	"github.com/essentialkaos/perfecto/spec"
 )
+
+// ////////////////////////////////////////////////////////////////////////////////// //
+
+const WIKI_URL = "https://kaos.sh/perfecto/w/"
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
@@ -125,7 +130,10 @@ func renderFullReport(r *check.Report) {
 		renderAlerts(check.LEVEL_CRITICAL, r.Criticals)
 	}
 
-	fmtc.Printf("{s}%s{!}\n\n", strings.Repeat("-", 88))
+	renderLinks(r)
+
+	fmtutil.Separator(true)
+	fmtc.NewLine()
 
 	renderSummary(r)
 
@@ -286,6 +294,24 @@ func renderShortAlert(alert check.Alert) {
 	} else {
 		fmtc.Printf(fg+"(rpmlint) %s{!}\n", alert.Info)
 	}
+}
+
+// renderLinks prints links to mentioned failed checks
+func renderLinks(r *check.Report) {
+	ids := r.IDs()
+
+	if len(ids) == 0 {
+		return
+	}
+
+	fmtutil.Separator(true)
+	fmtc.Println("\n{*}Links:{!}\n")
+
+	for _, id := range r.IDs() {
+		fmtc.Printf(" • %s%s\n", WIKI_URL, id)
+	}
+
+	fmtc.NewLine()
 }
 
 // renderSummary print number for each alert type
