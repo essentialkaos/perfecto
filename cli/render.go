@@ -24,6 +24,10 @@ import (
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
+const WIKI_URL = "https://kaos.sh/perfecto/w/"
+
+// ////////////////////////////////////////////////////////////////////////////////// //
+
 var levelsPrefixes = map[uint8]string{
 	check.LEVEL_NOTICE:   "<N>",
 	check.LEVEL_WARNING:  "<W>",
@@ -304,7 +308,7 @@ func renderLinks(r *check.Report) {
 	fmtc.Println("\n{*}Links:{!}\n")
 
 	for _, id := range r.IDs() {
-		fmtc.Printf(" • https://kaos.sh/perfecto/w/%s\n", id)
+		fmtc.Printf(" • %s%s\n", WIKI_URL, id)
 	}
 
 	fmtc.NewLine()
