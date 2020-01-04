@@ -97,6 +97,7 @@ fi
 %changelog
 * Sat Dec 21 2019 Anton Novojilov <andy@essentialkaos.com> - 3.2.0-0
 - Added printing links to wiki articles about failed checks
+- Improved check for using variables instead of macroses (PF5)
 
 * Fri Dec 13 2019 Anton Novojilov <andy@essentialkaos.com> - 3.1.0-0
 - Added URL check to PF20
