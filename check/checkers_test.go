@@ -401,6 +401,19 @@ func (sc *CheckSuite) TestCheckForUselessSlash(c *chk.C) {
 	c.Assert(alerts[0].Line.Index, chk.Equals, 48)
 }
 
+func (sc *CheckSuite) TestCheckForEmptyIf(c *chk.C) {
+	s, err := spec.Read("../testdata/test_14.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts := checkForEmptyIf("", s)
+
+	c.Assert(alerts, chk.HasLen, 1)
+	c.Assert(alerts[0].Info, chk.Equals, "Evaluated if clause can be empty. Change the order of clauses (i.e. %if → if instead of if → %if).")
+	c.Assert(alerts[0].Line.Index, chk.Equals, 84)
+}
+
 func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
 	s := &spec.Spec{}
 
@@ -502,7 +515,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 
 func (sc *CheckSuite) TestAux(c *chk.C) {
 	// This test will fail if new checkers was added
-	c.Assert(getCheckers(), chk.HasLen, 23)
+	c.Assert(getCheckers(), chk.HasLen, 24)
 
 	r := &Report{}
 	c.Assert(r.IsPerfect(), chk.Equals, true)
