@@ -14,7 +14,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         3.2.0
+Version:         3.3.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -95,6 +95,9 @@ fi
 ################################################################################
 
 %changelog
+* Wed Jan 29 2020 Anton Novojilov <andy@essentialkaos.com> - 3.3.0-0
+- Added check for possible empty evaluated if clauses (PF24)
+
 * Sat Dec 21 2019 Anton Novojilov <andy@essentialkaos.com> - 3.2.0-0
 - Added printing links to wiki articles about failed checks
 - Improved check for using variables instead of macroses (PF5)

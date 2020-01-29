@@ -95,6 +95,7 @@ func getCheckers() map[string]Checker {
 		"PF21": checkForCheckMacro,
 		"PF22": checkIfClause,
 		"PF23": checkForUselessSlash,
+		"PF24": checkForEmptyIf,
 	}
 }
 
@@ -834,6 +835,78 @@ func checkForUselessSlash(id string, s *spec.Spec) []Alert {
 					desc := fmt.Sprintf("Slash between %%{buildroot} and %s macroses is useless", macro.Name)
 					result = append(result, NewAlert(id, LEVEL_WARNING, desc, line))
 				}
+			}
+		}
+	}
+
+	return result
+}
+
+// checkForEmptyIf checks for possible empty if clauses
+func checkForEmptyIf(id string, s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
+	var result []Alert
+
+	sections := []string{
+		spec.SECTION_BUILD,
+		spec.SECTION_CHECK,
+		spec.SECTION_INSTALL,
+		spec.SECTION_POST,
+		spec.SECTION_POSTTRANS,
+		spec.SECTION_POSTUN,
+		spec.SECTION_PRE,
+		spec.SECTION_PREP,
+		spec.SECTION_PRETRANS,
+		spec.SECTION_PREUN,
+		spec.SECTION_SETUP,
+		spec.SECTION_TRIGGERPOSTUN,
+		spec.SECTION_TRIGGERUN,
+		spec.SECTION_VERIFYSCRIPT,
+		spec.SECTION_VERIFYSCRIPT,
+	}
+
+	var clauseOpen, macroOpen, hasContent bool
+	var clauseLine spec.Line
+
+	for _, section := range s.GetSections(sections...) {
+		for _, line := range section.Data {
+			if isComment(line) {
+				continue
+			}
+
+			if prefix(line, "if ") && !macroOpen {
+				clauseOpen = true
+				clauseLine = line
+				continue
+			}
+
+			if prefix(line, "%else") {
+				hasContent = true
+				continue
+			}
+
+			if prefix(line, "%if") {
+				if !macroOpen {
+					macroOpen = true
+				} else {
+					hasContent = true
+				}
+			}
+
+			if !macroOpen && clauseOpen {
+				hasContent = true
+			}
+
+			if prefix(line, "fi") {
+				if clauseOpen && !hasContent {
+					desc := fmt.Sprintf("Evaluated if clause can be empty. Change the order of clauses (i.e. %%if → if instead of if → %%if).")
+					result = append(result, NewAlert(id, LEVEL_WARNING, desc, clauseLine))
+				}
+
+				clauseOpen, macroOpen, hasContent = false, false, false
 			}
 		}
 	}
