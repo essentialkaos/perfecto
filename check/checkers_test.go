@@ -411,7 +411,7 @@ func (sc *CheckSuite) TestCheckForEmptyIf(c *chk.C) {
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Evaluated if clause can be empty. Change the order of clauses (i.e. %if → if instead of if → %if).")
-	c.Assert(alerts[0].Line.Index, chk.Equals, 84)
+	c.Assert(alerts[0].Line.Index, chk.Equals, 92)
 }
 
 func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {

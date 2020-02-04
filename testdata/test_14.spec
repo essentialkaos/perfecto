@@ -56,6 +56,14 @@ rm -rf %{buildroot}
 %{make} check
 %endif
 
+%pre
+if [[ $1 -ge 1 ]] ; then
+%if 0%{?rhel} >= 7
+  %{__systemctl} daemon-reload &>/dev/null || :
+%endif
+%{__service} %{name} restart &>/dev/null || :
+fi
+
 %post
 if [[ $1 -eq 1 ]] ; then
   %if 0%{?rhel} >= 7
@@ -86,6 +94,13 @@ if [[ $1 -ge 1 ]] ; then
   %{__systemctl} daemon-reload &>/dev/null || :
 %endif
 fi
+
+%postun magic
+%if 0%{?rhel} >= 7
+%if %{?_with_check:1}%{?_without_check:0}
+  %{__systemctl} daemon-reload &>/dev/null || :
+%endif
+%endif
 
 ################################################################################
 

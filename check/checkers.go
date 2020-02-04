@@ -896,7 +896,12 @@ func checkForEmptyIf(id string, s *spec.Spec) []Alert {
 				}
 			}
 
-			if !macroOpen && clauseOpen {
+			if prefix(line, "%endif") && macroOpen {
+				macroOpen = false
+				continue
+			}
+
+			if !macroOpen && clauseOpen && !prefix(line, "fi") {
 				hasContent = true
 			}
 
@@ -909,6 +914,8 @@ func checkForEmptyIf(id string, s *spec.Spec) []Alert {
 				clauseOpen, macroOpen, hasContent = false, false, false
 			}
 		}
+
+		clauseOpen, macroOpen, hasContent = false, false, false
 	}
 
 	return result

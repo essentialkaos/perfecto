@@ -11,6 +11,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -132,6 +133,12 @@ var tags = []string{
 	"URL",
 	"Version",
 }
+
+// regexpCache is regexp cache
+var regexpCache = make(map[string]*regexp.Regexp)
+
+// sectionRegex is section check regexp
+var sectionRegex = regexp.MustCompile(`^%(prep|setup|build|install|check|clean|files|changelog|package|description|verifyscript|pretrans|pre|post|preun|postun|posttrans|triggerin|triggerun|triggerpostun)( |$)`)
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
@@ -283,9 +290,9 @@ func checkFile(file string) error {
 }
 
 // hasSection returns true if spec contains given section
-func hasSection(s *Spec, sectionName string) bool {
+func hasSection(s *Spec, section string) bool {
 	for _, line := range s.Data {
-		if strings.HasPrefix(line.Text, "%"+sectionName) {
+		if getSectionRegexp(section).MatchString(line.Text) {
 			return true
 		}
 	}
@@ -391,13 +398,7 @@ func extractSources(s *Spec) []Line {
 
 // isSectionHeader returns if given string is package header
 func isSectionHeader(text string) bool {
-	for _, sectionName := range sections {
-		if strings.HasPrefix(text, "%"+sectionName) {
-			return true
-		}
-	}
-
-	return false
+	return sectionRegex.MatchString(text)
 }
 
 // isHeaderTag returns if given string is header tag
@@ -438,7 +439,7 @@ func isSectionMatch(data string, names []string) bool {
 	}
 
 	for _, name := range names {
-		if data == "%"+name {
+		if getSectionRegexp(name).MatchString(data) {
 			return true
 		}
 	}
@@ -498,4 +499,17 @@ func extractSkipCount(text string) int {
 	}
 
 	return countInt
+}
+
+// getSectionRegexp creates new regex struct and cache it
+func getSectionRegexp(section string) *regexp.Regexp {
+	_, exist := regexpCache[section]
+
+	if exist {
+		return regexpCache[section]
+	}
+
+	regexpCache[section] = regexp.MustCompile(`^%` + section + `($| )`)
+
+	return regexpCache[section]
 }
