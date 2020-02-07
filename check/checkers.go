@@ -96,6 +96,7 @@ func getCheckers() map[string]Checker {
 		"PF22": checkIfClause,
 		"PF23": checkForUselessSlash,
 		"PF24": checkForEmptyIf,
+		"PF25": checkForDotInSummary,
 	}
 }
 
@@ -916,6 +917,29 @@ func checkForEmptyIf(id string, s *spec.Spec) []Alert {
 		}
 
 		clauseOpen, macroOpen, hasContent = false, false, false
+	}
+
+	return result
+}
+
+// checkForDotInSummary checks for dot on the end of summary
+func checkForDotInSummary(id string, s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
+	var result []Alert
+
+	for _, header := range s.GetHeaders() {
+		for _, line := range header.Data {
+			if isComment(line) {
+				continue
+			}
+
+			if prefix(line, "Summary:") && suffix(line, ".") {
+				result = append(result, NewAlert(id, LEVEL_WARNING, "The summary contains useless dot at the end", line))
+			}
+		}
 	}
 
 	return result
