@@ -14,7 +14,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         3.3.1
+Version:         3.4.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -95,6 +95,9 @@ fi
 ################################################################################
 
 %changelog
+* Sat Feb 08 2020 Anton Novojilov <andy@essentialkaos.com> - 3.4.0-0
+- Added check for useless dot at the end of the package summary
+
 * Wed Feb 05 2020 Anton Novojilov <andy@essentialkaos.com> - 3.3.1-0
 - Fixed bug with extracting sections
 - Fixed false-positive alerts for PF24

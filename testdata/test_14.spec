@@ -4,7 +4,7 @@
 
 ################################################################################
 
-Summary:            Test spec for perfecto
+Summary:            Test spec for perfecto.
 Name:               perfecto-spec
 Version:            1.0.0
 Release:            0%{?dist}
