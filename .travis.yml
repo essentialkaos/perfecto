@@ -3,6 +3,7 @@ language: go
 go:
   - 1.12.x
   - 1.13.x
+  - 1.14.x
   - tip
 
 os:
@@ -20,10 +21,14 @@ matrix:
 
 cache: apt
 
+env:
+  - SHELLCHECK_VERSION=0.7.1 HADOLINT_VERSION=1.17.5
+
 before_install:
-  - wget https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz
-  - wget -O hadolint https://github.com/hadolint/hadolint/releases/download/v1.17.5/hadolint-Linux-x86_64
-  - tar xf shellcheck-latest.linux.x86_64.tar.xz
+  - wget https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz
+  - wget -O hadolint https://github.com/hadolint/hadolint/releases/download/v${HADOLINT_VERSION}/hadolint-Linux-x86_64
+  - tar xf shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz
+  - mv shellcheck-v${SHELLCHECK_VERSION} shellcheck-latest
   - echo "deb http://us.archive.ubuntu.com/ubuntu xenial main universe" | sudo tee -a /etc/apt/sources.list
   - sudo apt-get update -qq
   - sudo apt-get install -y rpmlint
