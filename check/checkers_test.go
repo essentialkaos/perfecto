@@ -427,6 +427,21 @@ func (sc *CheckSuite) TestCheckForDotInSummary(c *chk.C) {
 	c.Assert(alerts[0].Line.Index, chk.Equals, 7)
 }
 
+func (sc *CheckSuite) TestCheckForChownAndChmod(c *chk.C) {
+	s, err := spec.Read("../testdata/test_15.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts := checkForChownAndChmod("", s)
+
+	c.Assert(alerts, chk.HasLen, 2)
+	c.Assert(alerts[0].Info, chk.Equals, "Do not change file or directory mode in scriptlets")
+	c.Assert(alerts[0].Line.Index, chk.Equals, 60)
+	c.Assert(alerts[1].Info, chk.Equals, "Do not change file or directory owner without --no-dereference option")
+	c.Assert(alerts[1].Line.Index, chk.Equals, 61)
+}
+
 func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
 	s := &spec.Spec{}
 
@@ -528,7 +543,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 
 func (sc *CheckSuite) TestAux(c *chk.C) {
 	// This test will fail if new checkers was added
-	c.Assert(getCheckers(), chk.HasLen, 25)
+	c.Assert(getCheckers(), chk.HasLen, 26)
 
 	r := &Report{}
 	c.Assert(r.IsPerfect(), chk.Equals, true)

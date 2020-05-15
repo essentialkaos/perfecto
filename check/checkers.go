@@ -97,6 +97,7 @@ func getCheckers() map[string]Checker {
 		"PF23": checkForUselessSlash,
 		"PF24": checkForEmptyIf,
 		"PF25": checkForDotInSummary,
+		"PF26": checkForChownAndChmod,
 	}
 }
 
@@ -938,6 +939,48 @@ func checkForDotInSummary(id string, s *spec.Spec) []Alert {
 
 			if prefix(line, "Summary:") && suffix(line, ".") {
 				result = append(result, NewAlert(id, LEVEL_WARNING, "The summary contains useless dot at the end", line))
+			}
+		}
+	}
+
+	return result
+}
+
+// checkForChownAndChmod checks scriptlets for chown and chmod commands
+func checkForChownAndChmod(id string, s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
+	var result []Alert
+
+	sections := []string{
+		spec.SECTION_POST,
+		spec.SECTION_POSTTRANS,
+		spec.SECTION_POSTUN,
+		spec.SECTION_PRE,
+		spec.SECTION_PREP,
+		spec.SECTION_PRETRANS,
+		spec.SECTION_PREUN,
+		spec.SECTION_TRIGGERIN,
+		spec.SECTION_TRIGGERPOSTUN,
+		spec.SECTION_TRIGGERUN,
+	}
+
+	for _, section := range s.GetSections(sections...) {
+		for _, line := range section.Data {
+			if isComment(line) {
+				continue
+			}
+
+			if prefix(line, "chmod ") {
+				result = append(result, NewAlert(id, LEVEL_ERROR, "Do not change file or directory mode in scriptlets", line))
+			}
+
+			if prefix(line, "chown ") {
+				if !contains(line, " -h ") && !contains(line, " --no-dereference ") {
+					result = append(result, NewAlert(id, LEVEL_ERROR, "Do not change file or directory owner without --no-dereference option", line))
+				}
 			}
 		}
 	}
