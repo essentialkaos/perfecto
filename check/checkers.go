@@ -13,10 +13,10 @@ import (
 	"strings"
 	"time"
 
-	"pkg.re/essentialkaos/ek.v11/cache"
-	"pkg.re/essentialkaos/ek.v11/req"
-	"pkg.re/essentialkaos/ek.v11/sliceutil"
-	"pkg.re/essentialkaos/ek.v11/strutil"
+	"pkg.re/essentialkaos/ek.v12/cache"
+	"pkg.re/essentialkaos/ek.v12/req"
+	"pkg.re/essentialkaos/ek.v12/sliceutil"
+	"pkg.re/essentialkaos/ek.v12/strutil"
 
 	"github.com/essentialkaos/perfecto/spec"
 )
