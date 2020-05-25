@@ -10,8 +10,8 @@ package check
 import (
 	"sort"
 
-	"pkg.re/essentialkaos/ek.v11/sliceutil"
-	"pkg.re/essentialkaos/ek.v11/sortutil"
+	"pkg.re/essentialkaos/ek.v12/sliceutil"
+	"pkg.re/essentialkaos/ek.v12/sortutil"
 
 	"github.com/essentialkaos/perfecto/spec"
 )

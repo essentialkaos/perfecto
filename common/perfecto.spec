@@ -14,7 +14,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         3.4.0
+Version:         3.5.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -95,6 +95,10 @@ fi
 ################################################################################
 
 %changelog
+* Fri May 15 2020 Anton Novojilov <andy@essentialkaos.com> - 3.5.0-0
+- Added check for chown and chmod usage in scriptlets
+- ek package updated to the latest version
+
 * Sat Feb 08 2020 Anton Novojilov <andy@essentialkaos.com> - 3.4.0-0
 - Added check for useless dot at the end of the package summary
 
