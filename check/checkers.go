@@ -98,6 +98,7 @@ func getCheckers() map[string]Checker {
 		"PF24": checkForEmptyIf,
 		"PF25": checkForDotInSummary,
 		"PF26": checkForChownAndChmod,
+		"PF27": checkForUnclosedCondition,
 	}
 }
 
@@ -982,6 +983,56 @@ func checkForChownAndChmod(id string, s *spec.Spec) []Alert {
 					result = append(result, NewAlert(id, LEVEL_ERROR, "Do not change file or directory owner without --no-dereference option", line))
 				}
 			}
+		}
+	}
+
+	return result
+}
+
+// checkForChownAndChmod checks scriptlets for unclosed conditions
+func checkForUnclosedCondition(id string, s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
+	var result []Alert
+
+	sections := []string{
+		spec.SECTION_POST,
+		spec.SECTION_POSTTRANS,
+		spec.SECTION_POSTUN,
+		spec.SECTION_PRE,
+		spec.SECTION_PREP,
+		spec.SECTION_PRETRANS,
+		spec.SECTION_PREUN,
+		spec.SECTION_TRIGGERIN,
+		spec.SECTION_TRIGGERPOSTUN,
+		spec.SECTION_TRIGGERUN,
+	}
+
+	var conditions []spec.Line
+
+	for _, section := range s.GetSections(sections...) {
+		for _, line := range section.Data {
+			if isComment(line) {
+				continue
+			}
+
+			if prefix(line, "if ") && contains(line, "then") {
+				if !contains(line, " fi") {
+					conditions = append(conditions, line)
+				}
+			}
+
+			if prefix(line, "fi") && len(conditions) != 0 {
+				conditions = conditions[:len(conditions)-1]
+			}
+		}
+	}
+
+	if len(conditions) != 0 {
+		for _, line := range conditions {
+			result = append(result, NewAlert(id, LEVEL_CRITICAL, "Scriptlet contains unclosed IF condition", line))
 		}
 	}
 

@@ -14,7 +14,7 @@ branches:
   - master
   - develop
 
-matrix:
+jobs:
   fast_finish: true
   allow_failures:
     - go: tip
@@ -43,5 +43,4 @@ before_install:
 script:
   - .travis/script.sh
   - bash -c 'shopt -s globstar; ./shellcheck-latest/shellcheck perfecto-docker'
-  - ./hadolint centos6.docker
   - ./hadolint centos7.docker
