@@ -44,18 +44,11 @@ For update to latest stable release, do:
 go get -u github.com/essentialkaos/perfecto
 ```
 
-#### From ESSENTIAL KAOS Public repo for RHEL6/CentOS6
+#### From [ESSENTIAL KAOS Public Repository](https://yum.kaos.st)
 
 ```bash
-[sudo] yum install -y https://yum.kaos.st/kaos-repo-latest.el6.noarch.rpm
-[sudo] yum install perfecto
-```
-
-#### From ESSENTIAL KAOS Public repo for RHEL7/CentOS7
-
-```bash
-[sudo] yum install -y https://yum.kaos.st/kaos-repo-latest.el7.noarch.rpm
-[sudo] yum install perfecto
+sudo yum install -y https://yum.kaos.st/get/$(uname -r).rpm
+sudo yum install perfecto
 ```
 
 #### Prebuilt binaries
@@ -132,9 +125,9 @@ script:
 Install latest version of Docker, then:
 
 ```bash
-curl -o perfecto-docker https://kaos.sh/perfecto/perfecto-docker
+curl -fL# -o perfecto-docker https://kaos.sh/perfecto/perfecto-docker
 chmod +x perfecto-docker
-[sudo] mv perfecto-docker /usr/bin/
+sudo mv perfecto-docker /usr/bin/
 perfecto-docker PATH_TO_YOUR_SPEC_HERE
 ```
 

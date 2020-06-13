@@ -153,6 +153,8 @@ func Check(s *spec.Spec, lint bool, linterConfig string, absolved []string) *Rep
 				report.Warnings = append(report.Warnings, alert)
 			case LEVEL_ERROR:
 				report.Errors = append(report.Errors, alert)
+			case LEVEL_CRITICAL:
+				report.Criticals = append(report.Criticals, alert)
 			}
 		}
 	}

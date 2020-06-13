@@ -442,6 +442,21 @@ func (sc *CheckSuite) TestCheckForChownAndChmod(c *chk.C) {
 	c.Assert(alerts[1].Line.Index, chk.Equals, 61)
 }
 
+func (sc *CheckSuite) TestCheckForUnclosedCondition(c *chk.C) {
+	s, err := spec.Read("../testdata/test_16.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts := checkForUnclosedCondition("", s)
+
+	c.Assert(alerts, chk.HasLen, 2)
+	c.Assert(alerts[0].Info, chk.Equals, "Scriptlet contains unclosed IF condition")
+	c.Assert(alerts[0].Line.Index, chk.Equals, 70)
+	c.Assert(alerts[1].Info, chk.Equals, "Scriptlet contains unclosed IF condition")
+	c.Assert(alerts[1].Line.Index, chk.Equals, 71)
+}
+
 func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
 	s := &spec.Spec{}
 
@@ -543,7 +558,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 
 func (sc *CheckSuite) TestAux(c *chk.C) {
 	// This test will fail if new checkers was added
-	c.Assert(getCheckers(), chk.HasLen, 26)
+	c.Assert(getCheckers(), chk.HasLen, 27)
 
 	r := &Report{}
 	c.Assert(r.IsPerfect(), chk.Equals, true)
