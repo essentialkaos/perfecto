@@ -1021,7 +1021,6 @@ func checkForUnclosedCondition(id string, s *spec.Spec) []Alert {
 			if prefix(line, "if ") && contains(line, "then") {
 				if !contains(line, " fi") {
 					conditions = append(conditions, line)
-					fmt.Println(line)
 				}
 			}
 

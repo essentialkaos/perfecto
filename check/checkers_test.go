@@ -455,6 +455,10 @@ func (sc *CheckSuite) TestCheckForUnclosedCondition(c *chk.C) {
 	c.Assert(alerts[0].Line.Index, chk.Equals, 70)
 	c.Assert(alerts[1].Info, chk.Equals, "Scriptlet contains unclosed IF condition")
 	c.Assert(alerts[1].Line.Index, chk.Equals, 71)
+
+	r := Check(s, false, "", nil)
+
+	c.Assert(r.Criticals, chk.Not(chk.HasLen), 0)
 }
 
 func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
