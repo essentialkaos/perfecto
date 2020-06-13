@@ -14,7 +14,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         3.6.0
+Version:         3.6.1
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         EKOL
@@ -95,6 +95,9 @@ fi
 ################################################################################
 
 %changelog
+* Sat Jun 13 2020 Anton Novojilov <andy@essentialkaos.com> - 3.6.1-0
+- Fixed false-positive PF27 alert for Lua code
+
 * Sat Jun 13 2020 Anton Novojilov <andy@essentialkaos.com> - 3.6.0-0
 - Added check PF27 for checking unclosed if conditions in scriptlets
 - Minor improvements
