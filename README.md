@@ -6,7 +6,7 @@
   <a href="https://travis-ci.com/essentialkaos/perfecto"><img src="https://travis-ci.com/essentialkaos/perfecto.svg"></a>
   <a href="https://github.com/essentialkaos/perfecto/actions?query=workflow%3ACodeQL"><img src="https://github.com/essentialkaos/perfecto/workflows/CodeQL/badge.svg" /></a>
   <a href='https://coveralls.io/github/essentialkaos/perfecto'><img src='https://coveralls.io/repos/github/essentialkaos/perfecto/badge.svg' alt='Coverage Status' /></a>
-  <a href="#license"><img src="https://gh.kaos.st/ekol.svg"></a>
+  <a href="#license"><img src="https://gh.kaos.st/apache2.svg"></a>
 </p>
 
 <p align="center"><a href="#checks">Checks</a> • <a href="#installing">Installing</a> • <a href="#using-on-travisci">Using on TravisCI</a> • <a href="#using-with-docker">Using with Docker</a> • <a href="#usage">Usage</a> • <a href="#build-status">Build Status</a> • <a href="#license">License</a></p>
