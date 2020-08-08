@@ -23,7 +23,7 @@ FROM centos:7
 LABEL name="Perfecto Image on CentOS 7" \
       vendor="ESSENTIAL KAOS" \
       maintainer="Anton Novojilov" \
-      license="EKOL" \
+      license="Apache-2.0" \
       version="2020.02.08"
 
 COPY --from=builder /go/src/github.com/essentialkaos/perfecto/perfecto /usr/bin/
