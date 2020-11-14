@@ -34,15 +34,19 @@ main() {
 # Code: No
 # Echo: No
 check() {
-  local image tmp_dir args status
+  local image tmp_dir args opts status
 
   image="${IMAGE:-$DEFAULT_IMAGE}"
   tmp_dir=$(mktemp -d -t 'pfdkr-XXXXXXXXXXXXX')
 
   args=$(processArgs "$tmp_dir" "$@")
+
+  if [[ -z "$CI" ]] ; then
+    opts="-it"
+  fi
   
   # shellcheck disable=SC2086
-  docker run --rm -it -v "$tmp_dir":/perfecto "$image" ${args}
+  docker run --rm $opts -v "$tmp_dir":/perfecto "$image" ${args}
 
   status=$?
 
@@ -57,8 +61,13 @@ check() {
 # Echo: No
 usage() {
   local image="${IMAGE:-$DEFAULT_IMAGE}"
+  local opts
 
-  docker run --rm -it "$image" "--help"
+  if [[ -z "$CI" ]] ; then
+    opts="-it"
+  fi
+
+  docker run --rm $opts "$image" "--help"
 
   return $?
 }
