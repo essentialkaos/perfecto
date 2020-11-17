@@ -3,13 +3,13 @@
 <p align="center">
   <a href="https://goreportcard.com/report/github.com/essentialkaos/perfecto"><img src="https://goreportcard.com/badge/github.com/essentialkaos/perfecto"></a>
   <a href="https://codebeat.co/projects/github-com-essentialkaos-perfecto-master"><img alt="codebeat badge" src="https://codebeat.co/badges/74af2307-8aa2-48eb-afd5-2ae3620a1149" /></a>
-  <a href="https://travis-ci.com/essentialkaos/perfecto"><img src="https://travis-ci.com/essentialkaos/perfecto.svg"></a>
+  <a href="https://github.com/essentialkaos/perfecto/actions"><img src="https://github.com/essentialkaos/perfecto/workflows/CI/badge.svg" alt="GitHub Actions Status" /></a>
   <a href="https://github.com/essentialkaos/perfecto/actions?query=workflow%3ACodeQL"><img src="https://github.com/essentialkaos/perfecto/workflows/CodeQL/badge.svg" /></a>
   <a href='https://coveralls.io/github/essentialkaos/perfecto'><img src='https://coveralls.io/repos/github/essentialkaos/perfecto/badge.svg' alt='Coverage Status' /></a>
   <a href="#license"><img src="https://gh.kaos.st/apache2.svg"></a>
 </p>
 
-<p align="center"><a href="#checks">Checks</a> • <a href="#installing">Installing</a> • <a href="#using-on-travisci">Using on TravisCI</a> • <a href="#using-with-docker">Using with Docker</a> • <a href="#usage">Usage</a> • <a href="#build-status">Build Status</a> • <a href="#license">License</a></p>
+<p align="center"><a href="#checks">Checks</a> • <a href="#installing">Installing</a> • <a href="#using-with-github-actions">Using with Github Actions</a> • <a href="#using-with-docker">Using with Docker</a> • <a href="#usage">Usage</a> • <a href="#build-status">Build Status</a> • <a href="#license">License</a></p>
 
 <br/>
 
@@ -27,13 +27,7 @@ You can find additional information about every _perfecto_ check in [project wik
 
 #### From sources
 
-Before the initial install allows git to use redirects for [pkg.re](https://github.com/essentialkaos/pkgre) service (_reason why you should do this described [here](https://github.com/essentialkaos/pkgre#git-support)_):
-
-```
-git config --global http.https://pkg.re.followRedirects true
-```
-
-Make sure you have a working Go 1.12+ workspace ([instructions](https://golang.org/doc/install)), then:
+Make sure you have a working Go 1.14+ workspace ([instructions](https://golang.org/doc/install)), then:
 
 ```
 go get github.com/essentialkaos/perfecto
@@ -60,64 +54,42 @@ You can download prebuilt binaries for Linux and OS X from [EK Apps Repository](
 bash <(curl -fsSL https://apps.kaos.st/get) perfecto
 ```
 
-### Using on TravisCI
+### Using with Github Actions
 
-For using latest stable version _perfecto_ on TravisCI use this `.travis.yml` file:
-
-```yaml
-language: bash
-
-cache: apt
-
-before_install:
-  - echo "deb http://us.archive.ubuntu.com/ubuntu xenial main universe" | sudo tee -a /etc/apt/sources.list
-  - sudo apt-get update -qq
-  - sudo apt-get install -y rpmlint
-  - sudo ln -sf /usr/bin/python2.7 /usr/bin/python2.6
-  - wget https://apps.kaos.st/perfecto/latest/linux/x86_64/perfecto
-  - chmod +x perfecto
-  - ./perfecto -v
-
-script:
-  - ./perfecto PATH_TO_YOUR_SPEC_HERE
-
-```
-
-or this:
+For using latest stable version _perfecto_ with Github Actions use this `perfecto.yml` file or add it to your workflow:
 
 ```yaml
-services:
-  - docker
+name: Perfecto
 
-env:
-  global:
-    - IMAGE=essentialkaos/perfecto:centos7
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+    branches: [master]
 
-before_install:
-  - docker pull "$IMAGE"
-  - wget https://kaos.sh/perfecto/perfecto-docker
-  - chmod +x perfecto-docker
+jobs:
+  Perfecto:
+    name: Perfecto
+    runs-on: ubuntu-latest
 
-script:
-  - ./perfecto-docker PATH_TO_YOUR_SPEC_HERE
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v2
 
-```
+      - name: Run Perfecto docker image
+        uses: docker://essentialkaos/perfecto:slim
+        with:
+          args: --version
 
-or this:
+      - name: Install perfecto-docker
+        run: |
+          wget https://kaos.sh/perfecto/perfecto-docker
+          chmod +x perfecto-docker
 
-```yaml
-services:
-  - docker
-
-env:
-  global:
-    - IMAGE=essentialkaos/perfecto:centos7
-
-before_install:
-  - docker pull "$IMAGE"
-
-script:
-  - bash <(curl -fsSL https://kaos.sh/perfecto/perfecto-docker) PATH_TO_YOUR_SPEC_HERE
+      - name: Run Perfecto check
+        env:
+          IMAGE: essentialkaos/perfecto:slim
+        run: ./perfecto-docker your-app.spec
 
 ```
 
@@ -172,8 +144,8 @@ Examples
 
 | Branch | Status |
 |--------|--------|
-| `master` | [![Build Status](https://travis-ci.com/essentialkaos/perfecto.svg?branch=master)](https://travis-ci.com/essentialkaos/perfecto) |
-| `develop` | [![Build Status](https://travis-ci.com/essentialkaos/perfecto.svg?branch=develop)](https://travis-ci.com/essentialkaos/perfecto) |
+| `master` | [![CI](https://github.com/essentialkaos/perfecto/workflows/CI/badge.svg?branch=master)](https://github.com/essentialkaos/perfecto/actions) |
+| `develop` | [![CI](https://github.com/essentialkaos/perfecto/workflows/CI/badge.svg?branch=develop)](https://github.com/essentialkaos/perfecto/actions) |
 
 ### License
 

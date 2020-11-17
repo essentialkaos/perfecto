@@ -10,6 +10,7 @@ WORKDIR /go/src/github.com/essentialkaos/perfecto
 
 COPY . .
 
+# hadolint ignore=DL3032,DL3033
 RUN yum -y -q install https://yum.kaos.st/kaos-repo-latest.el7.noarch.rpm && \
     yum -y -q install make golang git upx && \
     make deps && \
@@ -30,6 +31,7 @@ COPY --from=builder /go/src/github.com/essentialkaos/perfecto/perfecto /usr/bin/
 
 COPY common/rpmlint.conf /root/.config/rpmlint
 
+# hadolint ignore=DL3033
 RUN yum -y -q install https://yum.kaos.st/kaos-repo-latest.el7.noarch.rpm && \
     yum -y -q install rpmlint && \
     yum clean all && \
