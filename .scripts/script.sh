@@ -23,7 +23,7 @@ testWithCover() {
     fi
 
     if [[ -f cover.tmp ]] ; then
-      egrep -v '^mode:' coverage.tmp >> cover.out
+      egrep -v '^mode:' cover.tmp >> cover.out
       rm -f cover.tmp
     fi
   done
