@@ -9,7 +9,7 @@
   <a href="#license"><img src="https://gh.kaos.st/apache2.svg"></a>
 </p>
 
-<p align="center"><a href="#checks">Checks</a> • <a href="#installing">Installing</a> • <a href="#using-on-travisci">Using on TravisCI</a> • <a href="#using-with-docker">Using with Docker</a> • <a href="#usage">Usage</a> • <a href="#build-status">Build Status</a> • <a href="#license">License</a></p>
+<p align="center"><a href="#checks">Checks</a> • <a href="#installing">Installing</a> • <a href="#using-with-github-actions">Using with Github Actions</a> • <a href="#using-with-docker">Using with Docker</a> • <a href="#usage">Usage</a> • <a href="#build-status">Build Status</a> • <a href="#license">License</a></p>
 
 <br/>
 
