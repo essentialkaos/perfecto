@@ -76,6 +76,13 @@ jobs:
       - name: Code checkout
         uses: actions/checkout@v2
 
+      # https://docs.docker.com/docker-hub/download-rate-limit/
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Run Perfecto docker image
         uses: docker://essentialkaos/perfecto:slim
         with:
