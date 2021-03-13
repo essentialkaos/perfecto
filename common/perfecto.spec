@@ -14,7 +14,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         3.6.1
+Version:         3.6.2
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         Apache License, Version 2.0
@@ -26,7 +26,7 @@ Source100:       checksum.sha512
 
 BuildRoot:       %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:   golang >= 1.13
+BuildRequires:   golang >= 1.15
 
 Requires:        rpmlint
 
@@ -46,6 +46,7 @@ Tool for checking perfectly written RPM specs.
 
 %build
 export GOPATH=$(pwd)
+export GO111MODULE=auto
 go build src/github.com/essentialkaos/%{name}/%{name}.go
 
 %install
@@ -95,6 +96,10 @@ fi
 ################################################################################
 
 %changelog
+* Fri Feb 26 2021 Anton Novojilov <andy@essentialkaos.com> - 3.6.2-0
+- Fixed bash completion
+- Fixed zsh completion
+
 * Sat Jun 13 2020 Anton Novojilov <andy@essentialkaos.com> - 3.6.1-0
 - Fixed false-positive PF27 alert for Lua code
 

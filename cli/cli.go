@@ -33,7 +33,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "3.6.1"
+	VER  = "3.6.2"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -327,11 +327,11 @@ func genCompletion() {
 
 	switch options.GetS(OPT_COMPLETION) {
 	case "bash":
-		fmt.Printf(bash.Generate(info, "perfecto"))
+		fmt.Printf(bash.Generate(info, "perfecto", "spec"))
 	case "fish":
 		fmt.Printf(fish.Generate(info, "perfecto"))
 	case "zsh":
-		fmt.Printf(zsh.Generate(info, optMap, "perfecto"))
+		fmt.Printf(zsh.Generate(info, optMap, "perfecto", "*.spec"))
 	default:
 		os.Exit(1)
 	}
