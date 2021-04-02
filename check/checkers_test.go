@@ -508,6 +508,12 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 
 	s = &spec.Spec{File: "test.spec"}
 	c.Assert(Lint(s, "test.conf"), chk.IsNil)
+
+	rpmLintBin = "__unknown__"
+	s = &spec.Spec{File: ""}
+	c.Assert(Lint(s, ""), chk.IsNil)
+
+	rpmLintBin = "rpmlint"
 }
 
 func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {

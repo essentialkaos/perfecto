@@ -33,7 +33,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "3.6.3"
+	VER  = "3.7.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -295,10 +295,10 @@ func genUsage() *usage.Info {
 
 	info.AddOption(OPT_ABSOLVE, "Disable some checks by their ID", "id…")
 	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny|short|json|xml){!}", "format")
-	info.AddOption(OPT_LINT_CONFIG, "Path to rpmlint configuration file", "file")
+	info.AddOption(OPT_LINT_CONFIG, "Path to RPMLint configuration file", "file")
 	info.AddOption(OPT_ERROR_LEVEL, "Return non-zero exit code if alert level greater than given {s-}(notice|warning|error|critical){!}", "level")
 	info.AddOption(OPT_QUIET, "Suppress all normal output")
-	info.AddOption(OPT_NO_LINT, "Disable rpmlint checks")
+	info.AddOption(OPT_NO_LINT, "Disable RPMLint checks")
 	info.AddOption(OPT_NO_COLOR, "Disable colors in output")
 	info.AddOption(OPT_HELP, "Show this help message")
 	info.AddOption(OPT_VER, "Show version")

@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 
+	"pkg.re/essentialkaos/ek.v12/env"
 	"pkg.re/essentialkaos/ek.v12/strutil"
 
 	"github.com/essentialkaos/perfecto/spec"
@@ -25,6 +26,10 @@ var rpmLintBin = "rpmlint"
 
 // Lint run rpmlint and return alerts from it
 func Lint(s *spec.Spec, linterConfig string) []Alert {
+	if env.Which(rpmLintBin) == "" {
+		return nil // RPMLint not installed
+	}
+
 	cmd := exec.Command(rpmLintBin)
 
 	if linterConfig != "" {
