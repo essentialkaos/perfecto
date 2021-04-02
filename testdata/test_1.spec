@@ -62,3 +62,4 @@ rm -rf %{buildroot}
 %changelog
 * Wed Jan 24 2018 Anton Novojilov <andy@essentialkaos.com> - 1.0.0-0
 - At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium
+- https://github.com/organization/project/issues?q=milestone:versionAlpha+label:ReadyForReview
