@@ -14,7 +14,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         3.6.2
+Version:         3.6.3
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         Apache License, Version 2.0
@@ -96,6 +96,9 @@ fi
 ################################################################################
 
 %changelog
+* Fri Apr 02 2021 Anton Novojilov <andy@essentialkaos.com> - 3.6.3-0
+- Ignore links longer than 80 symbols in PF2
+
 * Fri Feb 26 2021 Anton Novojilov <andy@essentialkaos.com> - 3.6.2-0
 - Fixed bash completion
 - Fixed zsh completion

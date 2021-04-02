@@ -149,6 +149,10 @@ func checkForLineLength(id string, s *spec.Spec) []Alert {
 				continue
 			}
 
+			if strings.IndexRune(strutil.Substr(line.Text, 2, 999), ' ') == -1 {
+				continue
+			}
+
 			if strutil.Len(line.Text) > 80 {
 				result = append(result, NewAlert(id, LEVEL_WARNING, "Line is longer than 80 symbols", line))
 			}
