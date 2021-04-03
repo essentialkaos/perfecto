@@ -14,7 +14,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         3.6.3
+Version:         3.7.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         Apache License, Version 2.0
@@ -96,6 +96,9 @@ fi
 ################################################################################
 
 %changelog
+* Sat Apr 03 2021 Anton Novojilov <andy@essentialkaos.com> - 3.7.0-0
+- Do not run RPMLint if it isn't installed
+
 * Fri Apr 02 2021 Anton Novojilov <andy@essentialkaos.com> - 3.6.3-0
 - Ignore links longer than 80 symbols in PF2
 
