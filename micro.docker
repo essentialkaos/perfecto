@@ -1,0 +1,34 @@
+## BUILDER #####################################################################
+
+FROM golang:alpine as builder
+
+WORKDIR /go/src/github.com/essentialkaos/perfecto
+
+COPY . .
+
+RUN apk add --no-cache git=~2.26 make=4.3-r0 upx=3.96-r0 && \
+    make deps && \
+    make all && \
+    upx perfecto
+
+## FINAL IMAGE #################################################################
+
+FROM alpine:3.13
+
+LABEL name="Perfecto Micro Image" \
+      vendor="ESSENTIAL KAOS" \
+      maintainer="Anton Novojilov" \
+      license="Apache-2.0" \
+      version="2021.04.03"
+
+COPY --from=builder /go/src/github.com/essentialkaos/perfecto/perfecto /usr/bin/
+
+# hadolint ignore=DL3018
+RUN apk add --no-cache ca-certificates
+
+VOLUME /perfecto
+WORKDIR /perfecto
+
+ENTRYPOINT ["perfecto"]
+
+################################################################################

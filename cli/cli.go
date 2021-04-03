@@ -12,7 +12,6 @@ import (
 	"os"
 	"strings"
 
-	"pkg.re/essentialkaos/ek.v12/env"
 	"pkg.re/essentialkaos/ek.v12/fmtc"
 	"pkg.re/essentialkaos/ek.v12/mathutil"
 	"pkg.re/essentialkaos/ek.v12/options"
@@ -33,7 +32,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "3.6.3"
+	VER  = "3.7.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -139,10 +138,6 @@ func configureUI() {
 // process start spec file processing
 func process(files []string) {
 	var exitCode int
-
-	if !options.GetB(OPT_NO_LINT) && !isLinterInstalled() {
-		printErrorAndExit("Can't run linter: rpmlint not installed. Install rpmlint or use option '--no-lint'.")
-	}
 
 	format := options.GetS(OPT_FORMAT)
 
@@ -266,11 +261,6 @@ func splitAlertsCount(alerts []check.Alert) (int, int) {
 	return actual, absolved
 }
 
-// isLinterInstalled checks if rpmlint is installed
-func isLinterInstalled() bool {
-	return env.Which("rpmlint") != ""
-}
-
 // printError prints error message to console
 func printError(f string, a ...interface{}) {
 	fmtc.Fprintf(os.Stderr, "{r}"+f+"{!}\n", a...)
@@ -295,10 +285,10 @@ func genUsage() *usage.Info {
 
 	info.AddOption(OPT_ABSOLVE, "Disable some checks by their ID", "id…")
 	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny|short|json|xml){!}", "format")
-	info.AddOption(OPT_LINT_CONFIG, "Path to rpmlint configuration file", "file")
+	info.AddOption(OPT_LINT_CONFIG, "Path to RPMLint configuration file", "file")
 	info.AddOption(OPT_ERROR_LEVEL, "Return non-zero exit code if alert level greater than given {s-}(notice|warning|error|critical){!}", "level")
 	info.AddOption(OPT_QUIET, "Suppress all normal output")
-	info.AddOption(OPT_NO_LINT, "Disable rpmlint checks")
+	info.AddOption(OPT_NO_LINT, "Disable RPMLint checks")
 	info.AddOption(OPT_NO_COLOR, "Disable colors in output")
 	info.AddOption(OPT_HELP, "Show this help message")
 	info.AddOption(OPT_VER, "Show version")
