@@ -12,7 +12,6 @@ import (
 	"os"
 	"strings"
 
-	"pkg.re/essentialkaos/ek.v12/env"
 	"pkg.re/essentialkaos/ek.v12/fmtc"
 	"pkg.re/essentialkaos/ek.v12/mathutil"
 	"pkg.re/essentialkaos/ek.v12/options"
@@ -140,10 +139,6 @@ func configureUI() {
 func process(files []string) {
 	var exitCode int
 
-	if !options.GetB(OPT_NO_LINT) && !isLinterInstalled() {
-		printErrorAndExit("Can't run linter: rpmlint not installed. Install rpmlint or use option '--no-lint'.")
-	}
-
 	format := options.GetS(OPT_FORMAT)
 
 	if !sliceutil.Contains([]string{FORMAT_TINY, FORMAT_SHORT, FORMAT_SUMMARY, FORMAT_JSON, FORMAT_XML, ""}, format) {
@@ -264,11 +259,6 @@ func splitAlertsCount(alerts []check.Alert) (int, int) {
 	absolved := len(alerts) - actual
 
 	return actual, absolved
-}
-
-// isLinterInstalled checks if rpmlint is installed
-func isLinterInstalled() bool {
-	return env.Which("rpmlint") != ""
 }
 
 // printError prints error message to console
