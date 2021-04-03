@@ -10,6 +10,8 @@ WORKDIR /go/src/github.com/essentialkaos/perfecto
 
 COPY . .
 
+ENV GO111MODULE=auto
+
 # hadolint ignore=DL3032,DL3033
 RUN yum -y -q install https://yum.kaos.st/kaos-repo-latest.el7.noarch.rpm && \
     yum -y -q install make golang git upx && \
@@ -25,7 +27,7 @@ LABEL name="Perfecto Image on CentOS 7" \
       vendor="ESSENTIAL KAOS" \
       maintainer="Anton Novojilov" \
       license="Apache-2.0" \
-      version="2020.02.08"
+      version="2021.04.03"
 
 COPY --from=builder /go/src/github.com/essentialkaos/perfecto/perfecto /usr/bin/
 
