@@ -84,7 +84,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Run Perfecto docker image
-        uses: docker://essentialkaos/perfecto:slim
+        uses: docker://essentialkaos/perfecto:centos7
         with:
           args: --version
 
@@ -95,7 +95,7 @@ jobs:
 
       - name: Run Perfecto check
         env:
-          IMAGE: essentialkaos/perfecto:slim
+          IMAGE: essentialkaos/perfecto:centos7
         run: ./perfecto-docker your-app.spec
 
 ```
