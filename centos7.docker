@@ -28,7 +28,7 @@ LABEL name="Perfecto Image on CentOS 7" \
       vendor="ESSENTIAL KAOS" \
       maintainer="Anton Novojilov" \
       license="Apache-2.0" \
-      version="2021.04.03"
+      version="2021.05.01"
 
 COPY --from=builder /go/src/github.com/essentialkaos/perfecto/perfecto /usr/bin/
 
