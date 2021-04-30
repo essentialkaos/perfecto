@@ -12,9 +12,11 @@ COPY . .
 
 ENV GO111MODULE=auto
 
-# hadolint ignore=DL3032,DL3033
+# hadolint ignore=DL3031,DL3033
 RUN yum -y -q install https://yum.kaos.st/kaos-repo-latest.el7.noarch.rpm && \
+    yum -y update && \
     yum -y -q install make golang git upx && \
+    yum clean all && \
     make deps && \
     make all && \
     upx perfecto
@@ -27,14 +29,15 @@ LABEL name="Perfecto Image on CentOS 7" \
       vendor="ESSENTIAL KAOS" \
       maintainer="Anton Novojilov" \
       license="Apache-2.0" \
-      version="2021.04.03"
+      version="2021.05.01"
 
 COPY --from=builder /go/src/github.com/essentialkaos/perfecto/perfecto /usr/bin/
 
 COPY common/rpmlint.conf /root/.config/rpmlint
 
-# hadolint ignore=DL3033
+# hadolint ignore=DL3031,DL3033
 RUN yum -y -q install https://yum.kaos.st/kaos-repo-latest.el7.noarch.rpm && \
+    yum -y update && \
     yum -y -q install rpmlint && \
     yum clean all && \
     rm -rf /var/cache/yum
