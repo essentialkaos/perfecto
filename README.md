@@ -1,11 +1,11 @@
 <p align="center"><a href="#readme"><img src="https://gh.kaos.st/perfecto.svg"/></a></p>
 
 <p align="center">
-  <a href="https://goreportcard.com/report/github.com/essentialkaos/perfecto"><img src="https://goreportcard.com/badge/github.com/essentialkaos/perfecto"></a>
-  <a href="https://codebeat.co/projects/github-com-essentialkaos-perfecto-master"><img alt="codebeat badge" src="https://codebeat.co/badges/74af2307-8aa2-48eb-afd5-2ae3620a1149" /></a>
-  <a href="https://github.com/essentialkaos/perfecto/actions"><img src="https://github.com/essentialkaos/perfecto/workflows/CI/badge.svg" alt="GitHub Actions Status" /></a>
-  <a href="https://github.com/essentialkaos/perfecto/actions?query=workflow%3ACodeQL"><img src="https://github.com/essentialkaos/perfecto/workflows/CodeQL/badge.svg" /></a>
-  <a href='https://coveralls.io/github/essentialkaos/perfecto'><img src='https://coveralls.io/repos/github/essentialkaos/perfecto/badge.svg' alt='Coverage Status' /></a>
+  <a href="https://kaos.sh/r/perfecto"><img src="https://kaos.sh/r/perfecto.svg" alt="GoReportCard" /></a>
+  <a href="https://kaos.sh/b/perfecto"><img src="https://kaos.sh/b/74af2307-8aa2-48eb-afd5-2ae3620a1149.svg" alt="Codebeat badge" /></a>
+  <a href="https://kaos.sh/w/perfecto/ci"><img src="https://kaos.sh/w/perfecto/ci.svg" alt="GitHub Actions CI Status" /></a>
+  <a href="https://kaos.sh/w/perfecto/codeql"><img src="https://kaos.sh/w/perfecto/codeql.svg" alt="GitHub Actions CodeQL Status" /></a>
+  <a href="https://kaos.sh/c/perfecto"><img src="https://kaos.sh/c/perfecto.svg" alt="Coverage Status" /></a>
   <a href="#license"><img src="https://gh.kaos.st/apache2.svg"></a>
 </p>
 
@@ -30,13 +30,7 @@ You can find additional information about every _perfecto_ check in [project wik
 Make sure you have a working Go 1.15+ workspace ([instructions](https://golang.org/doc/install)), then:
 
 ```
-go get github.com/essentialkaos/perfecto
-```
-
-For update to latest stable release, do:
-
-```
-go get -u github.com/essentialkaos/perfecto
+go install github.com/essentialkaos/perfecto
 ```
 
 #### From [ESSENTIAL KAOS Public Repository](https://yum.kaos.st)
@@ -151,8 +145,8 @@ Examples
 
 | Branch | Status |
 |--------|--------|
-| `master` | [![CI](https://github.com/essentialkaos/perfecto/workflows/CI/badge.svg?branch=master)](https://github.com/essentialkaos/perfecto/actions) |
-| `develop` | [![CI](https://github.com/essentialkaos/perfecto/workflows/CI/badge.svg?branch=develop)](https://github.com/essentialkaos/perfecto/actions) |
+| `master` | [![CI](https://kaos.sh/w/perfecto/ci.svg?branch=master)](https://kaos.sh/w/perfecto/ci?query=branch:master) |
+| `develop` | [![CI](https://kaos.sh/w/perfecto/ci.svg?branch=develop)](https://kaos.sh/w/perfecto/ci?query=branch:develop) |
 
 ### License
 
