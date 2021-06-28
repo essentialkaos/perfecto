@@ -12,7 +12,7 @@ import (
 
 	"github.com/essentialkaos/perfecto/spec"
 
-	chk "pkg.re/check.v1"
+	chk "pkg.re/essentialkaos/check.v1"
 )
 
 // ////////////////////////////////////////////////////////////////////////////////// //
