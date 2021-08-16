@@ -33,7 +33,7 @@ type macro struct {
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
-var httpCheckCache *cache.Store
+var httpCheckCache *cache.Cache
 
 var pathMacroSlice = []macro{
 	{"/etc/init", "%{_initddir}"},
