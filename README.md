@@ -27,7 +27,7 @@ You can find additional information about every _perfecto_ check in [project wik
 
 #### From sources
 
-Make sure you have a working Go 1.15+ workspace ([instructions](https://golang.org/doc/install)), then:
+Make sure you have a working Go 1.16+ workspace ([instructions](https://golang.org/doc/install)), then:
 
 ```
 go install github.com/essentialkaos/perfecto
