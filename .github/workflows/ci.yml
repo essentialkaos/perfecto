@@ -142,7 +142,7 @@ jobs:
           ./hadolint micro.docker
 
   DockerBuild:
-    name: Docker Build
+    name: Docker Build Check
     runs-on: ubuntu-latest
 
     needs: Hadolint
