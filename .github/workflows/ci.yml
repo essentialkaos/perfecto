@@ -19,7 +19,7 @@ jobs:
 
     strategy:
       matrix:
-        go: [ '1.15.x', '1.16.x' ]
+        go: [ '1.16.x', '1.17.x' ]
 
     steps:
       - name: Set up Go
@@ -38,6 +38,12 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: ${{env.SRC_DIR}}
+
+      - name: Disable initramfs update
+        run: sudo sed -i 's/yes/no/g' /etc/initramfs-tools/update-initramfs.conf
+
+      - name: Disable man-db update
+        run: sudo rm -f /var/lib/man-db/auto-update
 
       - name: Install RPMLint
         run: sudo apt-get install -y rpmlint
