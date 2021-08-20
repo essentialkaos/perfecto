@@ -15,13 +15,13 @@ RUN apk add --no-cache git=~2.30 make=4.3-r0 upx=3.96-r1 && \
 
 ## FINAL IMAGE #################################################################
 
-FROM alpine:3.13
+FROM essentialkaos/alpine:3.13
 
 LABEL name="Perfecto Micro Image" \
       vendor="ESSENTIAL KAOS" \
       maintainer="Anton Novojilov" \
       license="Apache-2.0" \
-      version="2021.06.29"
+      version="2021.08.20"
 
 COPY --from=builder /go/src/github.com/essentialkaos/perfecto/perfecto /usr/bin/
 
