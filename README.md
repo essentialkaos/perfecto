@@ -70,29 +70,23 @@ jobs:
       - name: Code checkout
         uses: actions/checkout@v2
 
-      # https://docs.docker.com/docker-hub/download-rate-limit/
       - name: Login to DockerHub
         uses: docker/login-action@v1
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        if: ${{ env.DOCKERHUB_USERNAME != '' }}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Run Perfecto docker image
-        uses: docker://essentialkaos/perfecto:centos7
+      - name: Check specs with Perfecto
+        uses: essentialkaos/perfecto-action@v1
         with:
-          args: --version
-
-      - name: Install perfecto-docker
-        run: |
-          wget https://kaos.sh/perfecto/perfecto-docker
-          chmod +x perfecto-docker
-
-      - name: Run Perfecto check
-        env:
-          IMAGE: essentialkaos/perfecto:centos7
-        run: ./perfecto-docker your-app.spec
+          files: myapp.spec
 
 ```
+
+Additional information about action configuration can be found on [the official GitHub action page](https://github.com/marketplace/actions/ek-perfecto).
 
 ### Using with Docker
 
