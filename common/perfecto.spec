@@ -14,7 +14,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         3.7.1
+Version:         3.7.2
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         Apache License, Version 2.0
@@ -26,7 +26,7 @@ Source100:       checksum.sha512
 
 BuildRoot:       %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:   golang >= 1.15
+BuildRequires:   golang >= 1.17
 
 Requires:        rpmlint
 
@@ -96,6 +96,11 @@ fi
 ################################################################################
 
 %changelog
+* Wed Mar 30 2022 Anton Novojilov <andy@essentialkaos.com> - 3.7.2-0
+- Removed pkg.re usage
+- Added module info
+- Added Dependabot configuration
+
 * Mon Aug 16 2021 Anton Novojilov <andy@essentialkaos.com> - 3.7.1-0
 - Fixed compatibility with the latest version of ek package
 
