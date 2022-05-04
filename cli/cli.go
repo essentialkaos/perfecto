@@ -32,7 +32,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "3.7.2"
+	VER  = "3.7.3"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -136,13 +136,13 @@ func configureUI() {
 }
 
 // process start spec file processing
-func process(files []string) {
+func process(files options.Arguments) {
 	var exitCode int
 
 	format := options.GetS(OPT_FORMAT)
 
 	if !sliceutil.Contains([]string{FORMAT_TINY, FORMAT_SHORT, FORMAT_SUMMARY, FORMAT_JSON, FORMAT_XML, ""}, format) {
-		printErrorAndExit("Output format \"%s\" is not supported", format)
+		printErrorAndExit("Output format %q is not supported", format)
 	}
 
 	if len(files) > 1 {
@@ -150,7 +150,7 @@ func process(files []string) {
 	}
 
 	for _, file := range files {
-		ec := checkSpec(file, format)
+		ec := checkSpec(file.Clean().String(), format)
 		exitCode = mathutil.Max(ec, exitCode)
 	}
 
