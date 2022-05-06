@@ -59,6 +59,7 @@ const (
 	FORMAT_SUMMARY = "summary"
 	FORMAT_SHORT   = "short"
 	FORMAT_TINY    = "tiny"
+	FORMAT_GITHUB  = "github"
 	FORMAT_JSON    = "json"
 	FORMAT_XML     = "xml"
 )
@@ -94,6 +95,7 @@ var formats = []string{
 	FORMAT_SUMMARY,
 	FORMAT_SHORT,
 	FORMAT_TINY,
+	FORMAT_GITHUB,
 	FORMAT_JSON,
 	FORMAT_XML,
 }
@@ -207,6 +209,8 @@ func getRender(format string) render.Renderer {
 		return &render.TerminalRenderer{Format: FORMAT_TINY}
 	case FORMAT_SHORT:
 		return &render.TerminalRenderer{Format: FORMAT_SHORT}
+	case FORMAT_GITHUB:
+		return &render.GithubRenderer{}
 	case FORMAT_JSON:
 		return &render.JSONRenderer{}
 	case FORMAT_XML:
@@ -277,7 +281,7 @@ func genUsage() *usage.Info {
 	info := usage.NewInfo("", "file…")
 
 	info.AddOption(OPT_ABSOLVE, "Disable some checks by their ID", "id…")
-	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny|short|json|xml){!}", "format")
+	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny|short|github|json|xml){!}", "format")
 	info.AddOption(OPT_LINT_CONFIG, "Path to RPMLint configuration file", "file")
 	info.AddOption(OPT_ERROR_LEVEL, "Return non-zero exit code if alert level greater than given {s-}(notice|warning|error|critical){!}", "level")
 	info.AddOption(OPT_QUIET, "Suppress all normal output")
