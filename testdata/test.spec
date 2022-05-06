@@ -56,8 +56,6 @@ rm -rf %{buildroot}
 %endif
 
 %post
-# perfecto:absolve 1
-chmod 0755 %{_datadir}/%{name}/cli
 %{__chkconfig} --add %{name} &>/dev/null || :
 
 %preun
