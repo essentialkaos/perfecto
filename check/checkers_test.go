@@ -461,6 +461,16 @@ func (sc *CheckSuite) TestCheckForUnclosedCondition(c *chk.C) {
 	c.Assert(r.Criticals, chk.Not(chk.HasLen), 0)
 }
 
+func (sc *CheckSuite) TestAutoGenerators(c *chk.C) {
+	s, err := spec.Read("../testdata/test_17.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	c.Assert(checkForDist("", s), chk.HasLen, 0)
+	c.Assert(checkForUnescapedPercent("", s), chk.HasLen, 0)
+}
+
 func (sc *CheckSuite) TestWithEmptyData(c *chk.C) {
 	s := &spec.Spec{}
 
