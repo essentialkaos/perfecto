@@ -98,6 +98,8 @@ fi
 
 %changelog
 * Fri May 06 2022 Anton Novojilov <andy@essentialkaos.com> - 4.0.0-0
+- Code refactoring
+- UI improvements
 - Added autochangelog and autorelease macro support
 
 * Wed Mar 30 2022 Anton Novojilov <andy@essentialkaos.com> - 3.7.2-0

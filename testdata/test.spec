@@ -48,7 +48,6 @@ rm -rf %{buildroot}
 %{make_install} PREFIX=%{buildroot}%{_prefix}
 
 %clean
-# perfecto:absolve 2
 rm -rf %{buildroot}
 
 %check
@@ -57,6 +56,8 @@ rm -rf %{buildroot}
 %endif
 
 %post
+# perfecto:absolve 1
+chmod 0755 %{_datadir}/%{name}/cli
 %{__chkconfig} --add %{name} &>/dev/null || :
 
 %preun

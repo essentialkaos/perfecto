@@ -25,6 +25,8 @@ import (
 
 	"github.com/essentialkaos/perfecto/check"
 	"github.com/essentialkaos/perfecto/spec"
+
+	"github.com/essentialkaos/perfecto/cli/render"
 )
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -32,7 +34,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "3.8.0"
+	VER  = "4.0.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -53,12 +55,12 @@ const (
 
 // Supported formats
 const (
+	FORMAT_FULL    = "full"
 	FORMAT_SUMMARY = "summary"
 	FORMAT_SHORT   = "short"
 	FORMAT_TINY    = "tiny"
-
-	FORMAT_JSON = "json"
-	FORMAT_XML  = "xml"
+	FORMAT_JSON    = "json"
+	FORMAT_XML     = "xml"
 )
 
 // Levels
@@ -71,12 +73,12 @@ const (
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
-// options map
+// optMap is map with all supported options
 var optMap = options.Map{
 	OPT_ABSOLVE:     {Mergeble: true},
-	OPT_FORMAT:      {Type: options.STRING},
-	OPT_LINT_CONFIG: {Type: options.STRING},
-	OPT_ERROR_LEVEL: {Type: options.STRING},
+	OPT_FORMAT:      {Value: FORMAT_FULL},
+	OPT_LINT_CONFIG: {},
+	OPT_ERROR_LEVEL: {},
 	OPT_QUIET:       {Type: options.BOOL},
 	OPT_NO_LINT:     {Type: options.BOOL},
 	OPT_NO_COLOR:    {Type: options.BOOL},
@@ -84,6 +86,16 @@ var optMap = options.Map{
 	OPT_VER:         {Type: options.BOOL, Alias: "ver"},
 
 	OPT_COMPLETION: {},
+}
+
+// formats is slice with all supported formats
+var formats = []string{
+	FORMAT_FULL,
+	FORMAT_SUMMARY,
+	FORMAT_SHORT,
+	FORMAT_TINY,
+	FORMAT_JSON,
+	FORMAT_XML,
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -125,13 +137,6 @@ func configureUI() {
 		fmtc.DisableColors = true
 	}
 
-	// Set color to orange for errors if 256 colors are supported
-	if fmtc.Is256ColorsSupported() {
-		bgColor[check.LEVEL_ERROR] = "{*@}{#208}"
-		fgColor[check.LEVEL_ERROR] = "{#208}"
-		hlColor[check.LEVEL_ERROR] = "{*}{#214}"
-	}
-
 	strutil.EllipsisSuffix = "…"
 }
 
@@ -141,7 +146,7 @@ func process(files options.Arguments) {
 
 	format := options.GetS(OPT_FORMAT)
 
-	if !sliceutil.Contains([]string{FORMAT_TINY, FORMAT_SHORT, FORMAT_SUMMARY, FORMAT_JSON, FORMAT_XML, ""}, format) {
+	if !sliceutil.Contains(formats, format) {
 		printErrorAndExit("Output format %q is not supported", format)
 	}
 
@@ -161,10 +166,11 @@ func process(files options.Arguments) {
 
 // checkSpec check spec file
 func checkSpec(file, format string) int {
+	rnd := getRender(options.GetS(OPT_FORMAT))
 	s, err := spec.Read(file)
 
 	if err != nil && !options.GetB(OPT_QUIET) {
-		renderError(format, file, err)
+		rnd.Error(file, err)
 		return 1
 	}
 
@@ -176,30 +182,38 @@ func checkSpec(file, format string) int {
 
 	if report.IsPerfect() {
 		if !options.GetB(OPT_QUIET) {
-			renderPerfect(format, s.GetFileName())
+			rnd.Perfect(s.GetFileName())
 		}
 
 		return 0
 	}
 
-	if !options.GetB(OPT_QUIET) {
-		switch format {
-		case FORMAT_SUMMARY:
-			renderSummary(report)
-		case FORMAT_TINY:
-			renderTinyReport(s, report)
-		case FORMAT_SHORT:
-			renderShortReport(report)
-		case FORMAT_JSON:
-			renderJSONReport(report)
-		case FORMAT_XML:
-			renderXMLReport(report)
-		case "":
-			renderFullReport(report)
-		}
+	err = rnd.Report(s.GetFileName(), report)
+
+	if err != nil {
+		printError(err.Error())
+		return 1
 	}
 
 	return getExitCode(report)
+}
+
+// getRender returns renderer for given format
+func getRender(format string) render.Renderer {
+	switch format {
+	case FORMAT_SUMMARY:
+		return &render.TerminalRenderer{Format: FORMAT_SUMMARY}
+	case FORMAT_TINY:
+		return &render.TerminalRenderer{Format: FORMAT_TINY}
+	case FORMAT_SHORT:
+		return &render.TerminalRenderer{Format: FORMAT_SHORT}
+	case FORMAT_JSON:
+		return &render.JSONRenderer{}
+	case FORMAT_XML:
+		return &render.XMLRenderer{}
+	default:
+		return &render.TerminalRenderer{Format: FORMAT_FULL}
+	}
 }
 
 // codebeat:enable[ABC]
@@ -210,13 +224,13 @@ func getExitCode(r *check.Report) int {
 	var nonZero bool
 
 	switch {
-	case countAlerts(r.Criticals) != 0:
+	case r.Criticals.HasAlerts():
 		maxLevel = 4
-	case countAlerts(r.Errors) != 0:
+	case r.Errors.HasAlerts():
 		maxLevel = 3
-	case countAlerts(r.Warnings) != 0:
+	case r.Warnings.HasAlerts():
 		maxLevel = 2
-	case countAlerts(r.Notices) != 0:
+	case r.Notices.HasAlerts():
 		maxLevel = 1
 	}
 
@@ -238,27 +252,6 @@ func getExitCode(r *check.Report) int {
 	}
 
 	return 0
-}
-
-// countAlerts return number of actual alerts
-func countAlerts(alerts []check.Alert) int {
-	var counter int
-
-	for _, alert := range alerts {
-		if !alert.Absolve {
-			counter++
-		}
-	}
-
-	return counter
-}
-
-// splitAlertsCount count actual and absolved alerts
-func splitAlertsCount(alerts []check.Alert) (int, int) {
-	actual := countAlerts(alerts)
-	absolved := len(alerts) - actual
-
-	return actual, absolved
 }
 
 // printError prints error message to console
@@ -300,8 +293,15 @@ func genUsage() *usage.Info {
 		"Check spec without rpmlint and print extended report",
 	)
 
-	info.AddExample("--format tiny app.spec", "Check spec and print tiny report")
-	info.AddExample("--format summary app.spec", "Check spec and print summary")
+	info.AddExample(
+		"--format tiny app.spec",
+		"Check spec and print tiny report",
+	)
+
+	info.AddExample(
+		"--format summary app.spec",
+		"Check spec and print summary",
+	)
 
 	info.AddExample(
 		"--format json app.spec 1> report.json",

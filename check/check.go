@@ -28,15 +28,15 @@ const (
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
-// Report contain alerts
+// Report contains info about all alerts
 type Report struct {
-	Notices   []Alert `json:"notices,omitempty"`
-	Warnings  []Alert `json:"warnings,omitempty"`
-	Errors    []Alert `json:"errors,omitempty"`
-	Criticals []Alert `json:"criticals,omitempty"`
+	Notices   Alerts `json:"notices,omitempty"`
+	Warnings  Alerts `json:"warnings,omitempty"`
+	Errors    Alerts `json:"errors,omitempty"`
+	Criticals Alerts `json:"criticals,omitempty"`
 }
 
-// Alert contain basic alert info
+// Alert contains basic alert info
 type Alert struct {
 	ID      string    `json:"id"`
 	Level   uint8     `json:"level"`
@@ -47,12 +47,12 @@ type Alert struct {
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
-// AlertSlice is alerts slice
-type AlertSlice []Alert
+// Alerts is slice with alerts
+type Alerts []Alert
 
-func (s AlertSlice) Len() int      { return len(s) }
-func (s AlertSlice) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
-func (s AlertSlice) Less(i, j int) bool {
+func (s Alerts) Len() int      { return len(s) }
+func (s Alerts) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+func (s Alerts) Less(i, j int) bool {
 	return s[i].Line.Index < s[j].Line.Index
 }
 
@@ -65,20 +65,25 @@ func NewAlert(id string, level uint8, info string, line spec.Line) Alert {
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
-// IsPerfect return true if report doesn't have any alerts
+// IsPerfect returns true if report doesn't have any alerts
 func (r *Report) IsPerfect() bool {
-	switch {
-	case len(r.Notices) != 0:
-		return false
-	case len(r.Warnings) != 0:
-		return false
-	case len(r.Errors) != 0:
-		return false
-	case len(r.Criticals) != 0:
-		return false
-	}
+	return r.Total() == 0
+}
 
-	return true
+// Total returns total number of alerts (including absolved)
+func (r *Report) Total() int {
+	return r.Notices.Total() +
+		r.Warnings.Total() +
+		r.Errors.Total() +
+		r.Criticals.Total()
+}
+
+// Absolved returns number of absolved (skipped) alerts
+func (r *Report) Absolved() int {
+	return r.Notices.Absolved() +
+		r.Warnings.Absolved() +
+		r.Errors.Absolved() +
+		r.Criticals.Absolved()
 }
 
 // IDs returns slice with all mentioned checks ID's
@@ -122,6 +127,39 @@ func (r *Report) IDs() []string {
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
+// HasAlerts returns true if alerts contains at least one non-absolved alert
+func (a Alerts) HasAlerts() bool {
+	for _, alert := range a {
+		if alert.Absolve {
+			continue
+		}
+
+		return true
+	}
+
+	return false
+}
+
+// Absolved returns total number of alerts
+func (a Alerts) Total() int {
+	return len(a)
+}
+
+// Absolved returns number of absolved (skipped) alerts
+func (a Alerts) Absolved() int {
+	var counter int
+
+	for _, alert := range a {
+		if alert.Absolve {
+			counter++
+		}
+	}
+
+	return counter
+}
+
+// ////////////////////////////////////////////////////////////////////////////////// //
+
 // Check check spec
 func Check(s *spec.Spec, lint bool, linterConfig string, absolved []string) *Report {
 	report := &Report{}
@@ -159,10 +197,10 @@ func Check(s *spec.Spec, lint bool, linterConfig string, absolved []string) *Rep
 		}
 	}
 
-	sort.Sort(AlertSlice(report.Notices))
-	sort.Sort(AlertSlice(report.Warnings))
-	sort.Sort(AlertSlice(report.Errors))
-	sort.Sort(AlertSlice(report.Criticals))
+	sort.Sort(Alerts(report.Notices))
+	sort.Sort(Alerts(report.Warnings))
+	sort.Sort(Alerts(report.Errors))
+	sort.Sort(Alerts(report.Criticals))
 
 	return report
 }

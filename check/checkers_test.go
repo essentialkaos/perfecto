@@ -595,15 +595,24 @@ func (sc *CheckSuite) TestAux(c *chk.C) {
 		Notices:   []Alert{Alert{}},
 		Warnings:  []Alert{Alert{ID: "PF0"}},
 		Errors:    []Alert{Alert{ID: "PF0"}},
-		Criticals: []Alert{Alert{ID: "PF0"}},
+		Criticals: []Alert{Alert{ID: "PF0", Absolve: true}},
 	}
 
 	c.Assert(r.IDs(), chk.HasLen, 1)
+	c.Assert(r.Total(), chk.Equals, 4)
+	c.Assert(r.Absolved(), chk.Equals, 1)
 
-	a := AlertSlice{Alert{}, Alert{}}
+	a := Alerts{Alert{}, Alert{}}
 	a.Swap(0, 1)
 	c.Assert(a.Len(), chk.Equals, 2)
 	c.Assert(a.Less(0, 1), chk.Equals, false)
+
+	a = Alerts{}
+	c.Assert(a.HasAlerts(), chk.Equals, false)
+	a = Alerts{Alert{}}
+	c.Assert(a.HasAlerts(), chk.Equals, true)
+	a = Alerts{Alert{Absolve: true}}
+	c.Assert(a.HasAlerts(), chk.Equals, false)
 
 	al, _ := parseAlertLine("../testdata/test_7.spec: E: specfile-error warning: some error", &spec.Spec{})
 	c.Assert(al.Level, chk.Equals, LEVEL_ERROR)
