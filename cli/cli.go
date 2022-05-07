@@ -77,7 +77,7 @@ const (
 // optMap is map with all supported options
 var optMap = options.Map{
 	OPT_ABSOLVE:     {Mergeble: true},
-	OPT_FORMAT:      {Value: FORMAT_FULL},
+	OPT_FORMAT:      {},
 	OPT_LINT_CONFIG: {},
 	OPT_ERROR_LEVEL: {},
 	OPT_QUIET:       {Type: options.BOOL},
@@ -98,6 +98,7 @@ var formats = []string{
 	FORMAT_GITHUB,
 	FORMAT_JSON,
 	FORMAT_XML,
+	"",
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -146,14 +147,10 @@ func configureUI() {
 func process(files options.Arguments) {
 	var exitCode int
 
-	format := options.GetS(OPT_FORMAT)
+	format := getFormat(files)
 
 	if !sliceutil.Contains(formats, format) {
 		printErrorAndExit("Output format %q is not supported", format)
-	}
-
-	if len(files) > 1 {
-		format = FORMAT_TINY
 	}
 
 	for _, file := range files {
@@ -168,7 +165,7 @@ func process(files options.Arguments) {
 
 // checkSpec check spec file
 func checkSpec(file, format string) int {
-	rnd := getRender(options.GetS(OPT_FORMAT))
+	rnd := getRenderer(format)
 	s, err := spec.Read(file)
 
 	if err != nil && !options.GetB(OPT_QUIET) {
@@ -200,8 +197,28 @@ func checkSpec(file, format string) int {
 	return getExitCode(report)
 }
 
-// getRender returns renderer for given format
-func getRender(format string) render.Renderer {
+// getFormat returns output format
+func getFormat(files options.Arguments) string {
+	format := options.GetS(OPT_FORMAT)
+
+	if len(files) > 1 {
+		switch format {
+		case FORMAT_JSON, FORMAT_XML:
+			printErrorAndExit("Can't check multiple files with %q output format", format)
+		case "":
+			format = FORMAT_TINY
+		}
+	} else {
+		if format == "" && os.Getenv("GITHUB_ACTIONS") == "true" {
+			format = FORMAT_GITHUB
+		}
+	}
+
+	return format
+}
+
+// getRenderer returns renderer for given format
+func getRenderer(format string) render.Renderer {
 	switch format {
 	case FORMAT_SUMMARY:
 		return &render.TerminalRenderer{Format: FORMAT_SUMMARY}
