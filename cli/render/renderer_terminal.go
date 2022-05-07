@@ -15,6 +15,7 @@ import (
 
 	"github.com/essentialkaos/ek/v12/fmtc"
 	"github.com/essentialkaos/ek/v12/fmtutil"
+	"github.com/essentialkaos/ek/v12/path"
 	"github.com/essentialkaos/ek/v12/strutil"
 
 	"github.com/essentialkaos/perfecto/check"
@@ -183,7 +184,9 @@ func (r *TerminalRenderer) renderShortReport(report *check.Report) {
 
 // renderTinyReport prints tiny report (useful for mass check)
 func (r *TerminalRenderer) renderTinyReport(file string, report *check.Report) {
-	fmtc.Printf("%24s: ", file)
+	specName := strutil.Exclude(path.Base(file), ".spec")
+
+	fmtc.Printf("%24s: ", specName)
 
 	categories := map[uint8][]check.Alert{
 		check.LEVEL_NOTICE:   report.Notices,

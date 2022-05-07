@@ -16,7 +16,6 @@ import (
 	"strings"
 
 	"github.com/essentialkaos/ek/v12/fsutil"
-	"github.com/essentialkaos/ek/v12/path"
 	"github.com/essentialkaos/ek/v12/strutil"
 )
 
@@ -191,11 +190,6 @@ func (s *Spec) GetLine(index int) Line {
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
-
-// GetFileName return spec file name without extension
-func (s *Spec) GetFileName() string {
-	return strutil.Exclude(path.Base(s.File), ".spec")
-}
 
 // GetPackageName return package name if section is package specific
 func (s *Section) GetPackageName() string {

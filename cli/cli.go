@@ -181,13 +181,13 @@ func checkSpec(file, format string) int {
 
 	if report.IsPerfect() {
 		if !options.GetB(OPT_QUIET) {
-			rnd.Perfect(s.GetFileName())
+			rnd.Perfect(file)
 		}
 
 		return 0
 	}
 
-	err = rnd.Report(s.GetFileName(), report)
+	err = rnd.Report(file, report)
 
 	if err != nil {
 		printError(err.Error())
