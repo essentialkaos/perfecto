@@ -30,7 +30,7 @@ You can find additional information about every _perfecto_ check in [project wik
 Make sure you have a working Go 1.17+ workspace ([instructions](https://golang.org/doc/install)), then:
 
 ```
-go install github.com/essentialkaos/perfecto
+go install github.com/essentialkaos/perfecto@latest
 ```
 
 #### From [ESSENTIAL KAOS Public Repository](https://yum.kaos.st)
@@ -83,7 +83,6 @@ jobs:
         uses: essentialkaos/perfecto-action@v1
         with:
           files: myapp.spec
-
 ```
 
 Additional information about action configuration can be found on [the official GitHub action page](https://github.com/marketplace/actions/ek-perfecto).
@@ -107,11 +106,11 @@ Usage: perfecto {options} file…
 Options
 
   --absolve, -A id…          Disable some checks by their ID
-  --format, -f format        Output format (summary|tiny|short|json|xml)
-  --lint-config, -c file     Path to rpmlint configuration file
+  --format, -f format        Output format (summary|tiny|short|github|json|xml)
+  --lint-config, -c file     Path to RPMLint configuration file
   --error-level, -e level    Return non-zero exit code if alert level greater than given (notice|warning|error|critical)
   --quiet, -q                Suppress all normal output
-  --no-lint, -nl             Disable rpmlint checks
+  --no-lint, -nl             Disable RPMLint checks
   --no-color, -nc            Disable colors in output
   --help, -h                 Show this help message
   --version, -v              Show version
@@ -132,7 +131,6 @@ Examples
 
   perfecto --format json app.spec 1> report.json
   Check spec, generate report in JSON format and save as report.json
-
 ```
 
 ### Build Status
