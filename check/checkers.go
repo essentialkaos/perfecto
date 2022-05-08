@@ -67,6 +67,8 @@ var binariesAsMacro = []string{
 
 var emptyLine = spec.Line{-1, "", false}
 
+var macroRegExp = regexp.MustCompile(`\%\{?\??([a-zA-Z0-9_\?\:]+)\}?`)
+
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // getCheckers return slice with all supported checkers
@@ -177,7 +179,7 @@ func checkForDist(id string, s *spec.Spec) []Alert {
 			}
 
 			if prefix(line, "Release:") {
-				if !contains(line, "%{?dist}") {
+				if !containsMacro(line, "autorelease") && !containsMacro(line, "dist") {
 					result = append(result, NewAlert(id, LEVEL_ERROR, "Release tag must contains %{?dist} as part of release", line))
 				}
 			}
@@ -452,6 +454,10 @@ func checkForUnescapedPercent(id string, s *spec.Spec) []Alert {
 
 	for _, section := range s.GetSections(sections...) {
 		for _, line := range section.Data {
+			if containsMacro(line, "autochangelog") {
+				continue
+			}
+
 			for _, word := range strings.Fields(line.Text) {
 				if strings.HasPrefix(word, "%") && !strings.HasPrefix(word, "%%") {
 					result = append(result, NewAlert(id, LEVEL_ERROR, "Symbol % must be escaped by another % (i.e % → %%)", line))
@@ -1058,6 +1064,17 @@ func suffix(line spec.Line, value string) bool {
 // contains is strings.Contains wrapper
 func contains(line spec.Line, value string) bool {
 	return strings.Contains(line.Text, value)
+}
+
+// contains checks if line contain given macro
+func containsMacro(line spec.Line, macro string) bool {
+	for _, found := range macroRegExp.FindAllStringSubmatch(line.Text, -1) {
+		if found[1] == macro {
+			return true
+		}
+	}
+
+	return false
 }
 
 // containsField return true if line contains given field

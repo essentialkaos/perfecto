@@ -1,4 +1,4 @@
-package cli
+package render
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 //                                                                                    //
@@ -8,19 +8,22 @@ package cli
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 import (
-	"encoding/json"
-	"fmt"
-
 	"github.com/essentialkaos/perfecto/check"
 )
 
-// renderJSONReport render report in JSON format
-func renderJSONReport(r *check.Report) {
-	data, err := json.MarshalIndent(r, "", "  ")
+// ////////////////////////////////////////////////////////////////////////////////// //
 
-	if err != nil {
-		printErrorAndExit(err.Error())
-	}
+// Renderer is interface for perfecto data
+type Renderer interface {
 
-	fmt.Println(string(data))
+	// Report renders alerts from perfecto report
+	Report(file string, report *check.Report) error
+
+	// Perfect renders message about perfect spec
+	Perfect(file string)
+
+	// Error renders global error message
+	Error(file string, err error)
 }
+
+// ////////////////////////////////////////////////////////////////////////////////// //

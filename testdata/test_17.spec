@@ -7,7 +7,7 @@
 Summary:            Test spec for perfecto
 Name:               perfecto-spec
 Version:            1.0.0
-Release:            0%{?dist}
+Release:            %autorelease -p
 Group:              System Environment/Base
 License:            MIT
 URL:                https://domain.com
@@ -48,6 +48,7 @@ rm -rf %{buildroot}
 %{make_install} PREFIX=%{buildroot}%{_prefix}
 
 %clean
+# perfecto:absolve 2
 rm -rf %{buildroot}
 
 %check
@@ -77,5 +78,4 @@ rm -rf %{buildroot}
 ################################################################################
 
 %changelog
-* Wed Jan 24 2018 Anton Novojilov <andy@essentialkaos.com> - 1.0.0-0
-- Test changelog record
+%autochangelog
