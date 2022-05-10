@@ -1,19 +1,29 @@
 #! /usr/bin/env bash
+# shellcheck disable=SC2034
 
 ################################################################################
 
-# Default image (String)
-DEFAULT_IMAGE="essentialkaos/perfecto:centos7"
+# Name of perfecto image on Docker Hub with CentOS 7 based image
+IMAGE_DOCKERHUB_CENTOS="essentialkaos/perfecto:centos7"
+
+# Name of perfecto image on GitHub Container Registry with CentOS 7 based image
+IMAGE_GHCR_CENTOS="ghcr.io/essentialkaos/perfecto:centos7"
+
+# Name of perfecto image on Docker Hub with Alpine based image
+IMAGE_DOCKERHUB_MICRO="essentialkaos/perfecto:micro"
+
+# Name of perfecto image on GitHub Container Registry with Alpine based image
+IMAGE_GHCR_MICRO="ghcr.io/essentialkaos/perfecto:micro"
 
 ################################################################################
 
-# Main func
+# Main function
 #
 # Code: No
 # Echo: No
 main() {
   if ! hasApp "docker" ; then
-    echo "You must install docker first"
+    echo "You must install Docker runtime first"
     exit 1
   fi
 
@@ -60,8 +70,9 @@ check() {
 # Code: No
 # Echo: No
 usage() {
-  local image="${IMAGE:-$DEFAULT_IMAGE}"
-  local opts
+  local image opts
+
+  image="${IMAGE:-$DEFAULT_IMAGE}"
 
   if [[ -z "$CI" ]] ; then
     opts="-it"
@@ -98,6 +109,29 @@ processArgs() {
   done
 
   echo "$result"
+}
+
+# Get docker image name with perfecto
+#
+# Code: No
+# Echo: Image name (String)
+getImage() {
+  if [[ -n "$IMAGE" ]] ; then
+    echo "$IMAGE"
+    return
+  fi
+
+  if [[ $(printenv "GITHUB_ACTIONS") == "true" ]] ; then
+    echo "$IMAGE_GHCR_MICRO"
+    return
+  fi
+
+  if [[ $(printenv "CI") == "true" ]] ; then
+    echo "$IMAGE_DOCKERHUB_MICRO"
+    return
+  fi
+
+  echo "$IMAGE_DOCKERHUB_CENTOS"
 }
 
 # Check if some app is installed
