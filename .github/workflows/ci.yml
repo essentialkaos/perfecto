@@ -13,6 +13,10 @@ permissions:
   contents: read
   statuses: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   SRC_DIR: src/github.com/${{ github.repository }}
 
@@ -143,25 +147,45 @@ jobs:
     needs: [Hadolint, Shellcheck, Perfecto]
 
     steps:
+      - name: Check event type
+        run: |
+          if [[ "${{github.event_name}}" != "pull_request" ]] ; then
+            echo "::notice::Event type is not 'pull_request', all job actions will be skipped"
+          fi
+
+          # This step is a hack for needs+if issue with actions
+          # More info about issue: https://github.com/actions/runner/issues/491
+
       - name: Checkout
         uses: actions/checkout@v3
+        if: ${{ github.event_name == 'pull_request' }}
 
       - name: Login to DockerHub
         uses: docker/login-action@v2
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        if: ${{ github.event_name == 'pull_request' && env.DOCKERHUB_USERNAME != '' }}
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build CentOS 7 based image
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        if: ${{ github.event_name == 'pull_request' }}
         run: |
           docker build -f centos7.docker -t perfecto:centos7 .
-
-      - name: Build Alpine based image
-        run: |
           docker build -f micro.docker -t perfecto:micro .
 
       - name: Show info about built Docker image
         uses: essentialkaos/docker-info-action@v1
+        if: ${{ github.event_name == 'pull_request' }}
         with:
           image: perfecto:centos7 perfecto:micro
           show-labels: true
