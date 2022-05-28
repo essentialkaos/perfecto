@@ -116,7 +116,7 @@ jobs:
       - name: Check dockerfiles with Hadolint
         uses: essentialkaos/hadolint-action@v1
         with:
-          files: centos7.docker micro.docker
+          files: .docker/centos7.docker .docker/micro.docker
 
   Perfecto:
     name: Perfecto
