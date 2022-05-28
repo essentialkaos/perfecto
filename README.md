@@ -68,16 +68,14 @@ jobs:
 
     steps:
       - name: Code checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Login to DockerHub
-        uses: docker/login-action@v1
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-        if: ${{ env.DOCKERHUB_USERNAME != '' }}
+        uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check specs with Perfecto
         uses: essentialkaos/perfecto-action@v1
@@ -89,14 +87,22 @@ Additional information about action configuration can be found on [the official 
 
 ### Using with Docker
 
-Install latest version of Docker, then:
+You can use Docker containers with _perfecto_ for checking your specs. Install latest version of Docker, then:
 
 ```bash
 curl -fL# -o perfecto-docker https://kaos.sh/perfecto/perfecto-docker
 chmod +x perfecto-docker
 sudo mv perfecto-docker /usr/bin/
-perfecto-docker PATH_TO_YOUR_SPEC_HERE
+
+perfecto-docker your.spec
 ```
+
+Official Docker images with _perfecto_:
+
+- [`essentialkaos/perfecto:centos7`](https://kaos.sh/d/perfecto)
+- [`essentialkaos/perfecto:micro`](https://kaos.sh/d/perfecto)
+- [`ghcr.io/essentialkaos/perfecto:centos7`](https://kaos.sh/p/perfecto)
+- [`ghcr.io/essentialkaos/perfecto:micro`](https://kaos.sh/p/perfecto)
 
 ### Usage
 
