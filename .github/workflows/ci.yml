@@ -180,8 +180,8 @@ jobs:
       - name: Build Docker image
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          docker build -f centos7.docker -t perfecto:centos7 .
-          docker build -f micro.docker -t perfecto:micro .
+          docker build -f .docker/centos7.docker -t perfecto:centos7 .
+          docker build -f .docker/micro.docker -t perfecto:micro .
 
       - name: Show info about built Docker image
         uses: essentialkaos/docker-info-action@v1
