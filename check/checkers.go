@@ -268,14 +268,29 @@ func checkForVariables(id string, s *spec.Spec) []Alert {
 				continue
 			}
 
-			if contains(line, "$RPM_BUILD_ROOT") {
+			switch {
+			case contains(line, "$RPM_BUILD_ROOT"):
 				result = append(result, NewAlert(id, LEVEL_ERROR, "Build root path must be used as macro %{buildroot}", line))
-				continue
-			}
-
-			if contains(line, "$RPM_OPT_FLAGS") {
+			case contains(line, "$RPM_OPT_FLAGS"):
 				result = append(result, NewAlert(id, LEVEL_ERROR, "Optimization flags must be used as macro %{optflags}", line))
-				continue
+			case contains(line, "$RPM_LD_FLAGS"):
+				result = append(result, NewAlert(id, LEVEL_ERROR, "Linking flags must be used as macro %{build_ldflags}", line))
+			case contains(line, "$RPM_DOC_DIR"):
+				result = append(result, NewAlert(id, LEVEL_ERROR, "Linking flags must be used as macro %{build_ldflags}", line))
+			case contains(line, "$RPM_SOURCE_DIR"):
+				result = append(result, NewAlert(id, LEVEL_ERROR, "Path to source directory must be used as macro %{_sourcedir}", line))
+			case contains(line, "$RPM_BUILD_DIR"):
+				result = append(result, NewAlert(id, LEVEL_ERROR, "Path to build directory must be used as macro %{_builddir}", line))
+			case contains(line, "$RPM_ARCH"):
+				result = append(result, NewAlert(id, LEVEL_ERROR, "Arch value must be used as macro %{_arch}", line))
+			case contains(line, "$RPM_OS"):
+				result = append(result, NewAlert(id, LEVEL_ERROR, "OS value must be used as macro %{_os}", line))
+			case contains(line, "$RPM_PACKAGE_NAME"):
+				result = append(result, NewAlert(id, LEVEL_ERROR, "Package name value must be used as macro %{name}", line))
+			case contains(line, "$RPM_PACKAGE_VERSION"):
+				result = append(result, NewAlert(id, LEVEL_ERROR, "Package version value must be used as macro %{version}", line))
+			case contains(line, "$RPM_PACKAGE_RELEASE"):
+				result = append(result, NewAlert(id, LEVEL_ERROR, "Package release value must be used as macro %{release}", line))
 			}
 		}
 	}
