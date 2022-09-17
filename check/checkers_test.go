@@ -79,9 +79,9 @@ func (sc *CheckSuite) TestCheckForNonMacroPaths(c *chk.C) {
 
 	c.Assert(alerts, chk.HasLen, 2)
 	c.Assert(alerts[0].Info, chk.Equals, "Path \"/usr\" should be used as macro \"%{_usr}\"")
-	c.Assert(alerts[0].Line.Index, chk.Equals, 41)
+	c.Assert(alerts[0].Line.Index, chk.Equals, 55)
 	c.Assert(alerts[1].Info, chk.Equals, "Path \"/etc\" should be used as macro \"%{_sysconfdir}\"")
-	c.Assert(alerts[1].Line.Index, chk.Equals, 42)
+	c.Assert(alerts[1].Line.Index, chk.Equals, 56)
 }
 
 func (sc *CheckSuite) TestCheckForVariables(c *chk.C) {
@@ -92,11 +92,29 @@ func (sc *CheckSuite) TestCheckForVariables(c *chk.C) {
 
 	alerts := checkForVariables("", s)
 
-	c.Assert(alerts, chk.HasLen, 2)
+	c.Assert(alerts, chk.HasLen, 11)
 	c.Assert(alerts[0].Info, chk.Equals, "Optimization flags must be used as macro %{optflags}")
 	c.Assert(alerts[0].Line.Index, chk.Equals, 34)
-	c.Assert(alerts[1].Info, chk.Equals, "Build root path must be used as macro %{buildroot}")
-	c.Assert(alerts[1].Line.Index, chk.Equals, 41)
+	c.Assert(alerts[1].Info, chk.Equals, "Linking flags must be used as macro %{build_ldflags}")
+	c.Assert(alerts[1].Line.Index, chk.Equals, 35)
+	c.Assert(alerts[2].Info, chk.Equals, "Linking flags must be used as macro %{_docdir}")
+	c.Assert(alerts[2].Line.Index, chk.Equals, 38)
+	c.Assert(alerts[3].Info, chk.Equals, "OS value must be used as macro %{_os}")
+	c.Assert(alerts[3].Line.Index, chk.Equals, 40)
+	c.Assert(alerts[4].Info, chk.Equals, "Arch value must be used as macro %{_arch}")
+	c.Assert(alerts[4].Line.Index, chk.Equals, 41)
+	c.Assert(alerts[5].Info, chk.Equals, "Package name value must be used as macro %{name}")
+	c.Assert(alerts[5].Line.Index, chk.Equals, 42)
+	c.Assert(alerts[6].Info, chk.Equals, "Package version value must be used as macro %{version}")
+	c.Assert(alerts[6].Line.Index, chk.Equals, 43)
+	c.Assert(alerts[7].Info, chk.Equals, "Package release value must be used as macro %{release}")
+	c.Assert(alerts[7].Line.Index, chk.Equals, 44)
+	c.Assert(alerts[8].Info, chk.Equals, "Path to build directory must be used as macro %{_builddir}")
+	c.Assert(alerts[8].Line.Index, chk.Equals, 48)
+	c.Assert(alerts[9].Info, chk.Equals, "Build root path must be used as macro %{buildroot}")
+	c.Assert(alerts[9].Line.Index, chk.Equals, 55)
+	c.Assert(alerts[10].Info, chk.Equals, "Path to source directory must be used as macro %{_sourcedir}")
+	c.Assert(alerts[10].Line.Index, chk.Equals, 58)
 }
 
 func (sc *CheckSuite) TestCheckForDevNull(c *chk.C) {
@@ -109,15 +127,15 @@ func (sc *CheckSuite) TestCheckForDevNull(c *chk.C) {
 
 	c.Assert(alerts, chk.HasLen, 5)
 	c.Assert(alerts[0].Info, chk.Equals, "Use \"&>/dev/null || :\" instead of \">/dev/null 2>&1 || :\"")
-	c.Assert(alerts[0].Line.Index, chk.Equals, 48)
+	c.Assert(alerts[0].Line.Index, chk.Equals, 64)
 	c.Assert(alerts[1].Info, chk.Equals, "Use \"&>/dev/null || :\" instead of \"2>&1 >/dev/null || :\"")
-	c.Assert(alerts[1].Line.Index, chk.Equals, 49)
+	c.Assert(alerts[1].Line.Index, chk.Equals, 65)
 	c.Assert(alerts[2].Info, chk.Equals, "Use \"&>/dev/null || :\" instead of \">/dev/null 2>/dev/null || :\"")
-	c.Assert(alerts[2].Line.Index, chk.Equals, 50)
+	c.Assert(alerts[2].Line.Index, chk.Equals, 66)
 	c.Assert(alerts[3].Info, chk.Equals, "Use \"&>/dev/null || :\" instead of \"2>/dev/null >/dev/null || :\"")
-	c.Assert(alerts[3].Line.Index, chk.Equals, 51)
+	c.Assert(alerts[3].Line.Index, chk.Equals, 67)
 	c.Assert(alerts[4].Info, chk.Equals, "Use \" || :\" instead of \" || exit 0\"")
-	c.Assert(alerts[4].Line.Index, chk.Equals, 51)
+	c.Assert(alerts[4].Line.Index, chk.Equals, 67)
 }
 
 func (sc *CheckSuite) TestCheckChangelogHeaders(c *chk.C) {
@@ -130,9 +148,9 @@ func (sc *CheckSuite) TestCheckChangelogHeaders(c *chk.C) {
 
 	c.Assert(alerts, chk.HasLen, 2)
 	c.Assert(alerts[0].Info, chk.Equals, "Changelog record header must contain release")
-	c.Assert(alerts[0].Line.Index, chk.Equals, 74)
+	c.Assert(alerts[0].Line.Index, chk.Equals, 90)
 	c.Assert(alerts[1].Info, chk.Equals, "Misformatted changelog record header")
-	c.Assert(alerts[1].Line.Index, chk.Equals, 77)
+	c.Assert(alerts[1].Line.Index, chk.Equals, 93)
 }
 
 func (sc *CheckSuite) TestCheckForMakeMacro(c *chk.C) {
@@ -398,7 +416,7 @@ func (sc *CheckSuite) TestCheckForUselessSlash(c *chk.C) {
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Slash between %{buildroot} and %{_usr} macroses is useless")
-	c.Assert(alerts[0].Line.Index, chk.Equals, 48)
+	c.Assert(alerts[0].Line.Index, chk.Equals, 64)
 }
 
 func (sc *CheckSuite) TestCheckForEmptyIf(c *chk.C) {
