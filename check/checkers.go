@@ -276,7 +276,7 @@ func checkForVariables(id string, s *spec.Spec) []Alert {
 			case contains(line, "$RPM_LD_FLAGS"):
 				result = append(result, NewAlert(id, LEVEL_ERROR, "Linking flags must be used as macro %{build_ldflags}", line))
 			case contains(line, "$RPM_DOC_DIR"):
-				result = append(result, NewAlert(id, LEVEL_ERROR, "Linking flags must be used as macro %{build_ldflags}", line))
+				result = append(result, NewAlert(id, LEVEL_ERROR, "Linking flags must be used as macro %{_docdir}", line))
 			case contains(line, "$RPM_SOURCE_DIR"):
 				result = append(result, NewAlert(id, LEVEL_ERROR, "Path to source directory must be used as macro %{_sourcedir}", line))
 			case contains(line, "$RPM_BUILD_DIR"):
