@@ -31,7 +31,21 @@ Test subpackge for perfecto app.
 %setup -qn %{name}-%{version}
 
 %build
-gcc $RPM_OPT_FLAGS -o app app.c
+export CFLAGS="$RPM_OPT_FLAGS"
+export LDFLAGS="$RPM_LD_FLAGS"
+export PREFIX="%{_prefix}"
+export LIBDIR="%{_libdir}"
+export DOCDIR="$RPM_DOC_DIR"
+
+export CURRENT_OS="$RPM_OS"
+export CURRENT_ARCH="$RPM_ARCH"
+export PKG_NAME="$RPM_PACKAGE_NAME"
+export PKG_VER="$RPM_PACKAGE_VERSION"
+export PKG_REL="$RPM_PACKAGE_RELEASE"
+
+%make_build
+
+rm -f $RPM_BUILD_DIR/output.log
 
 %install
 rm -rf %{buildroot}
@@ -40,6 +54,8 @@ export PATH="$PATH:/usr/sbin/test"
 
 install -pm file $RPM_BUILD_ROOT/usr/
 install -pm file2 %{buildroot}/etc/
+
+cp $RPM_SOURCE_DIR/app.conf %{buildroot}/root/
 
 wget github.com/etcd-io/etcd/Documentation
 

@@ -1,6 +1,6 @@
 ## BUILDER #####################################################################
 
-FROM golang:alpine3.13 as builder
+FROM golang:alpine3.14 as builder
 
 WORKDIR /go/src/github.com/essentialkaos/perfecto
 
@@ -16,7 +16,7 @@ RUN apk add --no-cache git make upx && \
 
 ## FINAL IMAGE #################################################################
 
-FROM essentialkaos/alpine:3.13
+FROM essentialkaos/alpine:3.14
 
 LABEL org.opencontainers.image.title="perfecto" \
       org.opencontainers.image.description="Tool for checking perfectly written RPM specs" \
