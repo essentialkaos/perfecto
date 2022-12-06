@@ -116,7 +116,7 @@ jobs:
       - name: Check dockerfiles with Hadolint
         uses: essentialkaos/hadolint-action@v1
         with:
-          files: .docker/centos7.docker .docker/micro.docker
+          files: .docker/*.docker
 
   Perfecto:
     name: Perfecto
@@ -145,6 +145,13 @@ jobs:
     runs-on: ubuntu-latest
 
     needs: [Hadolint, Shellcheck, Perfecto]
+
+    env:
+      REGISTRY: ghcr.io
+
+    strategy:
+      matrix:
+        image: [ 'centos7', 'micro' ]
 
     steps:
       - name: Check event type
@@ -180,12 +187,11 @@ jobs:
       - name: Build Docker image
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          docker build -f .docker/centos7.docker -t perfecto:centos7 .
-          docker build -f .docker/micro.docker -t perfecto:micro .
+          docker build --build-arg REGISTRY=${REGISTRY} -f .docker/${{matrix.image}}.docker -t ${{matrix.image}} .
 
       - name: Show info about built Docker image
         uses: essentialkaos/docker-info-action@v1
         if: ${{ github.event_name == 'pull_request' }}
         with:
-          image: perfecto:centos7 perfecto:micro
+          image: ${{matrix.image}}
           show-labels: true
