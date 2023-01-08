@@ -1,14 +1,10 @@
 ################################################################################
 
-# rpmbuilder:relative-pack true
-
-################################################################################
-
 %global crc_check pushd ../SOURCES ; sha512sum -c %{SOURCE100} ; popd
 
 ################################################################################
 
-%define  debug_package %{nil}
+%define debug_package  %{nil}
 
 ################################################################################
 
@@ -45,6 +41,11 @@ Tool for checking perfectly written RPM specs.
 %setup -q
 
 %build
+if [[ ! -d "%{name}/vendor" ]] ; then
+  echo "This package requires vendored dependencies"
+  exit 1
+fi
+
 pushd %{name}
   go build %{name}.go
   cp LICENSE ..
