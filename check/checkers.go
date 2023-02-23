@@ -61,7 +61,7 @@ var pathMacroSlice = []macro{
 var binariesAsMacro = []string{
 	"7zip", "bzip2", "bzr", "cat", "chgrp", "chmod", "chown", "cp", "cpio",
 	"file", "git", "grep", "gzip", "hg", "id", "install", "ld", "lrzip", "lzip",
-	"mkdir", "mv", "nm", "objcopy", "objdump", "patch", "perl", "python", "quilt",
+	"mkdir", "mv", "nm", "objcopy", "objdump", "patch", "quilt",
 	"rm", "rsh", "sed", "semodule", "ssh", "strip", "tar", "unzip", "xz",
 }
 
