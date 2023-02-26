@@ -131,7 +131,7 @@ func showEnvInfo() {
 	data, err := cmd.Output()
 
 	if err != nil {
-		printInfo(8, "RPMLint", "")
+		printInfo(7, "RPMLint", "")
 		return
 	}
 
