@@ -138,9 +138,9 @@ func showEnvInfo() {
 	dataStr := strings.Trim(string(data), "\r\n\t")
 
 	if strings.Count(dataStr, " ") == 0 {
-		printInfo(8, "RPMLint", dataStr)
+		printInfo(7, "RPMLint", dataStr)
 	} else {
-		printInfo(8, "RPMLint", strutil.ReadField(dataStr, 2, false, " "))
+		printInfo(7, "RPMLint", strutil.ReadField(dataStr, 2, false, " "))
 	}
 }
 
