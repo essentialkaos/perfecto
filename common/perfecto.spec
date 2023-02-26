@@ -10,8 +10,8 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         4.0.1
-Release:         1%{?dist}
+Version:         4.1.0
+Release:         0%{?dist}
 Group:           Development/Tools
 License:         Apache License, Version 2.0
 URL:             https://kaos.sh/perfecto
@@ -98,7 +98,9 @@ fi
 ################################################################################
 
 %changelog
-* Wed Nov 30 2022 Anton Novojilov <andy@essentialkaos.com> - 4.0.1-1
+* Wed Nov 30 2022 Anton Novojilov <andy@essentialkaos.com> - 4.1.0-1
+- Added verbose version info output
+- Dependencies update
 - Fixed build using sources from source.kaos.st
 
 * Sun Sep 18 2022 Anton Novojilov <andy@essentialkaos.com> - 4.0.1-0
