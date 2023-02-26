@@ -49,6 +49,9 @@ jobs:
       - name: Install RPMLint
         run: sudo apt-get install -y rpmlint
 
+      - name: Configure RPMLint
+        run: sed -i "s#Filters = []#Filters = ['superfluous-%clean-section']#" /usr/lib/python3/dist-packages/rpmlint/configdefaults.toml
+
       - name: Print RPMLint version
         run: rpmlint --version
 
