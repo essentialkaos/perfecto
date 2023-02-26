@@ -21,12 +21,14 @@ import (
 	"github.com/essentialkaos/ek/v12/usage/completion/bash"
 	"github.com/essentialkaos/ek/v12/usage/completion/fish"
 	"github.com/essentialkaos/ek/v12/usage/completion/zsh"
+	"github.com/essentialkaos/ek/v12/usage/man"
 	"github.com/essentialkaos/ek/v12/usage/update"
 
 	"github.com/essentialkaos/perfecto/check"
 	"github.com/essentialkaos/perfecto/spec"
 
 	"github.com/essentialkaos/perfecto/cli/render"
+	"github.com/essentialkaos/perfecto/cli/support"
 )
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -34,7 +36,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "4.0.2"
+	VER  = "4.1.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -50,7 +52,9 @@ const (
 	OPT_HELP        = "h:help"
 	OPT_VER         = "v:version"
 
-	OPT_COMPLETION = "completion"
+	OPT_VERB_VER     = "vv:verbose-version"
+	OPT_COMPLETION   = "completion"
+	OPT_GENERATE_MAN = "generate-man"
 )
 
 // Supported formats
@@ -83,10 +87,12 @@ var optMap = options.Map{
 	OPT_QUIET:       {Type: options.BOOL},
 	OPT_NO_LINT:     {Type: options.BOOL},
 	OPT_NO_COLOR:    {Type: options.BOOL},
-	OPT_HELP:        {Type: options.BOOL, Alias: "u:usage"},
-	OPT_VER:         {Type: options.BOOL, Alias: "ver"},
+	OPT_HELP:        {Type: options.BOOL},
+	OPT_VER:         {Type: options.BOOL},
 
-	OPT_COMPLETION: {},
+	OPT_VERB_VER:     {Type: options.BOOL},
+	OPT_COMPLETION:   {},
+	OPT_GENERATE_MAN: {Type: options.BOOL},
 }
 
 // formats is slice with all supported formats
@@ -103,8 +109,8 @@ var formats = []string{
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
-// Init is main function of cli
-func Init() {
+// Init is main function
+func Init(gitRev string, gomod []byte) {
 	args, errs := options.Parse(optMap)
 
 	if len(errs) != 0 {
@@ -115,20 +121,22 @@ func Init() {
 		os.Exit(1)
 	}
 
-	if options.Has(OPT_COMPLETION) {
-		genCompletion()
-	}
-
 	configureUI()
 
-	if options.GetB(OPT_VER) {
-		showAbout()
-		return
-	}
-
-	if options.GetB(OPT_HELP) || len(args) == 0 {
+	switch {
+	case options.Has(OPT_COMPLETION):
+		os.Exit(genCompletion())
+	case options.Has(OPT_GENERATE_MAN):
+		os.Exit(genMan())
+	case options.GetB(OPT_VER):
+		showAbout(gitRev)
+		os.Exit(0)
+	case options.GetB(OPT_VERB_VER):
+		support.ShowSupportInfo(APP, VER, gitRev, gomod)
+		os.Exit(0)
+	case options.GetB(OPT_HELP) || len(args) == 2:
 		showUsage()
-		return
+		os.Exit(0)
 	}
 
 	process(args)
@@ -293,9 +301,44 @@ func showUsage() {
 	genUsage().Render()
 }
 
+// showAbout prints info about version
+func showAbout(gitRev string) {
+	genAbout(gitRev).Render()
+}
+
+// genCompletion generates completion for different shells
+func genCompletion() int {
+	info := genUsage()
+
+	switch options.GetS(OPT_COMPLETION) {
+	case "bash":
+		fmt.Printf(bash.Generate(info, "perfecto", "spec"))
+	case "fish":
+		fmt.Printf(fish.Generate(info, "perfecto"))
+	case "zsh":
+		fmt.Printf(zsh.Generate(info, optMap, "perfecto", "*.spec"))
+	default:
+		os.Exit(1)
+	}
+
+	return 0
+}
+
+// genMan generates man page
+func genMan() int {
+	fmt.Println(
+		man.Generate(
+			genUsage(),
+			genAbout(""),
+		),
+	)
+
+	return 0
+}
+
 // genUsage generates usage info
 func genUsage() *usage.Info {
-	info := usage.NewInfo("", "file…")
+	info := usage.NewInfo("", "spec…")
 
 	info.AddOption(OPT_ABSOLVE, "Disable some checks by their ID", "id…")
 	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny|short|github|json|xml){!}", "format")
@@ -332,26 +375,8 @@ func genUsage() *usage.Info {
 	return info
 }
 
-// genCompletion generates completion for different shells
-func genCompletion() {
-	info := genUsage()
-
-	switch options.GetS(OPT_COMPLETION) {
-	case "bash":
-		fmt.Printf(bash.Generate(info, "perfecto", "spec"))
-	case "fish":
-		fmt.Printf(fish.Generate(info, "perfecto"))
-	case "zsh":
-		fmt.Printf(zsh.Generate(info, optMap, "perfecto", "*.spec"))
-	default:
-		os.Exit(1)
-	}
-
-	os.Exit(0)
-}
-
-// showAbout shows info about version
-func showAbout() {
+// genAbout generates info about version
+func genAbout(gitRev string) *usage.About {
 	about := &usage.About{
 		App:           APP,
 		Version:       VER,
@@ -362,5 +387,9 @@ func showAbout() {
 		UpdateChecker: usage.UpdateChecker{"essentialkaos/perfecto", update.GitHubChecker},
 	}
 
-	about.Render()
+	if gitRev != "" {
+		about.Build = "git:" + gitRev
+	}
+
+	return about
 }
