@@ -32,7 +32,6 @@ LABEL org.opencontainers.image.title="perfecto" \
       org.opencontainers.image.source="https://github.com/essentialkaos/perfecto"
 
 COPY --from=builder /go/src/github.com/essentialkaos/perfecto/perfecto /usr/bin/
-COPY common/rpmlint.conf /root/.config/rpmlint
 
 # hadolint ignore=DL3031,DL3041
 RUN dnf -y -q install https://yum.kaos.st/kaos-repo-latest.el9.noarch.rpm && \
