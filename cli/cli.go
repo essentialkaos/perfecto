@@ -127,12 +127,13 @@ func Init(gitRev string, gomod []byte) {
 	case options.Has(OPT_COMPLETION):
 		os.Exit(genCompletion())
 	case options.Has(OPT_GENERATE_MAN):
-		os.Exit(genMan())
+		genMan()
+		os.Exit(0)
 	case options.GetB(OPT_VER):
 		showAbout(gitRev)
 		os.Exit(0)
 	case options.GetB(OPT_VERB_VER):
-		support.ShowSupportInfo(APP, VER, gitRev, gomod)
+		support.Print(APP, VER, gitRev, gomod)
 		os.Exit(0)
 	case options.GetB(OPT_HELP) || len(args) == 2:
 		showUsage()
@@ -325,15 +326,13 @@ func genCompletion() int {
 }
 
 // genMan generates man page
-func genMan() int {
+func genMan() {
 	fmt.Println(
 		man.Generate(
 			genUsage(),
 			genAbout(""),
 		),
 	)
-
-	return 0
 }
 
 // genUsage generates usage info
