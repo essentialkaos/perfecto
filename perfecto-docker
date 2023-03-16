@@ -3,17 +3,11 @@
 
 ################################################################################
 
-# Name of perfecto image on Docker Hub with CentOS 7 based image
-IMAGE_DOCKERHUB_CENTOS="essentialkaos/perfecto:centos7"
-
-# Name of perfecto image on GitHub Container Registry with CentOS 7 based image
-IMAGE_GHCR_CENTOS="ghcr.io/essentialkaos/perfecto:centos7"
-
-# Name of perfecto image on Docker Hub with Alpine based image
-IMAGE_DOCKERHUB_MICRO="essentialkaos/perfecto:micro"
+# Name of perfecto image on GitHub Container Registry with OL 8 based image
+IMAGE_CENTOS="ghcr.io/essentialkaos/perfecto:ol8"
 
 # Name of perfecto image on GitHub Container Registry with Alpine based image
-IMAGE_GHCR_MICRO="ghcr.io/essentialkaos/perfecto:micro"
+IMAGE_MICRO="ghcr.io/essentialkaos/perfecto:micro"
 
 ################################################################################
 
@@ -122,16 +116,16 @@ getImage() {
   fi
 
   if [[ $(printenv "GITHUB_ACTIONS") == "true" ]] ; then
-    echo "$IMAGE_GHCR_MICRO"
+    echo "$IMAGE_MICRO"
     return
   fi
 
   if [[ $(printenv "CI") == "true" ]] ; then
-    echo "$IMAGE_DOCKERHUB_MICRO"
+    echo "$IMAGE_MICRO"
     return
   fi
 
-  echo "$IMAGE_DOCKERHUB_CENTOS"
+  echo "$IMAGE_CENTOS"
 }
 
 # Check if some app is installed
