@@ -3,11 +3,18 @@
 
 ################################################################################
 
+# Name of registry, repository and name of official image
+IMAGE_BASE="ghcr.io/essentialkaos/perfecto"
+
 # Name of perfecto image on GitHub Container Registry with OL 8 based image
-IMAGE_CENTOS="ghcr.io/essentialkaos/perfecto:ol8"
+IMAGE_CENTOS="$IMAGE_BASE:ol8"
 
 # Name of perfecto image on GitHub Container Registry with Alpine based image
-IMAGE_MICRO="ghcr.io/essentialkaos/perfecto:micro"
+IMAGE_MICRO="$IMAGE_BASE:micro"
+
+################################################################################
+
+engine=""
 
 ################################################################################
 
@@ -16,8 +23,10 @@ IMAGE_MICRO="ghcr.io/essentialkaos/perfecto:micro"
 # Code: No
 # Echo: No
 main() {
-  if ! hasApp "docker" ; then
-    echo "You must install Docker runtime first"
+  engine=$(getContainerEngine)
+
+  if [[ -z "$engine" ]] ; then
+    error "You must install Podman or Docker first"
     exit 1
   fi
 
@@ -35,22 +44,22 @@ main() {
 #
 # *: Specs
 #
-# Code: No
+# Code: Yes
 # Echo: No
 check() {
   local image tmp_dir args opts status
 
-  image="${IMAGE:-$DEFAULT_IMAGE}"
-  tmp_dir=$(mktemp -d -t 'pfdkr-XXXXXXXXXXXXX')
+  image=$(getImage)
+  tmp_dir=$(mktemp -d -t 'pfcnt-XXXXXXXXXXXXX')
 
   args=$(processArgs "$tmp_dir" "$@")
 
   if [[ -z "$CI" ]] ; then
-    opts="-it"
+    opts="-i -t"
   fi
   
   # shellcheck disable=SC2086
-  docker run --rm $opts -v "$tmp_dir":/perfecto "$image" ${args}
+  $engine run --rm $opts -v "$tmp_dir":/perfecto "$image" ${args}
 
   status=$?
 
@@ -61,18 +70,19 @@ check() {
 
 # Show usage info
 #
-# Code: No
+# Code: Yes
 # Echo: No
 usage() {
   local image opts
 
-  image="${IMAGE:-$DEFAULT_IMAGE}"
+  image=$(getImage)
 
   if [[ -z "$CI" ]] ; then
-    opts="-it"
+    opts="-i -t"
   fi
 
-  docker run --rm $opts "$image" "--help"
+  # shellcheck disable=SC2086
+  $engine run --rm $opts "$image" "--help"
 
   return $?
 }
@@ -83,7 +93,7 @@ usage() {
 # *: Specs
 #
 # Code: No
-# Echo: No
+# Echo: Arguments (String)
 processArgs() {
   local tmp_dir="$1"
   local arg spec_name result
@@ -105,12 +115,17 @@ processArgs() {
   echo "$result"
 }
 
-# Get docker image name with perfecto
+# Get container image name with perfecto
 #
 # Code: No
 # Echo: Image name (String)
 getImage() {
   if [[ -n "$IMAGE" ]] ; then
+    if [[ ! $image =~ \: ]] ; then
+      echo "$IMAGE_BASE:$IMAGE"
+      return
+    fi
+    
     echo "$IMAGE"
     return
   fi
@@ -126,6 +141,20 @@ getImage() {
   fi
 
   echo "$IMAGE_CENTOS"
+}
+
+# Get used container engine
+#
+# Code: No
+# Echo: Engine name (String)
+getContainerEngine() {
+  if hasApp "docker" ; then
+    echo "docker"
+  fi
+
+  if hasApp "podman" ; then
+    echo "podman"
+  fi
 }
 
 # Check if some app is installed

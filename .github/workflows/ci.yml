@@ -104,7 +104,7 @@ jobs:
       - name: Check scripts with Shellcheck
         uses: essentialkaos/shellcheck-action@v1
         with:
-          files: perfecto-docker
+          files: perfecto-container
 
   Hadolint:
     name: Hadolint
