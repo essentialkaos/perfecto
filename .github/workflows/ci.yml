@@ -7,6 +7,13 @@ on:
     branches: [master]
   schedule:
     - cron: '0 10 */15 * *'
+  workflow_dispatch:
+    inputs:
+      force_run:
+        description: 'Force workflow run'
+        required: true
+        type: choice
+        options: [yes, no]
 
 permissions:
   actions: read
@@ -16,9 +23,6 @@ permissions:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
-env:
-  SRC_DIR: src/github.com/${{ github.repository }}
 
 jobs:
   Go:
@@ -30,15 +34,13 @@ jobs:
         go: [ '1.19.x', '1.20.x' ]
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go }}
-
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          path: ${{env.SRC_DIR}}
 
       - name: Disable initramfs update
         run: sudo sed -i 's/yes/no/g' /etc/initramfs-tools/update-initramfs.conf
@@ -56,15 +58,12 @@ jobs:
         run: rpmlint --version
 
       - name: Download dependencies
-        working-directory: ${{env.SRC_DIR}}
         run: make deps
 
       - name: Build binary
-        working-directory: ${{env.SRC_DIR}}
         run: make all
 
       - name: Run tests
-        working-directory: ${{env.SRC_DIR}}
         run: make test COVERAGE_FILE=cover.out
 
       - name: Send coverage data
@@ -72,7 +71,6 @@ jobs:
         env:
           COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          path: ${{env.SRC_DIR}}
           profile: cover.out
           parallel: true
           flag-name: linux-${{ matrix.go }}
