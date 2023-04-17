@@ -153,7 +153,7 @@ fi
 
 * Sat Dec 21 2019 Anton Novojilov <andy@essentialkaos.com> - 3.2.0-0
 - Added printing links to wiki articles about failed checks
-- Improved check for using variables instead of macroses (PF5)
+- Improved check for using variables instead of macros (PF5)
 
 * Fri Dec 13 2019 Anton Novojilov <andy@essentialkaos.com> - 3.1.0-0
 - Added URL check to PF20
@@ -162,7 +162,7 @@ fi
 - Improved all renderers
 - Added check ID to output
 - Added check for checking check scriptlet for using _without_check
-  and _with_check macroses
+  and _with_check macros
 - Added check for single equals symbol in %%if clause
 
 * Sat Oct 26 2019 Anton Novojilov <andy@essentialkaos.com> - 2.5.1-0
