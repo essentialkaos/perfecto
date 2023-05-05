@@ -2,6 +2,7 @@
 
 <p align="center">
   <a href="https://kaos.sh/r/perfecto"><img src="https://kaos.sh/r/perfecto.svg" alt="GoReportCard" /></a>
+  <a href="https://kaos.sh/l/perfecto"><img src="https://kaos.sh/l/19f019d1310c2cb69b29.svg" alt="Code Climate Maintainability" /></a>
   <a href="https://kaos.sh/b/perfecto"><img src="https://kaos.sh/b/74af2307-8aa2-48eb-afd5-2ae3620a1149.svg" alt="Codebeat badge" /></a>
   <a href="https://kaos.sh/w/perfecto/ci"><img src="https://kaos.sh/w/perfecto/ci.svg" alt="GitHub Actions CI Status" /></a>
   <a href="https://kaos.sh/w/perfecto/codeql"><img src="https://kaos.sh/w/perfecto/codeql.svg" alt="GitHub Actions CodeQL Status" /></a>
@@ -27,7 +28,7 @@ You can find additional information about every _perfecto_ check in [project wik
 
 #### From sources
 
-Make sure you have a working Go 1.19+ workspace ([instructions](https://golang.org/doc/install)), then:
+Make sure you have a working Go 1.19+ workspace ([instructions](https://go.dev/doc/install)), then:
 
 ```bash
 go install github.com/essentialkaos/perfecto@latest
