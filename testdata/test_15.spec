@@ -32,7 +32,7 @@ Summary:            Test subpackage for perfecto
 Group:              System Environment/Base
 
 %description magic
-Test subpackge for perfecto app.
+Test subpackage for perfecto app.
 
 ################################################################################
 

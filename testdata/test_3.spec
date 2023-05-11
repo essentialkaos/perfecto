@@ -23,7 +23,7 @@ Summary:            Test subpackage for perfecto
 
 
 %description magic
-Test subpackge for perfecto app.
+Test subpackage for perfecto app.
 
 ################################################################################
 

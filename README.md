@@ -2,14 +2,16 @@
 
 <p align="center">
   <a href="https://kaos.sh/r/perfecto"><img src="https://kaos.sh/r/perfecto.svg" alt="GoReportCard" /></a>
+  <a href="https://kaos.sh/l/perfecto"><img src="https://kaos.sh/l/19f019d1310c2cb69b29.svg" alt="Code Climate Maintainability" /></a>
   <a href="https://kaos.sh/b/perfecto"><img src="https://kaos.sh/b/74af2307-8aa2-48eb-afd5-2ae3620a1149.svg" alt="Codebeat badge" /></a>
+  <br/>
+  <a href="https://kaos.sh/c/perfecto"><img src="https://kaos.sh/c/perfecto.svg" alt="Coverage Status" /></a>
   <a href="https://kaos.sh/w/perfecto/ci"><img src="https://kaos.sh/w/perfecto/ci.svg" alt="GitHub Actions CI Status" /></a>
   <a href="https://kaos.sh/w/perfecto/codeql"><img src="https://kaos.sh/w/perfecto/codeql.svg" alt="GitHub Actions CodeQL Status" /></a>
-  <a href="https://kaos.sh/c/perfecto"><img src="https://kaos.sh/c/perfecto.svg" alt="Coverage Status" /></a>
   <a href="#license"><img src="https://gh.kaos.st/apache2.svg"></a>
 </p>
 
-<p align="center"><a href="#checks">Checks</a> • <a href="#installing">Installing</a> • <a href="#using-with-github-actions">Using with Github Actions</a> • <a href="#using-with-docker">Using with Docker</a> • <a href="#usage">Usage</a> • <a href="#build-status">Build Status</a> • <a href="#license">License</a></p>
+<p align="center"><a href="#checks">Checks</a> • <a href="#installing">Installing</a> • <a href="#usage">Usage</a> • <a href="#build-status">Build Status</a> • <a href="#license">License</a></p>
 
 <br/>
 
@@ -27,16 +29,16 @@ You can find additional information about every _perfecto_ check in [project wik
 
 #### From sources
 
-Make sure you have a working Go 1.17+ workspace ([instructions](https://golang.org/doc/install)), then:
+Make sure you have a working Go 1.19+ workspace ([instructions](https://go.dev/doc/install)), then:
 
-```
+```bash
 go install github.com/essentialkaos/perfecto@latest
 ```
 
 #### From [ESSENTIAL KAOS Public Repository](https://yum.kaos.st)
 
 ```bash
-sudo yum install -y https://yum.kaos.st/get/$(uname -r).rpm
+sudo yum install -y https://yum.kaos.st/kaos-repo-latest.el$(grep 'CPE_NAME' /etc/os-release | tr -d '"' | cut -d':' -f5).noarch.rpm
 sudo yum install perfecto
 ```
 
@@ -48,7 +50,29 @@ You can download prebuilt binaries for Linux and macOS from [EK Apps Repository]
 bash <(curl -fsSL https://apps.kaos.st/get) perfecto
 ```
 
-### Using with Github Actions
+#### Container image
+
+Official _perfecto_ images available on [GitHub Container Registry](https://kaos.sh/p/perfecto) and [Docker Hub](https://kaos.sh/d/perfecto). Install the latest version of [Podman](https://podman.io/getting-started/installation.html) or [Docker](https://docs.docker.com/engine/install/), then:
+
+```bash
+curl -#L -o perfecto-container https://kaos.sh/perfecto/perfecto-container
+chmod +x perfecto-container
+sudo mv perfecto-container /usr/bin/perfecto
+perfecto your.spec
+```
+
+Official container images with _perfecto_:
+
+- [`ghcr.io/essentialkaos/perfecto:micro`](https://kaos.sh/p/perfecto)
+- [`ghcr.io/essentialkaos/perfecto:ol7`](https://kaos.sh/p/perfecto)
+- [`ghcr.io/essentialkaos/perfecto:ol8`](https://kaos.sh/p/perfecto)
+- [`ghcr.io/essentialkaos/perfecto:ol9`](https://kaos.sh/p/perfecto)
+- [`essentialkaos/perfecto:micro`](https://kaos.sh/d/perfecto)
+- [`essentialkaos/perfecto:ol7`](https://kaos.sh/d/perfecto)
+- [`essentialkaos/perfecto:ol8`](https://kaos.sh/d/perfecto)
+- [`essentialkaos/perfecto:ol9`](https://kaos.sh/d/perfecto)
+
+#### Using with Github Actions
 
 For using latest stable version _perfecto_ with Github Actions use this `perfecto.yml` file or add it to your workflow:
 
@@ -84,25 +108,6 @@ jobs:
 ```
 
 Additional information about action configuration can be found on [the official GitHub action page](https://github.com/marketplace/actions/ek-perfecto).
-
-### Using with Docker
-
-You can use Docker containers with _perfecto_ for checking your specs. Install latest version of Docker, then:
-
-```bash
-curl -fL# -o perfecto-docker https://kaos.sh/perfecto/perfecto-docker
-chmod +x perfecto-docker
-sudo mv perfecto-docker /usr/bin/
-
-perfecto-docker your.spec
-```
-
-Official Docker images with _perfecto_:
-
-- [`essentialkaos/perfecto:centos7`](https://kaos.sh/d/perfecto)
-- [`essentialkaos/perfecto:micro`](https://kaos.sh/d/perfecto)
-- [`ghcr.io/essentialkaos/perfecto:centos7`](https://kaos.sh/p/perfecto)
-- [`ghcr.io/essentialkaos/perfecto:micro`](https://kaos.sh/p/perfecto)
 
 ### Usage
 

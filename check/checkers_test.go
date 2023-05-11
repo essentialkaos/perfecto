@@ -2,7 +2,7 @@ package check
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 //                                                                                    //
-//                         Copyright (c) 2022 ESSENTIAL KAOS                          //
+//                         Copyright (c) 2023 ESSENTIAL KAOS                          //
 //      Apache License, Version 2.0 <https://www.apache.org/licenses/LICENSE-2.0>     //
 //                                                                                    //
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -204,13 +204,13 @@ func (sc *CheckSuite) TestCheckForUnescapedPercent(c *chk.C) {
 	c.Assert(alerts[0].Line.Index, chk.Equals, 67)
 }
 
-func (sc *CheckSuite) TestCheckForMacroDefenitionPosition(c *chk.C) {
+func (sc *CheckSuite) TestCheckForMacroDefinitionPosition(c *chk.C) {
 	s, err := spec.Read("../testdata/test_4.spec")
 
 	c.Assert(err, chk.IsNil)
 	c.Assert(s, chk.NotNil)
 
-	alerts := checkForMacroDefenitionPosition("", s)
+	alerts := checkForMacroDefinitionPosition("", s)
 
 	c.Assert(alerts, chk.HasLen, 1)
 	c.Assert(alerts[0].Info, chk.Equals, "Move %define and %global to top of your spec")
@@ -380,7 +380,7 @@ func (sc *CheckSuite) TestCheckForCheckMacro(c *chk.C) {
 	alerts := checkForCheckMacro("", s)
 
 	c.Assert(alerts, chk.HasLen, 1)
-	c.Assert(alerts[0].Info, chk.Equals, "Use %{_without_check} and %{_with_check} macroses for controlling tests execution")
+	c.Assert(alerts[0].Info, chk.Equals, "Use %{_without_check} and %{_with_check} macros for controlling tests execution")
 	c.Assert(alerts[0].Line.Index, chk.Equals, -1)
 
 	s, err = spec.Read("../testdata/test_12.spec")
@@ -415,7 +415,7 @@ func (sc *CheckSuite) TestCheckForUselessSlash(c *chk.C) {
 	alerts := checkForUselessSlash("", s)
 
 	c.Assert(alerts, chk.HasLen, 1)
-	c.Assert(alerts[0].Info, chk.Equals, "Slash between %{buildroot} and %{_usr} macroses is useless")
+	c.Assert(alerts[0].Info, chk.Equals, "Slash between %{buildroot} and %{_usr} macros is useless")
 	c.Assert(alerts[0].Line.Index, chk.Equals, 64)
 }
 

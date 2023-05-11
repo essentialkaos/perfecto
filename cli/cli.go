@@ -2,7 +2,7 @@ package cli
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 //                                                                                    //
-//                         Copyright (c) 2022 ESSENTIAL KAOS                          //
+//                         Copyright (c) 2023 ESSENTIAL KAOS                          //
 //      Apache License, Version 2.0 <https://www.apache.org/licenses/LICENSE-2.0>     //
 //                                                                                    //
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/essentialkaos/ek/v12/fmtc"
+	"github.com/essentialkaos/ek/v12/fsutil"
 	"github.com/essentialkaos/ek/v12/mathutil"
 	"github.com/essentialkaos/ek/v12/options"
 	"github.com/essentialkaos/ek/v12/sliceutil"
@@ -21,12 +22,14 @@ import (
 	"github.com/essentialkaos/ek/v12/usage/completion/bash"
 	"github.com/essentialkaos/ek/v12/usage/completion/fish"
 	"github.com/essentialkaos/ek/v12/usage/completion/zsh"
+	"github.com/essentialkaos/ek/v12/usage/man"
 	"github.com/essentialkaos/ek/v12/usage/update"
 
 	"github.com/essentialkaos/perfecto/check"
 	"github.com/essentialkaos/perfecto/spec"
 
 	"github.com/essentialkaos/perfecto/cli/render"
+	"github.com/essentialkaos/perfecto/cli/support"
 )
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -34,7 +37,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "4.0.1"
+	VER  = "4.1.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -50,7 +53,9 @@ const (
 	OPT_HELP        = "h:help"
 	OPT_VER         = "v:version"
 
-	OPT_COMPLETION = "completion"
+	OPT_VERB_VER     = "vv:verbose-version"
+	OPT_COMPLETION   = "completion"
+	OPT_GENERATE_MAN = "generate-man"
 )
 
 // Supported formats
@@ -83,10 +88,12 @@ var optMap = options.Map{
 	OPT_QUIET:       {Type: options.BOOL},
 	OPT_NO_LINT:     {Type: options.BOOL},
 	OPT_NO_COLOR:    {Type: options.BOOL},
-	OPT_HELP:        {Type: options.BOOL, Alias: "u:usage"},
-	OPT_VER:         {Type: options.BOOL, Alias: "ver"},
+	OPT_HELP:        {Type: options.BOOL},
+	OPT_VER:         {Type: options.MIXED},
 
-	OPT_COMPLETION: {},
+	OPT_VERB_VER:     {Type: options.BOOL},
+	OPT_COMPLETION:   {},
+	OPT_GENERATE_MAN: {Type: options.BOOL},
 }
 
 // formats is slice with all supported formats
@@ -103,35 +110,61 @@ var formats = []string{
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
-// Init is main function of cli
-func Init() {
+// Run is main utility function
+func Run(gitRev string, gomod []byte) {
+	preConfigureUI()
+
 	args, errs := options.Parse(optMap)
 
 	if len(errs) != 0 {
-		for _, err := range errs {
-			printError(err.Error())
-		}
-
+		printError(errs[0].Error())
 		os.Exit(1)
-	}
-
-	if options.Has(OPT_COMPLETION) {
-		genCompletion()
 	}
 
 	configureUI()
 
-	if options.GetB(OPT_VER) {
-		showAbout()
-		return
-	}
-
-	if options.GetB(OPT_HELP) || len(args) == 0 {
-		showUsage()
-		return
+	switch {
+	case options.Has(OPT_COMPLETION):
+		os.Exit(printCompletion())
+	case options.Has(OPT_GENERATE_MAN):
+		printMan()
+		os.Exit(0)
+	case options.GetB(OPT_VER):
+		genAbout(gitRev).Print(options.GetS(OPT_VER))
+		os.Exit(0)
+	case options.GetB(OPT_VERB_VER):
+		support.Print(APP, VER, gitRev, gomod)
+		os.Exit(0)
+	case options.GetB(OPT_HELP) || len(args) == 2:
+		genUsage().Print()
+		os.Exit(0)
 	}
 
 	process(args)
+}
+
+// preConfigureUI preconfigures UI based on information about user terminal
+func preConfigureUI() {
+	term := os.Getenv("TERM")
+
+	fmtc.DisableColors = true
+
+	if term != "" {
+		switch {
+		case strings.Contains(term, "xterm"),
+			strings.Contains(term, "color"),
+			term == "screen":
+			fmtc.DisableColors = false
+		}
+	}
+
+	if !fsutil.IsCharacterDevice("/dev/stdout") && os.Getenv("FAKETTY") == "" {
+		fmtc.DisableColors = true
+	}
+
+	if os.Getenv("NO_COLOR") != "" {
+		fmtc.DisableColors = true
+	}
 }
 
 // configureUI configure UI on start
@@ -280,7 +313,7 @@ func printError(f string, a ...interface{}) {
 	fmtc.Fprintf(os.Stderr, "{r}"+f+"{!}\n", a...)
 }
 
-// printErrorAndExit print error mesage and exit with exit code 1
+// printErrorAndExit print error message and exit with exit code 1
 func printErrorAndExit(f string, a ...interface{}) {
 	printError(f, a...)
 	os.Exit(1)
@@ -288,14 +321,37 @@ func printErrorAndExit(f string, a ...interface{}) {
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
-// showUsage prints usage info
-func showUsage() {
-	genUsage().Render()
+// printCompletion prints completion for given shell
+func printCompletion() int {
+	info := genUsage()
+
+	switch options.GetS(OPT_COMPLETION) {
+	case "bash":
+		fmt.Printf(bash.Generate(info, "perfecto", "spec"))
+	case "fish":
+		fmt.Printf(fish.Generate(info, "perfecto"))
+	case "zsh":
+		fmt.Printf(zsh.Generate(info, optMap, "perfecto", "*.spec"))
+	default:
+		os.Exit(1)
+	}
+
+	return 0
+}
+
+// printMan prints man page
+func printMan() {
+	fmt.Println(
+		man.Generate(
+			genUsage(),
+			genAbout(""),
+		),
+	)
 }
 
 // genUsage generates usage info
 func genUsage() *usage.Info {
-	info := usage.NewInfo("", "file…")
+	info := usage.NewInfo("", "spec…")
 
 	info.AddOption(OPT_ABSOLVE, "Disable some checks by their ID", "id…")
 	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny|short|github|json|xml){!}", "format")
@@ -332,26 +388,8 @@ func genUsage() *usage.Info {
 	return info
 }
 
-// genCompletion generates completion for different shells
-func genCompletion() {
-	info := genUsage()
-
-	switch options.GetS(OPT_COMPLETION) {
-	case "bash":
-		fmt.Printf(bash.Generate(info, "perfecto", "spec"))
-	case "fish":
-		fmt.Printf(fish.Generate(info, "perfecto"))
-	case "zsh":
-		fmt.Printf(zsh.Generate(info, optMap, "perfecto", "*.spec"))
-	default:
-		os.Exit(1)
-	}
-
-	os.Exit(0)
-}
-
-// showAbout shows info about version
-func showAbout() {
+// genAbout generates info about version
+func genAbout(gitRev string) *usage.About {
 	about := &usage.About{
 		App:           APP,
 		Version:       VER,
@@ -362,5 +400,9 @@ func showAbout() {
 		UpdateChecker: usage.UpdateChecker{"essentialkaos/perfecto", update.GitHubChecker},
 	}
 
-	about.Render()
+	if gitRev != "" {
+		about.Build = "git:" + gitRev
+	}
+
+	return about
 }

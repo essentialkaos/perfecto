@@ -1,20 +1,16 @@
 ################################################################################
 
-# rpmbuilder:relative-pack true
-
-################################################################################
-
 %global crc_check pushd ../SOURCES ; sha512sum -c %{SOURCE100} ; popd
 
 ################################################################################
 
-%define  debug_package %{nil}
+%define debug_package  %{nil}
 
 ################################################################################
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         4.0.1
+Version:         4.1.0
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         Apache License, Version 2.0
@@ -26,7 +22,7 @@ Source100:       checksum.sha512
 
 BuildRoot:       %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:   golang >= 1.17
+BuildRequires:   golang >= 1.19
 
 Requires:        rpmlint
 
@@ -45,16 +41,21 @@ Tool for checking perfectly written RPM specs.
 %setup -q
 
 %build
-export GOPATH=$(pwd)
-pushd src/github.com/essentialkaos/%{name}
-  go build -mod vendor -o $GOPATH/%{name} %{name}.go
+if [[ ! -d "%{name}/vendor" ]] ; then
+  echo "This package requires vendored dependencies"
+  exit 1
+fi
+
+pushd %{name}
+  go build %{name}.go
+  cp LICENSE ..
 popd
 
 %install
 rm -rf %{buildroot}
 
 install -dm 755 %{buildroot}%{_bindir}
-install -pm 755 %{name} %{buildroot}%{_bindir}/
+install -pm 755 %{name}/%{name} %{buildroot}%{_bindir}/
 
 %clean
 rm -rf %{buildroot}
@@ -97,6 +98,11 @@ fi
 ################################################################################
 
 %changelog
+* Wed Nov 30 2022 Anton Novojilov <andy@essentialkaos.com> - 4.1.0-1
+- Added verbose version info output
+- Dependencies update
+- Fixed build using sources from source.kaos.st
+
 * Sun Sep 18 2022 Anton Novojilov <andy@essentialkaos.com> - 4.0.1-0
 - Improve PF5 check
 
@@ -147,7 +153,7 @@ fi
 
 * Sat Dec 21 2019 Anton Novojilov <andy@essentialkaos.com> - 3.2.0-0
 - Added printing links to wiki articles about failed checks
-- Improved check for using variables instead of macroses (PF5)
+- Improved check for using variables instead of macros (PF5)
 
 * Fri Dec 13 2019 Anton Novojilov <andy@essentialkaos.com> - 3.1.0-0
 - Added URL check to PF20
@@ -156,7 +162,7 @@ fi
 - Improved all renderers
 - Added check ID to output
 - Added check for checking check scriptlet for using _without_check
-  and _with_check macroses
+  and _with_check macros
 - Added check for single equals symbol in %%if clause
 
 * Sat Oct 26 2019 Anton Novojilov <andy@essentialkaos.com> - 2.5.1-0

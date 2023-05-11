@@ -2,7 +2,7 @@ package check
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 //                                                                                    //
-//                         Copyright (c) 2022 ESSENTIAL KAOS                          //
+//                         Copyright (c) 2023 ESSENTIAL KAOS                          //
 //      Apache License, Version 2.0 <https://www.apache.org/licenses/LICENSE-2.0>     //
 //                                                                                    //
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -61,7 +61,7 @@ var pathMacroSlice = []macro{
 var binariesAsMacro = []string{
 	"7zip", "bzip2", "bzr", "cat", "chgrp", "chmod", "chown", "cp", "cpio",
 	"file", "git", "grep", "gzip", "hg", "id", "install", "ld", "lrzip", "lzip",
-	"mkdir", "mv", "nm", "objcopy", "objdump", "patch", "perl", "python", "quilt",
+	"mkdir", "mv", "nm", "objcopy", "objdump", "patch", "quilt",
 	"rm", "rsh", "sed", "semodule", "ssh", "strip", "tar", "unzip", "xz",
 }
 
@@ -84,7 +84,7 @@ func getCheckers() map[string]Checker {
 		"PF8":  checkForMakeMacro,
 		"PF9":  checkForHeaderTags,
 		"PF10": checkForUnescapedPercent,
-		"PF11": checkForMacroDefenitionPosition,
+		"PF11": checkForMacroDefinitionPosition,
 		"PF12": checkForSeparatorLength,
 		"PF13": checkForDefAttr,
 		"PF14": checkForUselessBinaryMacro,
@@ -189,7 +189,7 @@ func checkForDist(id string, s *spec.Spec) []Alert {
 	return result
 }
 
-// checkForNonMacroPaths checks if standart path not used as macro
+// checkForNonMacroPaths checks if standard path not used as macro
 func checkForNonMacroPaths(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
@@ -248,7 +248,7 @@ func checkForNonMacroPaths(id string, s *spec.Spec) []Alert {
 	return result
 }
 
-// checkForVariables checks for using variables instead of macroses
+// checkForVariables checks for using variables instead of macros
 func checkForVariables(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
@@ -486,8 +486,8 @@ func checkForUnescapedPercent(id string, s *spec.Spec) []Alert {
 
 // codebeat:enable[BLOCK_NESTING]
 
-// checkForMacroDefenitionPosition checks for macro defined after description
-func checkForMacroDefenitionPosition(id string, s *spec.Spec) []Alert {
+// checkForMacroDefinitionPosition checks for macro defined after description
+func checkForMacroDefinitionPosition(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
 		return nil
 	}
@@ -801,7 +801,7 @@ func checkForCheckMacro(id string, s *spec.Spec) []Alert {
 	}
 
 	return []Alert{
-		NewAlert(id, LEVEL_WARNING, "Use %{_without_check} and %{_with_check} macroses for controlling tests execution", emptyLine),
+		NewAlert(id, LEVEL_WARNING, "Use %{_without_check} and %{_with_check} macros for controlling tests execution", emptyLine),
 	}
 }
 
@@ -860,7 +860,7 @@ func checkForUselessSlash(id string, s *spec.Spec) []Alert {
 
 			for _, macro := range pathMacroSlice {
 				if contains(line, "%{buildroot}/"+macro.Name) {
-					desc := fmt.Sprintf("Slash between %%{buildroot} and %s macroses is useless", macro.Name)
+					desc := fmt.Sprintf("Slash between %%{buildroot} and %s macros is useless", macro.Name)
 					result = append(result, NewAlert(id, LEVEL_WARNING, desc, line))
 				}
 			}

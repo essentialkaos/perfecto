@@ -5,7 +5,7 @@
 ################################################################################
 
 Summary:            Test spec for perfecto
-Name:               perfecto-spec
+Name:               perfecto
 Version:            1.0.0
 Release:            0%{?dist}
 Group:              System Environment/Base
@@ -14,10 +14,10 @@ URL:                https://domain.com
 
 BuildRoot:          %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-Source0:            https://domain.com/%{name}-%{version}.tar.gz
+Source0:            https://source.kaos.st/perfecto/%{name}-%{version}.tar.gz
 
 # perfecto:absolve
-Source1:            http://domain.com/%{name}-%{version}.tar.gz
+Source1:            http://source.kaos.st/perfecto/%{name}-%{version}.tar.gz
 
 ################################################################################
 
@@ -32,7 +32,7 @@ Summary:            Test subpackage for perfecto
 Group:              System Environment/Base
 
 %description magic
-Test subpackge for perfecto app.
+Test subpackage for perfecto app.
 
 ################################################################################
 
