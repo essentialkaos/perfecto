@@ -98,7 +98,7 @@ fi
 ################################################################################
 
 %changelog
-* Wed Nov 30 2022 Anton Novojilov <andy@essentialkaos.com> - 4.1.0-1
+* Wed Nov 30 2022 Anton Novojilov <andy@essentialkaos.com> - 4.1.0-0
 - Added verbose version info output
 - Dependencies update
 - Fixed build using sources from source.kaos.st
