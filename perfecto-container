@@ -59,7 +59,7 @@ check() {
   fi
 
   # shellcheck disable=SC2086
-  $engine run --rm $opts -v "$tmp_dir":/perfecto "$image" ${args}
+  $engine run --rm $opts -v "$tmp_dir:/perfecto" "$image" ${args}
 
   status=$?
 
@@ -148,7 +148,7 @@ getImage() {
 # Code: No
 # Echo: Engine name (String)
 getContainerEngine() {
-  if [[ -n "$ENGINE" ]] && hasApp "docker" ; then
+  if [[ -n "$ENGINE" ]] && hasApp "$ENGINE" ; then
     echo "$ENGINE"
     return
   fi
