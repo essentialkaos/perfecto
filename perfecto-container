@@ -123,7 +123,7 @@ processArgs() {
 # Echo: Image name (String)
 getImage() {
   if [[ -n "$IMAGE" ]] ; then
-    if [[ ! $image =~ \: ]] ; then
+    if [[ ! $IMAGE =~ \/ ]] ; then
       echo "$IMAGE_BASE:$IMAGE"
       return
     fi
