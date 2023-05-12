@@ -58,8 +58,6 @@ check() {
     opts="-i -t"
   fi
 
-  echo "$engine run --rm $opts -v \"$tmp_dir\":/perfecto \"$image\" ${args}"
-  
   # shellcheck disable=SC2086
   $engine run --rm $opts -v "$tmp_dir":/perfecto "$image" ${args}
 
@@ -150,12 +148,19 @@ getImage() {
 # Code: No
 # Echo: Engine name (String)
 getContainerEngine() {
+  if [[ -n "$ENGINE" ]] && hasApp "docker" ; then
+    echo "$ENGINE"
+    return
+  fi
+
   if hasApp "docker" ; then
     echo "docker"
+    return
   fi
 
   if hasApp "podman" ; then
     echo "podman"
+    return
   fi
 }
 
