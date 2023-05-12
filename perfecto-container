@@ -57,6 +57,8 @@ check() {
   if [[ -z "$CI" ]] ; then
     opts="-i -t"
   fi
+
+  echo "$engine run --rm $opts -v \"$tmp_dir\":/perfecto \"$image\" ${args}"
   
   # shellcheck disable=SC2086
   $engine run --rm $opts -v "$tmp_dir":/perfecto "$image" ${args}
