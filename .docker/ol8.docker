@@ -37,6 +37,7 @@ COPY --from=builder /go/src/github.com/essentialkaos/perfecto/perfecto /usr/bin/
 RUN dnf -y -q install https://yum.kaos.st/kaos-repo-latest.el8.noarch.rpm && \
     dnf -y -q install oracle-epel-release-el8 && \
     dnf -y -q module disable "*" && \
+    dnf -y -q install @python36 && \
     dnf -y -q install rpmlint && \
     dnf clean all && \
     rm -rf /var/cache/dnf /var/log/dnf.*

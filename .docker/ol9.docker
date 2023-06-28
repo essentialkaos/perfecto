@@ -36,7 +36,7 @@ COPY --from=builder /go/src/github.com/essentialkaos/perfecto/perfecto /usr/bin/
 # hadolint ignore=DL3031,DL3041
 RUN dnf -y -q install https://yum.kaos.st/kaos-repo-latest.el9.noarch.rpm && \
     dnf -y -q install oracle-epel-release-el9 && \
-    dnf -y -q install rpmlint && \
+    dnf -y -q install --enablerepo=ol9_codeready_builder rpmlint && \
     dnf clean all && \
     rm -rf /var/cache/dnf /var/log/dnf.*
 
