@@ -10,7 +10,7 @@
 
 Summary:         Tool for checking perfectly written RPM specs
 Name:            perfecto
-Version:         4.1.0
+Version:         4.1.1
 Release:         0%{?dist}
 Group:           Development/Tools
 License:         Apache License, Version 2.0
@@ -98,6 +98,10 @@ fi
 ################################################################################
 
 %changelog
+* Thu Jun 29 2023 Anton Novojilov <andy@essentialkaos.com> - 4.1.1-0
+- Do not disable colors on CI
+- Dependencies update
+
 * Wed Nov 30 2022 Anton Novojilov <andy@essentialkaos.com> - 4.1.0-0
 - Added verbose version info output
 - Dependencies update
