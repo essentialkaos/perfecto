@@ -35,11 +35,21 @@ Make sure you have a working Go 1.19+ workspace ([instructions](https://go.dev/d
 go install github.com/essentialkaos/perfecto@latest
 ```
 
-#### From [ESSENTIAL KAOS Public Repository](https://yum.kaos.st)
+#### From [ESSENTIAL KAOS Public Repository](https://pkgs.kaos.st)
 
 ```bash
-sudo yum install -y https://yum.kaos.st/kaos-repo-latest.el$(grep 'CPE_NAME' /etc/os-release | tr -d '"' | cut -d':' -f5).noarch.rpm
+sudo yum install -y https://pkgs.kaos.st/kaos-repo-latest.el$(grep 'CPE_NAME' /etc/os-release | tr -d '"' | cut -d':' -f5).noarch.rpm
+
+# EL7 (OracleLinux/CentOS 7)
 sudo yum install perfecto
+
+# EL8 (OracleLinux/Alma/Rocky 8)
+sudo dnf install perfecto
+
+# Alma/Rocky 9
+sudo dnf --enablerepo=crb install perfecto
+# OracleLinux 9
+sudo dnf --enablerepo=ol9_codeready_builder install perfecto
 ```
 
 #### Prebuilt binaries
