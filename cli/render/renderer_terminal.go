@@ -186,7 +186,7 @@ func (r *TerminalRenderer) renderShortReport(report *check.Report) {
 func (r *TerminalRenderer) renderTinyReport(file string, report *check.Report) {
 	specName := strutil.Exclude(path.Base(file), ".spec")
 
-	fmtc.Printf("%24s: ", specName)
+	fmtc.Printf("%24s.spec: ", specName)
 
 	categories := map[uint8][]check.Alert{
 		check.LEVEL_NOTICE:   report.Notices,
