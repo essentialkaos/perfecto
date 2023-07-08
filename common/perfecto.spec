@@ -8,25 +8,25 @@
 
 ################################################################################
 
-Summary:         Tool for checking perfectly written RPM specs
-Name:            perfecto
-Version:         4.1.2
-Release:         0%{?dist}
-Group:           Development/Tools
-License:         Apache License, Version 2.0
-URL:             https://kaos.sh/perfecto
+Summary:        Tool for checking perfectly written RPM specs
+Name:           perfecto
+Version:        4.1.3
+Release:        0%{?dist}
+Group:          Development/Tools
+License:        Apache License, Version 2.0
+URL:            https://kaos.sh/perfecto
 
-Source0:         https://source.kaos.st/%{name}/%{name}-%{version}.tar.bz2
+Source0:        https://source.kaos.st/%{name}/%{name}-%{version}.tar.bz2
 
-Source100:       checksum.sha512
+Source100:      checksum.sha512
 
-BuildRoot:       %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:   golang >= 1.19
+BuildRequires:  golang >= 1.19
 
-Requires:        rpmlint
+Requires:       rpmlint
 
-Provides:        %{name} = %{version}-%{release}
+Provides:       %{name} = %{version}-%{release}
 
 ################################################################################
 
@@ -56,6 +56,10 @@ rm -rf %{buildroot}
 
 install -dm 755 %{buildroot}%{_bindir}
 install -pm 755 %{name}/%{name} %{buildroot}%{_bindir}/
+
+%if 0%{?rhel} >= 8
+install -pDm 644 %{name}/common/perfecto.toml %{buildroot}%{_sysconfdir}/xdg/rpmlint/perfecto.toml
+%endif
 
 %clean
 rm -rf %{buildroot}
@@ -94,10 +98,16 @@ fi
 %defattr(-,root,root,-)
 %doc LICENSE
 %{_bindir}/%{name}
+%if 0%{?rhel} >= 8
+%{_sysconfdir}/xdg/rpmlint/perfecto.toml
+%endif
 
 ################################################################################
 
 %changelog
+* Sun Jul 09 2023 Anton Novojilov <andy@essentialkaos.com> - 4.1.3-0
+- Added custom configuration for rpmlint ≥ 2
+
 * Sat Jul 08 2023 Anton Novojilov <andy@essentialkaos.com> - 4.1.2-0
 - Fixed using colored output on CI
 

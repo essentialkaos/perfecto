@@ -1,0 +1,5 @@
+Filters = [
+  ## Perfecto related configuration
+  # We check without packages, so no files it's okay
+  'sh: .*: No such file or directory',
+]
