@@ -78,7 +78,7 @@ usage() {
   image=$(getImage)
 
   if [[ -z "$CI" ]] ; then
-    opts="-i -t"
+    opts="-i -t -e CI=true"
   fi
 
   # shellcheck disable=SC2086
