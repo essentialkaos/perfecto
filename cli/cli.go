@@ -37,7 +37,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "4.1.1"
+	VER  = "4.1.2"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -159,15 +159,15 @@ func preConfigureUI() {
 		}
 	}
 
-	if os.Getenv("CI") != "" {
-		fmtc.DisableColors = false
-	}
-
 	// Check for output redirect using pipes
 	if fsutil.IsCharacterDevice("/dev/stdin") &&
 		!fsutil.IsCharacterDevice("/dev/stdout") &&
 		os.Getenv("FAKETTY") == "" {
 		fmtc.DisableColors = true
+	}
+
+	if os.Getenv("CI") != "" {
+		fmtc.DisableColors = false
 	}
 
 	if os.Getenv("NO_COLOR") != "" {
