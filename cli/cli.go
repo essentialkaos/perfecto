@@ -135,7 +135,7 @@ func Run(gitRev string, gomod []byte) {
 	case options.GetB(OPT_VERB_VER):
 		support.Print(APP, VER, gitRev, gomod)
 		os.Exit(0)
-	case options.GetB(OPT_HELP) || len(args) == 2:
+	case options.GetB(OPT_HELP) || len(args) == 0:
 		genUsage().Print()
 		os.Exit(0)
 	}
