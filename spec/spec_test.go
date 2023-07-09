@@ -138,12 +138,14 @@ func (s *SpecSuite) TestSourceExtractor(c *C) {
 }
 
 func (s *SpecSuite) TestSkipTag(c *C) {
+	c.Assert(isSkipTag("# perfecto:ignore 3"), Equals, true)
 	c.Assert(isSkipTag("# perfecto:absolve 3"), Equals, true)
 	c.Assert(isSkipTag("# abcd 1"), Equals, false)
 
-	c.Assert(extractSkipCount("# perfecto:absolve"), Equals, 1)
-	c.Assert(extractSkipCount("# perfecto:absolve ABC"), Equals, 0)
-	c.Assert(extractSkipCount("# perfecto:absolve 1"), Equals, 1)
+	c.Assert(extractSkipCount("# perfecto:ignore"), Equals, 1)
+	c.Assert(extractSkipCount("# perfecto:ignore ABC"), Equals, 0)
+	c.Assert(extractSkipCount("# perfecto:ignore 1"), Equals, 1)
+	c.Assert(extractSkipCount("# perfecto:ignore 10"), Equals, 10)
 	c.Assert(extractSkipCount("# perfecto:absolve 10"), Equals, 10)
 }
 

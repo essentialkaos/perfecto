@@ -42,7 +42,7 @@ type Alert struct {
 	Level   uint8     `json:"level"`
 	Info    string    `json:"info"`
 	Line    spec.Line `json:"line"`
-	Absolve bool      `json:"absolve"`
+	Ignored bool      `json:"ignored"`
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -70,7 +70,7 @@ func (r *Report) IsPerfect() bool {
 	return r.Total() == 0
 }
 
-// Total returns total number of alerts (including absolved)
+// Total returns total number of alerts (including ignored)
 func (r *Report) Total() int {
 	return r.Notices.Total() +
 		r.Warnings.Total() +
@@ -78,12 +78,12 @@ func (r *Report) Total() int {
 		r.Criticals.Total()
 }
 
-// Absolved returns number of absolved (skipped) alerts
-func (r *Report) Absolved() int {
-	return r.Notices.Absolved() +
-		r.Warnings.Absolved() +
-		r.Errors.Absolved() +
-		r.Criticals.Absolved()
+// Ignored returns number of ignored (skipped) alerts
+func (r *Report) Ignored() int {
+	return r.Notices.Ignored() +
+		r.Warnings.Ignored() +
+		r.Errors.Ignored() +
+		r.Criticals.Ignored()
 }
 
 // IDs returns slice with all mentioned checks ID's
@@ -127,10 +127,10 @@ func (r *Report) IDs() []string {
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
-// HasAlerts returns true if alerts contains at least one non-absolved alert
+// HasAlerts returns true if alerts contains at least one non-ignored alert
 func (a Alerts) HasAlerts() bool {
 	for _, alert := range a {
-		if alert.Absolve {
+		if alert.Ignored {
 			continue
 		}
 
@@ -140,17 +140,17 @@ func (a Alerts) HasAlerts() bool {
 	return false
 }
 
-// Absolved returns total number of alerts
+// Total returns total number of alerts
 func (a Alerts) Total() int {
 	return len(a)
 }
 
-// Absolved returns number of absolved (skipped) alerts
-func (a Alerts) Absolved() int {
+// Ignored returns number of ignored (skipped) alerts
+func (a Alerts) Ignored() int {
 	var counter int
 
 	for _, alert := range a {
-		if alert.Absolve {
+		if alert.Ignored {
 			counter++
 		}
 	}
@@ -161,7 +161,7 @@ func (a Alerts) Absolved() int {
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // Check check spec
-func Check(s *spec.Spec, lint bool, linterConfig string, absolved []string) *Report {
+func Check(s *spec.Spec, lint bool, linterConfig string, ignored []string) *Report {
 	report := &Report{}
 	checkers := getCheckers()
 
@@ -177,11 +177,11 @@ func Check(s *spec.Spec, lint bool, linterConfig string, absolved []string) *Rep
 			continue
 		}
 
-		absolve := sliceutil.Contains(absolved, id)
+		ignore := sliceutil.Contains(ignored, id)
 
 		for _, alert := range alerts {
-			if absolve || alert.Line.Skip {
-				alert.Absolve = true
+			if ignore || alert.Line.Skip {
+				alert.Ignored = true
 			}
 
 			switch alert.Level {

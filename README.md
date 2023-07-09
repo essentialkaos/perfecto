@@ -126,7 +126,7 @@ Usage: perfecto {options} file…
 
 Options
 
-  --absolve, -A id…          Disable some checks by their ID
+  --ignore, -I id…           Disable one or more checks by their ID
   --format, -f format        Output format (summary|tiny|short|github|json|xml)
   --lint-config, -c file     Path to RPMLint configuration file
   --error-level, -e level    Return non-zero exit code if alert level greater than given (notice|warning|error|critical)

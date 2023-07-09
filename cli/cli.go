@@ -37,7 +37,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "4.1.4"
+	VER  = "5.0.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -46,7 +46,7 @@ const (
 	OPT_FORMAT      = "f:format"
 	OPT_LINT_CONFIG = "c:lint-config"
 	OPT_ERROR_LEVEL = "e:error-level"
-	OPT_ABSOLVE     = "A:absolve"
+	OPT_IGNORE      = "I:ignore"
 	OPT_QUIET       = "q:quiet"
 	OPT_NO_LINT     = "nl:no-lint"
 	OPT_NO_COLOR    = "nc:no-color"
@@ -81,7 +81,7 @@ const (
 
 // optMap is map with all supported options
 var optMap = options.Map{
-	OPT_ABSOLVE:     {Mergeble: true},
+	OPT_IGNORE:      {Mergeble: true, Alias: "A:absolve"},
 	OPT_FORMAT:      {},
 	OPT_LINT_CONFIG: {},
 	OPT_ERROR_LEVEL: {},
@@ -215,7 +215,7 @@ func checkSpec(file, format string) int {
 	report := check.Check(
 		s, !options.GetB(OPT_NO_LINT),
 		options.GetS(OPT_LINT_CONFIG),
-		strings.Split(options.GetS(OPT_ABSOLVE), ","),
+		strings.Split(options.GetS(OPT_IGNORE), ","),
 	)
 
 	if report.IsPerfect() {
@@ -359,7 +359,7 @@ func printMan() {
 func genUsage() *usage.Info {
 	info := usage.NewInfo("", "spec…")
 
-	info.AddOption(OPT_ABSOLVE, "Disable some checks by their ID", "id…")
+	info.AddOption(OPT_IGNORE, "Disable one or more checks by their ID", "id…")
 	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny|short|github|json|xml){!}", "format")
 	info.AddOption(OPT_LINT_CONFIG, "Path to RPMLint configuration file", "file")
 	info.AddOption(OPT_ERROR_LEVEL, "Return non-zero exit code if alert level greater than given {s-}(notice|warning|error|critical){!}", "level")

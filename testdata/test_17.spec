@@ -16,7 +16,7 @@ BuildRoot:          %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -
 
 Source0:            https://domain.com/%{name}-%{version}.tar.gz
 
-# perfecto:absolve
+# perfecto:ignore
 Source1:            http://domain.com/%{name}-%{version}.tar.gz
 
 ################################################################################
@@ -48,7 +48,7 @@ rm -rf %{buildroot}
 %{make_install} PREFIX=%{buildroot}%{_prefix}
 
 %clean
-# perfecto:absolve 2
+# perfecto:ignore 2
 rm -rf %{buildroot}
 
 %check

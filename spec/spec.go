@@ -475,7 +475,8 @@ func isSpec(spec *Spec) bool {
 
 // isSkipTag returns true if text contains skip tag
 func isSkipTag(text string) bool {
-	return strings.Contains(text, "perfecto:absolve")
+	return strings.Contains(text, "perfecto:absolve") ||
+		strings.Contains(text, "perfecto:ignore")
 }
 
 // extractSkipCount returns number of lines to skip
