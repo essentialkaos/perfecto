@@ -106,6 +106,7 @@ fi
 
 %changelog
 * Mon Jul 10 2023 Anton Novojilov <andy@essentialkaos.com> - 5.0.0-0
+- -A/--absolve option renamed to -I/--ignore
 - 'absolve' directive renamed to 'ignore'
 - Apply 'ignore' directive to rpmlint alerts
 
