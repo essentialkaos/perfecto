@@ -56,6 +56,8 @@ check() {
 
   if [[ -z "$CI" ]] ; then
     opts="-i -t"
+  else
+    opts="-e CI=true"
   fi
 
   # shellcheck disable=SC2086
@@ -79,6 +81,8 @@ usage() {
 
   if [[ -z "$CI" ]] ; then
     opts="-i -t"
+  else
+    opts="-e CI=true"
   fi
 
   # shellcheck disable=SC2086

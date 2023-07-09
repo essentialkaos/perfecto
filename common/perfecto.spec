@@ -10,7 +10,7 @@
 
 Summary:        Tool for checking perfectly written RPM specs
 Name:           perfecto
-Version:        4.1.3
+Version:        4.1.4
 Release:        0%{?dist}
 Group:          Development/Tools
 License:        Apache License, Version 2.0
@@ -105,6 +105,10 @@ fi
 ################################################################################
 
 %changelog
+* Sun Jul 09 2023 Anton Novojilov <andy@essentialkaos.com> - 4.1.4-0
+- Fixed bug with printing help content if no specs provided
+- Fixed bug in terminal render with printing spec name with problems
+
 * Sun Jul 09 2023 Anton Novojilov <andy@essentialkaos.com> - 4.1.3-0
 - Added custom configuration for rpmlint ≥ 2
 
