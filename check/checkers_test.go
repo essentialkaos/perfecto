@@ -580,6 +580,10 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 	c.Assert(a.Line.Index, chk.Equals, 67)
 	alerts = append(alerts, a)
 
+	a, ok = parseAlertLine("test.spec:68: W: macro-in-%changelog %record", s)
+	a.Line.Skip = true
+	alerts = append(alerts, a)
+
 	a, ok = parseAlertLine("test.spec: E: specfile-error error: line A: Unknown tag: Release1", s)
 
 	c.Assert(ok, chk.Equals, false)
