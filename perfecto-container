@@ -55,7 +55,9 @@ check() {
   args=$(processArgs "$tmp_dir" "$@")
 
   if [[ -z "$CI" ]] ; then
-    opts="-i -t -e CI=true"
+    opts="-i -t"
+  else
+    opts="-e CI=true"
   fi
 
   # shellcheck disable=SC2086
@@ -78,7 +80,9 @@ usage() {
   image=$(getImage)
 
   if [[ -z "$CI" ]] ; then
-    opts="-i -t -e CI=true"
+    opts="-i -t"
+  else
+    opts="-e CI=true"
   fi
 
   # shellcheck disable=SC2086
