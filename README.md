@@ -122,7 +122,7 @@ Additional information about action configuration can be found on [the official 
 ### Usage
 
 ```
-Usage: perfecto {options} file…
+Usage: perfecto {options} spec…
 
 Options
 
@@ -143,6 +143,9 @@ Examples
 
   perfecto --no-lint app.spec
   Check spec without rpmlint and print extended report
+
+  perfecto --ignore PF2,PF12 app.spec
+  Check spec without PF2 and PF12 checks
 
   perfecto --format tiny app.spec
   Check spec and print tiny report

@@ -377,6 +377,11 @@ func genUsage() *usage.Info {
 	)
 
 	info.AddExample(
+		"--ignore PF2,PF12 app.spec",
+		"Check spec without PF2 and PF12 checks",
+	)
+
+	info.AddExample(
 		"--format tiny app.spec",
 		"Check spec and print tiny report",
 	)
