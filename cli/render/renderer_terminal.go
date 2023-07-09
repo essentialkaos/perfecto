@@ -104,9 +104,11 @@ func (r *TerminalRenderer) Report(file string, report *check.Report) error {
 
 // Perfect renders message about perfect spec
 func (r *TerminalRenderer) Perfect(file string) {
+	specName := strutil.Exclude(path.Base(file), ".spec")
+
 	switch r.Format {
 	case "tiny":
-		fmtc.Printf("%24s: {g}✔ {!}\n", file)
+		fmtc.Printf("%24s: {g}✔ {!}\n", specName)
 	default:
 		fmtc.Println("{g}This spec is perfect!{!}")
 	}
@@ -114,9 +116,11 @@ func (r *TerminalRenderer) Perfect(file string) {
 
 // Error renders global error message
 func (r *TerminalRenderer) Error(file string, err error) {
+	specName := strutil.Exclude(path.Base(file), ".spec")
+
 	switch r.Format {
 	case "tiny":
-		fmtc.Printf("%24s: {r}✖ ERROR: %v{!}\n", file, err)
+		fmtc.Printf("%24s: {r}✖ ERROR: %v{!}\n", specName, err)
 	default:
 		fmtc.Fprintf(os.Stderr, "{r}%v{!}\n", err)
 	}
@@ -184,7 +188,9 @@ func (r *TerminalRenderer) renderShortReport(report *check.Report) {
 
 // renderTinyReport prints tiny report (useful for mass check)
 func (r *TerminalRenderer) renderTinyReport(file string, report *check.Report) {
-	fmtc.Printf("%24s: ", path.Base(file))
+	specName := strutil.Exclude(path.Base(file), ".spec")
+
+	fmtc.Printf("%24s.spec: ", specName)
 
 	categories := map[uint8][]check.Alert{
 		check.LEVEL_NOTICE:   report.Notices,
