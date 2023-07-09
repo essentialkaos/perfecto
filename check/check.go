@@ -214,6 +214,10 @@ func appendLinterAlerts(r *Report, alerts []Alert) {
 	}
 
 	for _, alert := range alerts {
+		if alert.Line.Skip {
+			continue
+		}
+
 		switch alert.Level {
 		case LEVEL_ERROR:
 			r.Errors = append(r.Errors, alert)
