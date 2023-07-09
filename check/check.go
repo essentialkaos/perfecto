@@ -50,11 +50,9 @@ type Alert struct {
 // Alerts is slice with alerts
 type Alerts []Alert
 
-func (s Alerts) Len() int      { return len(s) }
-func (s Alerts) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
-func (s Alerts) Less(i, j int) bool {
-	return s[i].Line.Index < s[j].Line.Index
-}
+func (s Alerts) Len() int           { return len(s) }
+func (s Alerts) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+func (s Alerts) Less(i, j int) bool { return s[i].Line.Index < s[j].Line.Index }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
