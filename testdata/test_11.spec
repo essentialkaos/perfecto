@@ -12,7 +12,7 @@ BuildRoot:          %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -
 
 Source0:            http://kaos.st/%{name}-%{version}-1.tar.gz
 
-# perfecto:absolve
+# perfecto:ignore
 Source1:            http://kaos.st/%{name}-%{version}-2.tar.gz
 Source2:            http://kaos.st/%{name}-%{version}-3.tar.gz
 Source3:            %{name}-%{version}-3.tar.gz

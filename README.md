@@ -122,11 +122,11 @@ Additional information about action configuration can be found on [the official 
 ### Usage
 
 ```
-Usage: perfecto {options} file…
+Usage: perfecto {options} spec…
 
 Options
 
-  --absolve, -A id…          Disable some checks by their ID
+  --ignore, -I id…           Disable one or more checks by their ID
   --format, -f format        Output format (summary|tiny|short|github|json|xml)
   --lint-config, -c file     Path to RPMLint configuration file
   --error-level, -e level    Return non-zero exit code if alert level greater than given (notice|warning|error|critical)
@@ -143,6 +143,9 @@ Examples
 
   perfecto --no-lint app.spec
   Check spec without rpmlint and print extended report
+
+  perfecto --ignore PF2,PF12 app.spec
+  Check spec without PF2 and PF12 checks
 
   perfecto --format tiny app.spec
   Check spec and print tiny report

@@ -215,13 +215,13 @@ func (r *TerminalRenderer) renderTinyReport(file string, report *check.Report) {
 
 		for _, alert := range alerts {
 			if fmtc.DisableColors {
-				if alert.Absolve {
+				if alert.Ignored {
 					fmtc.Printf("X ")
 				} else {
 					fmtc.Printf(r.fallbackLevel[level] + " ")
 				}
 			} else {
-				if alert.Absolve {
+				if alert.Ignored {
 					fmtc.Printf("{s-}%s{!}", "•")
 				} else {
 					fmtc.Printf(r.fgColor[level]+"%s{!}", "•")
@@ -265,7 +265,7 @@ func (r *TerminalRenderer) renderAlert(alert check.Alert) {
 	hl := r.hlColor[alert.Level]
 	lc := fg
 
-	if alert.Absolve {
+	if alert.Ignored {
 		fg = "{s}"
 		hl = "{s*}"
 	}
@@ -278,7 +278,7 @@ func (r *TerminalRenderer) renderAlert(alert check.Alert) {
 		fmtc.Printf(hl + "[global]{!} ")
 	}
 
-	if alert.Absolve {
+	if alert.Ignored {
 		fmtc.Printf("{s}[A]{!} ")
 	}
 
@@ -340,7 +340,7 @@ func (r *TerminalRenderer) renderSummary(report *check.Report) {
 			continue
 		}
 
-		total, absolved := report.Total(), report.Absolved()
+		total, absolved := report.Total(), report.Ignored()
 		actual := total - absolved
 
 		if absolved != 0 {
@@ -379,7 +379,7 @@ func (r *TerminalRenderer) renderShortAlert(alert check.Alert) {
 		fmtc.Printf(hl + "[global]{!} ")
 	}
 
-	if alert.Absolve {
+	if alert.Ignored {
 		fmtc.Printf("{s}[A]{!} ")
 	}
 

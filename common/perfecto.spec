@@ -10,7 +10,7 @@
 
 Summary:        Tool for checking perfectly written RPM specs
 Name:           perfecto
-Version:        4.1.4
+Version:        5.0.0
 Release:        0%{?dist}
 Group:          Development/Tools
 License:        Apache License, Version 2.0
@@ -105,6 +105,11 @@ fi
 ################################################################################
 
 %changelog
+* Mon Jul 10 2023 Anton Novojilov <andy@essentialkaos.com> - 5.0.0-0
+- -A/--absolve option renamed to -I/--ignore
+- 'absolve' directive renamed to 'ignore'
+- Apply 'ignore' directive to rpmlint alerts
+
 * Sun Jul 09 2023 Anton Novojilov <andy@essentialkaos.com> - 4.1.4-0
 - Fixed bug with printing help content if no specs provided
 - Fixed bug in terminal render with printing spec name with problems

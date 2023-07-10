@@ -52,7 +52,7 @@ do
 done
 
 %clean
-# perfecto:absolve 2
+# perfecto:ignore 2
 rm -rf %{buildroot}
 
 %post

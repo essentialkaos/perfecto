@@ -40,7 +40,7 @@ rm -rf $RPM_BUILD_ROOT
 %{make_install} PREFIX=%{buildroot}%{_prefix}
 
 %clean
-# perfecto:absolve 2
+# perfecto:ignore 2
 rm -rf %{buildroot}
 
 %post
