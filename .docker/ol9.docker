@@ -40,6 +40,8 @@ RUN dnf -y -q install https://yum.kaos.st/kaos-repo-latest.el9.noarch.rpm && \
     dnf clean all && \
     rm -rf /var/cache/dnf /var/log/dnf.*
 
+COPY common/perfecto.toml /etc/xdg/rpmlint/perfecto.toml
+
 VOLUME /perfecto
 WORKDIR /perfecto
 
