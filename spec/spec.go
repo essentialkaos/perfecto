@@ -53,9 +53,8 @@ const (
 
 // Spec spec contains data from spec file
 type Spec struct {
-	File    string   `json:"file"`
-	Data    []Line   `json:"data"`
-	Targets []string `json:"target"`
+	File string `json:"file"`
+	Data []Line `json:"data"`
 }
 
 // Line contains line data and index
@@ -148,7 +147,7 @@ var sectionRegex = regexp.MustCompile(`^%(prep|setup|build|install|check|clean|f
 
 // Read read and parse rpm spec file
 func Read(file string) (*Spec, error) {
-	err := checkFile(file)
+	err := fsutil.ValidatePerms("FRS", file)
 
 	if err != nil {
 		return nil, err
@@ -262,31 +261,10 @@ LOOP:
 	}
 
 	if !isSpec(spec) {
-		return nil, fmt.Errorf("File %s is not a spec file", file)
+		return nil, fmt.Errorf("File %s is not a spec file or it is misformatted", file)
 	}
 
 	return spec, nil
-}
-
-// checkFile checks file for errors
-func checkFile(file string) error {
-	if !fsutil.IsExist(file) {
-		return fmt.Errorf("File %s doesn't exist", file)
-	}
-
-	if !fsutil.IsRegular(file) {
-		return fmt.Errorf("%s isn't a regular file", file)
-	}
-
-	if !fsutil.IsReadable(file) {
-		return fmt.Errorf("File %s isn't readable", file)
-	}
-
-	if !fsutil.IsNonEmpty(file) {
-		return fmt.Errorf("File %s is empty", file)
-	}
-
-	return nil
 }
 
 // hasSection returns true if spec contains given section
