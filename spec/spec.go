@@ -45,19 +45,24 @@ const (
 	SECTION_VERIFYSCRIPT  = "verifyscript"
 )
 
+const (
+	DIRECTIVE_IGNORE = "perfecto:ignore"
+)
+
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // Spec spec contains data from spec file
 type Spec struct {
-	File string `json:"file"`
-	Data []Line `json:"data"`
+	File    string   `json:"file"`
+	Data    []Line   `json:"data"`
+	Targets []string `json:"target"`
 }
 
 // Line contains line data and index
 type Line struct {
-	Index int    `json:"index"`
-	Text  string `json:"text"`
-	Skip  bool   `json:"skip"`
+	Index  int    `json:"index"`
+	Text   string `json:"text"`
+	Ignore bool   `json:"ignore"`
 }
 
 // Header header contains header info and data
@@ -226,7 +231,7 @@ func readFile(file string) (*Spec, error) {
 
 	defer fd.Close()
 
-	line, skip := 1, 0
+	line, ignore := 1, 0
 	spec := &Spec{File: file}
 	r := bufio.NewReader(fd)
 
@@ -235,21 +240,22 @@ LOOP:
 		text, err := r.ReadString('\n')
 
 		if err != nil {
-			spec.Data = append(spec.Data, Line{line, text, skip != 0})
+			spec.Data = append(spec.Data, Line{line, text, ignore != 0})
 			break LOOP
 		}
 
 		text = strings.TrimRight(text, "\r\n")
 
-		if isSkipTag(text) {
-			skip = extractSkipCount(text)
-			skip++
+		switch {
+		case isIgnoreDirective(text):
+			ignore = extractIgnoreCount(text)
+			ignore++
 		}
 
-		spec.Data = append(spec.Data, Line{line, text, skip != 0})
+		spec.Data = append(spec.Data, Line{line, text, ignore != 0})
 
-		if skip != 0 {
-			skip--
+		if ignore != 0 {
+			ignore--
 		}
 
 		line++
@@ -372,7 +378,7 @@ func extractSources(s *Spec) []Line {
 	var result []Line
 
 	for _, line := range s.Data {
-		if line.Skip {
+		if line.Ignore {
 			continue
 		}
 
@@ -473,14 +479,27 @@ func isSpec(spec *Spec) bool {
 	return count >= 3
 }
 
-// isSkipTag returns true if text contains skip tag
-func isSkipTag(text string) bool {
-	return strings.Contains(text, "perfecto:absolve") ||
-		strings.Contains(text, "perfecto:ignore")
+// getSectionRegexp creates new regex struct and cache it
+func getSectionRegexp(section string) *regexp.Regexp {
+	_, exist := regexpCache[section]
+
+	if exist {
+		return regexpCache[section]
+	}
+
+	regexpCache[section] = regexp.MustCompile(`^%` + section + `($| )`)
+
+	return regexpCache[section]
 }
 
-// extractSkipCount returns number of lines to skip
-func extractSkipCount(text string) int {
+// isIgnoreDirective returns true if text contains ignore directive
+func isIgnoreDirective(text string) bool {
+	return strings.Contains(text, DIRECTIVE_IGNORE) ||
+		strings.Contains(text, "perfecto:absolve")
+}
+
+// extractIgnoreCount returns number of lines to skip
+func extractIgnoreCount(text string) int {
 	count := strutil.ReadField(text, 2, true)
 
 	if count == "" {
@@ -494,17 +513,4 @@ func extractSkipCount(text string) int {
 	}
 
 	return countInt
-}
-
-// getSectionRegexp creates new regex struct and cache it
-func getSectionRegexp(section string) *regexp.Regexp {
-	_, exist := regexpCache[section]
-
-	if exist {
-		return regexpCache[section]
-	}
-
-	regexpCache[section] = regexp.MustCompile(`^%` + section + `($| )`)
-
-	return regexpCache[section]
 }

@@ -74,7 +74,7 @@ func (r *XMLRenderer) renderAlertsAsXML(category string, alerts []check.Alert) {
 		if alert.Line.Index != -1 {
 			fmt.Printf(
 				"      <line index=\"%d\" skip=\"%t\">%s</line>\n",
-				alert.Line.Index, alert.Line.Skip,
+				alert.Line.Index, alert.Line.Ignore,
 				r.escapeStringForXML(alert.Line.Text),
 			)
 		}

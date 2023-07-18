@@ -178,7 +178,7 @@ func Check(s *spec.Spec, lint bool, linterConfig string, ignored []string) *Repo
 		ignore := sliceutil.Contains(ignored, id)
 
 		for _, alert := range alerts {
-			if ignore || alert.Line.Skip {
+			if ignore || alert.Line.Ignore {
 				alert.Ignored = true
 			}
 
@@ -212,7 +212,7 @@ func appendLinterAlerts(r *Report, alerts []Alert) {
 	}
 
 	for _, alert := range alerts {
-		if alert.Line.Skip {
+		if alert.Line.Ignore {
 			continue
 		}
 

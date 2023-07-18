@@ -117,12 +117,12 @@ func checkForUselessSpaces(id string, s *spec.Spec) []Alert {
 	for _, line := range s.Data {
 		if contains(line, " ") {
 			if strings.TrimSpace(line.Text) == "" {
-				impLine := spec.Line{line.Index, strings.Replace(line.Text, " ", "▒", -1), line.Skip}
+				impLine := spec.Line{line.Index, strings.Replace(line.Text, " ", "▒", -1), line.Ignore}
 				result = append(result, NewAlert(id, LEVEL_NOTICE, "Line contains useless spaces", impLine))
 			} else if strings.TrimRight(line.Text, " ") != line.Text {
 				cleanLine := strings.TrimRight(line.Text, " ")
 				spaces := len(line.Text) - len(cleanLine)
-				impLine := spec.Line{line.Index, cleanLine + strings.Repeat("▒", spaces), line.Skip}
+				impLine := spec.Line{line.Index, cleanLine + strings.Repeat("▒", spaces), line.Ignore}
 				result = append(result, NewAlert(id, LEVEL_NOTICE, "Line contains spaces at the end of line", impLine))
 			}
 		}
