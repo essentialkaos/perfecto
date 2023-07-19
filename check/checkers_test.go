@@ -508,6 +508,7 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 	r := Check(s, true, "", nil)
 
 	c.Assert(r, chk.NotNil)
+	c.Assert(r.Total(), chk.Equals, 0)
 	c.Assert(r.IsPerfect, chk.Equals, true)
 	c.Assert(r.IDs(), chk.HasLen, 0)
 
