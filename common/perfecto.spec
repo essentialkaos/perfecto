@@ -10,7 +10,7 @@
 
 Summary:        Tool for checking perfectly written RPM specs
 Name:           perfecto
-Version:        5.0.0
+Version:        6.0.0
 Release:        0%{?dist}
 Group:          Development/Tools
 License:        Apache License, Version 2.0
@@ -105,6 +105,15 @@ fi
 ################################################################################
 
 %changelog
+* Thu Jul 20 2023 Anton Novojilov <andy@essentialkaos.com> - 6.0.0-0
+- Added 'target' directive
+- Improved XML render
+- Improved JSON render
+- Improved github render
+- Improved terminal render
+- Added extra info to report for XML and JSON renders
+- Code refactoring
+
 * Mon Jul 10 2023 Anton Novojilov <andy@essentialkaos.com> - 5.0.0-0
 - -A/--absolve option renamed to -I/--ignore
 - 'absolve' directive renamed to 'ignore'
