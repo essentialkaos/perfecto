@@ -11,6 +11,8 @@ import (
 	"fmt"
 
 	"github.com/essentialkaos/ek/v12/fmtc"
+	"github.com/essentialkaos/ek/v12/path"
+	"github.com/essentialkaos/ek/v12/strutil"
 
 	"github.com/essentialkaos/perfecto/check"
 )
@@ -23,7 +25,7 @@ type GithubRenderer struct{}
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // Report renders alerts from perfecto report
-func (r *GithubRenderer) Report(file string, report *check.Report) error {
+func (r *GithubRenderer) Report(file string, report *check.Report) {
 	if report.Notices.Total() != 0 {
 		r.renderActionAlerts("notice", file, report.Notices)
 	}
@@ -39,13 +41,18 @@ func (r *GithubRenderer) Report(file string, report *check.Report) error {
 	if report.Criticals.Total() != 0 {
 		r.renderActionAlerts("error", file, report.Criticals)
 	}
-
-	return nil
 }
 
 // Perfect renders message about perfect spec
-func (r *GithubRenderer) Perfect(file string) {
-	fmtc.Println("{g}This spec is perfect!{!}")
+func (r *GithubRenderer) Perfect(file string, report *check.Report) {
+	specName := strutil.Exclude(path.Base(file), ".spec")
+	fmtc.Printf("{g}%s.spec is perfect!{!}\n", specName)
+}
+
+// Skipped renders message about skipped check
+func (r *GithubRenderer) Skipped(file string, report *check.Report) {
+	specName := strutil.Exclude(path.Base(file), ".spec")
+	fmtc.Printf("{s}%s.spec check skipped due to non-applicable target{!}\n", specName)
 }
 
 // Error renders global error message

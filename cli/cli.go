@@ -37,7 +37,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "5.1.0"
+	VER  = "6.0.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -204,6 +204,8 @@ func process(files options.Arguments) {
 
 // checkSpec check spec file
 func checkSpec(file, format string) int {
+	var ignoreChecks []string
+
 	rnd := getRenderer(format)
 	s, err := spec.Read(file)
 
@@ -212,26 +214,30 @@ func checkSpec(file, format string) int {
 		return 1
 	}
 
+	if options.Has(OPT_IGNORE) {
+		ignoreChecks = strings.Split(options.GetS(OPT_IGNORE), ",")
+	}
+
 	report := check.Check(
 		s, !options.GetB(OPT_NO_LINT),
 		options.GetS(OPT_LINT_CONFIG),
-		strings.Split(options.GetS(OPT_IGNORE), ","),
+		ignoreChecks,
 	)
 
-	if report.IsPerfect() {
+	switch {
+	case report.IsSkipped:
 		if !options.GetB(OPT_QUIET) {
-			rnd.Perfect(file)
+			rnd.Skipped(file, report)
 		}
-
+		return 0
+	case report.IsPerfect():
+		if !options.GetB(OPT_QUIET) {
+			rnd.Perfect(file, report)
+		}
 		return 0
 	}
 
-	err = rnd.Report(file, report)
-
-	if err != nil {
-		printError(err.Error())
-		return 1
-	}
+	rnd.Report(file, report)
 
 	return getExitCode(report)
 }

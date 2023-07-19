@@ -528,7 +528,7 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 
 	c.Assert(r, chk.NotNil)
 	c.Assert(r.Warnings, chk.HasLen, 3)
-	c.Assert(r.Warnings[0].Ignored, chk.Equals, true)
+	c.Assert(r.Warnings[0].IsIgnored, chk.Equals, true)
 
 	rpmLintBin = "echo"
 	s = &spec.Spec{File: ""}
@@ -581,7 +581,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 	alerts = append(alerts, a)
 
 	a, ok = parseAlertLine("test.spec:68: W: macro-in-%changelog %record", s)
-	a.Line.Skip = true
+	a.Line.Ignore = true
 	alerts = append(alerts, a)
 
 	a, ok = parseAlertLine("test.spec: E: specfile-error error: line A: Unknown tag: Release1", s)
@@ -617,7 +617,7 @@ func (sc *CheckSuite) TestAux(c *chk.C) {
 		Notices:   []Alert{Alert{}},
 		Warnings:  []Alert{Alert{ID: "PF0"}},
 		Errors:    []Alert{Alert{ID: "PF0"}},
-		Criticals: []Alert{Alert{ID: "PF0", Ignored: true}},
+		Criticals: []Alert{Alert{ID: "PF0", IsIgnored: true}},
 	}
 
 	c.Assert(r.IDs(), chk.HasLen, 1)
@@ -633,7 +633,7 @@ func (sc *CheckSuite) TestAux(c *chk.C) {
 	c.Assert(a.HasAlerts(), chk.Equals, false)
 	a = Alerts{Alert{}}
 	c.Assert(a.HasAlerts(), chk.Equals, true)
-	a = Alerts{Alert{Ignored: true}}
+	a = Alerts{Alert{IsIgnored: true}}
 	c.Assert(a.HasAlerts(), chk.Equals, false)
 
 	al, _ := parseAlertLine("../testdata/test_7.spec: E: specfile-error warning: some error", &spec.Spec{})

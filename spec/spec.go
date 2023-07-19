@@ -47,14 +47,16 @@ const (
 
 const (
 	DIRECTIVE_IGNORE = "perfecto:ignore"
+	DIRECTIVE_TARGET = "perfecto:target"
 )
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // Spec spec contains data from spec file
 type Spec struct {
-	File string `json:"file"`
-	Data []Line `json:"data"`
+	File    string   `json:"file"`
+	Data    []Line   `json:"data"`
+	Targets []string `json:"targets"`
 }
 
 // Line contains line data and index
@@ -246,9 +248,13 @@ LOOP:
 		text = strings.TrimRight(text, "\r\n")
 
 		switch {
-		case isIgnoreDirective(text):
+		case strings.Contains(text, DIRECTIVE_IGNORE),
+			strings.Contains(text, "perfecto:absolve"):
 			ignore = extractIgnoreCount(text)
 			ignore++
+		case strings.Contains(text, DIRECTIVE_TARGET):
+			spec.Targets = extractTargets(text)
+			continue
 		}
 
 		spec.Data = append(spec.Data, Line{line, text, ignore != 0})
@@ -470,13 +476,7 @@ func getSectionRegexp(section string) *regexp.Regexp {
 	return regexpCache[section]
 }
 
-// isIgnoreDirective returns true if text contains ignore directive
-func isIgnoreDirective(text string) bool {
-	return strings.Contains(text, DIRECTIVE_IGNORE) ||
-		strings.Contains(text, "perfecto:absolve")
-}
-
-// extractIgnoreCount returns number of lines to skip
+// extractIgnoreCount extracts number of lines to ignore from directive
 func extractIgnoreCount(text string) int {
 	count := strutil.ReadField(text, 2, true)
 
@@ -491,4 +491,21 @@ func extractIgnoreCount(text string) int {
 	}
 
 	return countInt
+}
+
+// extractTargets extracts targets from directive
+func extractTargets(text string) []string {
+	var result []string
+
+	for i := 2; i < 32; i++ {
+		target := strutil.ReadField(text, i, true, " ", ",")
+
+		if target == "" {
+			break
+		}
+
+		result = append(result, strings.ToLower(target))
+	}
+
+	return result
 }

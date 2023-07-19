@@ -38,7 +38,7 @@ type TerminalRenderer struct {
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // Report renders alerts from perfecto report
-func (r *TerminalRenderer) Report(file string, report *check.Report) error {
+func (r *TerminalRenderer) Report(file string, report *check.Report) {
 	r.levelsPrefixes = map[uint8]string{
 		check.LEVEL_NOTICE:   "<N>",
 		check.LEVEL_WARNING:  "<W>",
@@ -98,19 +98,29 @@ func (r *TerminalRenderer) Report(file string, report *check.Report) error {
 	default:
 		r.renderFull(report)
 	}
-
-	return nil
 }
 
 // Perfect renders message about perfect spec
-func (r *TerminalRenderer) Perfect(file string) {
+func (r *TerminalRenderer) Perfect(file string, report *check.Report) {
 	specName := strutil.Exclude(path.Base(file), ".spec")
 
 	switch r.Format {
 	case "tiny":
 		fmtc.Printf("%24s{s}:{!} {g}✔ {!}\n", specName)
 	default:
-		fmtc.Println("{g}This spec is perfect!{!}")
+		fmtc.Printf("{g}{*}%s.spec{!*} is perfect!{!}\n", specName)
+	}
+}
+
+// Skipped renders message about skipped check
+func (r *TerminalRenderer) Skipped(file string, report *check.Report) {
+	specName := strutil.Exclude(path.Base(file), ".spec")
+
+	switch r.Format {
+	case "tiny":
+		fmtc.Printf("%24s{s}:{!} {s}—{!}\n", specName)
+	default:
+		fmtc.Printf("{s}{*}%s.spec{!*} check skipped due to non-applicable target{!}\n", specName)
 	}
 }
 
@@ -120,7 +130,7 @@ func (r *TerminalRenderer) Error(file string, err error) {
 
 	switch r.Format {
 	case "tiny":
-		fmtc.Printf("%24s{s}:{!} {r}✖ ERROR: %v{!}\n", specName, err)
+		fmtc.Printf("%24s{s}:{!} {r}✖ (%v){!}\n", specName, err)
 	default:
 		fmtc.Fprintf(os.Stderr, "{r}%v{!}\n", err)
 	}
@@ -215,13 +225,13 @@ func (r *TerminalRenderer) renderTinyReport(file string, report *check.Report) {
 
 		for _, alert := range alerts {
 			if fmtc.DisableColors {
-				if alert.Ignored {
+				if alert.IsIgnored {
 					fmtc.Printf("X ")
 				} else {
 					fmtc.Printf(r.fallbackLevel[level] + " ")
 				}
 			} else {
-				if alert.Ignored {
+				if alert.IsIgnored {
 					fmtc.Printf("{s-}%s{!}", "•")
 				} else {
 					fmtc.Printf(r.fgColor[level]+"%s{!}", "•")
@@ -265,7 +275,7 @@ func (r *TerminalRenderer) renderAlert(alert check.Alert) {
 	hl := r.hlColor[alert.Level]
 	lc := fg
 
-	if alert.Ignored {
+	if alert.IsIgnored {
 		fg = "{s}"
 		hl = "{s*}"
 	}
@@ -278,7 +288,7 @@ func (r *TerminalRenderer) renderAlert(alert check.Alert) {
 		fmtc.Printf(hl + "[global]{!} ")
 	}
 
-	if alert.Ignored {
+	if alert.IsIgnored {
 		fmtc.Printf("{s}[A]{!} ")
 	}
 
@@ -340,12 +350,12 @@ func (r *TerminalRenderer) renderSummary(report *check.Report) {
 			continue
 		}
 
-		total, absolved := report.Total(), report.Ignored()
-		actual := total - absolved
+		total, ignored := report.Total(), report.Ignored()
+		actual := total - ignored
 
-		if absolved != 0 {
+		if ignored != 0 {
 			result = append(result,
-				r.fgColor[level]+r.headers[level]+": "+strconv.Itoa(actual)+"{s}/"+strconv.Itoa(absolved)+"{!}",
+				r.fgColor[level]+r.headers[level]+": "+strconv.Itoa(actual)+"{s}/"+strconv.Itoa(ignored)+"{!}",
 			)
 		} else {
 			result = append(result,
@@ -379,7 +389,7 @@ func (r *TerminalRenderer) renderShortAlert(alert check.Alert) {
 		fmtc.Printf(hl + "[global]{!} ")
 	}
 
-	if alert.Ignored {
+	if alert.IsIgnored {
 		fmtc.Printf("{s}[A]{!} ")
 	}
 
