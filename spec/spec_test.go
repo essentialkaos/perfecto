@@ -86,7 +86,7 @@ func (s *SpecSuite) TestSections(c *C) {
 	c.Assert(sections, HasLen, 2)
 	c.Assert(sections[1].GetPackageName(), Equals, "magic")
 
-	c.Assert(spec.Targets, DeepEquals, []string{"el8", "el9", "@rhel"})
+	c.Assert(spec.Targets, DeepEquals, []string{"ubuntu", "el8", "el9", "@rhel"})
 
 	spec, err = Read("../testdata/test_12.spec")
 
