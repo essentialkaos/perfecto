@@ -10,6 +10,8 @@ package check
 import (
 	"testing"
 
+	"github.com/essentialkaos/ek/v12/system"
+
 	"github.com/essentialkaos/perfecto/spec"
 
 	chk "github.com/essentialkaos/check"
@@ -506,7 +508,7 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 	r := Check(s, true, "", nil)
 
 	c.Assert(r, chk.NotNil)
-	c.Assert(r.IsPerfect(), chk.Equals, true)
+	c.Assert(r.IsPerfect, chk.Equals, true)
 	c.Assert(r.IDs(), chk.HasLen, 0)
 
 	s, err = spec.Read("../testdata/test_7.spec")
@@ -517,7 +519,7 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 	r = Check(s, true, "", nil)
 
 	c.Assert(r, chk.NotNil)
-	c.Assert(r.IsPerfect(), chk.Equals, false)
+	c.Assert(r.IsPerfect, chk.Equals, false)
 
 	s, err = spec.Read("../testdata/test_11.spec")
 
@@ -544,6 +546,30 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 	rpmLintBin = "rpmlint"
 }
 
+func (sc *CheckSuite) TestTargetCheck(c *chk.C) {
+	s, err := spec.Read("../testdata/test_18.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+	c.Assert(s.Targets, chk.DeepEquals, []string{"mysuppaos"})
+
+	r := Check(s, false, "", nil)
+	c.Assert(r, chk.NotNil)
+
+	osInfo := &system.OSInfo{
+		ID:         "almalinux",
+		VersionID:  "8.8",
+		PlatformID: "platform:el8",
+		IDLike:     "rhel centos fedora",
+	}
+
+	c.Assert(isTargetFit(osInfo, "almalinux"), chk.Equals, true)
+	c.Assert(isTargetFit(osInfo, "almalinux8"), chk.Equals, true)
+	c.Assert(isTargetFit(osInfo, "el8"), chk.Equals, true)
+	c.Assert(isTargetFit(osInfo, "@fedora"), chk.Equals, true)
+	c.Assert(isTargetFit(osInfo, "test"), chk.Equals, false)
+}
+
 func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 	report := &Report{}
 	alerts := []Alert{}
@@ -556,7 +582,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 	a, ok := parseAlertLine("test.spec: W: no-buildroot-tag", s)
 
 	c.Assert(ok, chk.Equals, true)
-	c.Assert(a.ID, chk.Equals, "")
+	c.Assert(a.ID, chk.Equals, "LNT-0")
 	c.Assert(a.Level, chk.Equals, LEVEL_ERROR)
 	c.Assert(a.Info, chk.Equals, "no-buildroot-tag")
 	c.Assert(a.Line.Index, chk.Equals, -1)
@@ -565,7 +591,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 	a, ok = parseAlertLine("test.spec: E: specfile-error error: line 10: Unknown tag: Release1", s)
 
 	c.Assert(ok, chk.Equals, true)
-	c.Assert(a.ID, chk.Equals, "")
+	c.Assert(a.ID, chk.Equals, "LNT-0")
 	c.Assert(a.Level, chk.Equals, LEVEL_CRITICAL)
 	c.Assert(a.Info, chk.Equals, "Unknown tag: Release1")
 	c.Assert(a.Line.Index, chk.Equals, 10)
@@ -574,7 +600,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 	a, ok = parseAlertLine("test.spec:67: W: macro-in-%changelog %record", s)
 
 	c.Assert(ok, chk.Equals, true)
-	c.Assert(a.ID, chk.Equals, "")
+	c.Assert(a.ID, chk.Equals, "LNT-0")
 	c.Assert(a.Level, chk.Equals, LEVEL_ERROR)
 	c.Assert(a.Info, chk.Equals, "macro-in-%changelog %record")
 	c.Assert(a.Line.Index, chk.Equals, 67)
@@ -603,15 +629,15 @@ func (sc *CheckSuite) TestAux(c *chk.C) {
 	c.Assert(getCheckers(), chk.HasLen, 27)
 
 	r := &Report{}
-	c.Assert(r.IsPerfect(), chk.Equals, true)
+	c.Assert(r.IsPerfect, chk.Equals, false)
 	r = &Report{Notices: []Alert{Alert{}}}
-	c.Assert(r.IsPerfect(), chk.Equals, false)
+	c.Assert(r.IsPerfect, chk.Equals, false)
 	r = &Report{Warnings: []Alert{Alert{}}}
-	c.Assert(r.IsPerfect(), chk.Equals, false)
+	c.Assert(r.IsPerfect, chk.Equals, false)
 	r = &Report{Errors: []Alert{Alert{}}}
-	c.Assert(r.IsPerfect(), chk.Equals, false)
+	c.Assert(r.IsPerfect, chk.Equals, false)
 	r = &Report{Criticals: []Alert{Alert{}}}
-	c.Assert(r.IsPerfect(), chk.Equals, false)
+	c.Assert(r.IsPerfect, chk.Equals, false)
 
 	r = &Report{
 		Notices:   []Alert{Alert{}},
