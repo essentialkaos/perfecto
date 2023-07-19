@@ -46,13 +46,13 @@ func (r *GithubRenderer) Report(file string, report *check.Report) {
 // Perfect renders message about perfect spec
 func (r *GithubRenderer) Perfect(file string, report *check.Report) {
 	specName := strutil.Exclude(path.Base(file), ".spec")
-	fmtc.Printf("{g}%s.spec is perfect!{!}\n", specName)
+	fmtc.Printf("{g}{*}%s.spec{!*} is perfect!{!}\n", specName)
 }
 
 // Skipped renders message about skipped check
 func (r *GithubRenderer) Skipped(file string, report *check.Report) {
 	specName := strutil.Exclude(path.Base(file), ".spec")
-	fmtc.Printf("{s}%s.spec check skipped due to non-applicable target{!}\n", specName)
+	fmtc.Printf("{s}{*}%s.spec{!*} check skipped due to non-applicable target{!}\n", specName)
 }
 
 // Error renders global error message

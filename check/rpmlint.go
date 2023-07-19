@@ -77,9 +77,9 @@ func parseAlertLine(text string, s *spec.Spec) (Alert, bool) {
 
 	switch level {
 	case "W":
-		return NewAlert("", LEVEL_ERROR, desc, s.GetLine(line)), true
+		return NewAlert("LNT-0", LEVEL_ERROR, desc, s.GetLine(line)), true
 	case "E":
-		return NewAlert("", LEVEL_CRITICAL, desc, s.GetLine(line)), true
+		return NewAlert("LNT-0", LEVEL_CRITICAL, desc, s.GetLine(line)), true
 	}
 
 	return Alert{}, false

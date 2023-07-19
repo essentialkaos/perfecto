@@ -39,6 +39,7 @@ type Report struct {
 	Criticals     Alerts   `json:"criticals,omitempty"`
 	IgnoredChecks []string `json:"ignored_checks,omitempty"`
 	NoLint        bool     `json:"no_lint"`
+	IsPerfect     bool     `json:"is_perfect"`
 	IsSkipped     bool     `json:"is_skipped"`
 }
 
@@ -68,11 +69,6 @@ func NewAlert(id string, level uint8, info string, line spec.Line) Alert {
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
-
-// IsPerfect returns true if report doesn't have any alerts
-func (r *Report) IsPerfect() bool {
-	return r.Total() == 0
-}
 
 // Total returns total number of alerts (including ignored)
 func (r *Report) Total() int {
@@ -211,6 +207,8 @@ func Check(s *spec.Spec, lint bool, linterConfig string, ignored []string) *Repo
 	sort.Sort(Alerts(report.Warnings))
 	sort.Sort(Alerts(report.Errors))
 	sort.Sort(Alerts(report.Criticals))
+
+	report.IsPerfect = report.Total() == 0
 
 	return report
 }

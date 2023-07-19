@@ -24,7 +24,11 @@ type XMLRenderer struct{}
 // Report renders alerts from perfecto report
 func (r *XMLRenderer) Report(file string, report *check.Report) {
 	fmt.Println(`<?xml version="1.0" encoding="UTF-8"?>`)
-	fmt.Println("<alerts>")
+	fmt.Printf(
+		"<report noLint=\"%t\" isPerfect=\"%t\" isSkipped=\"%t\">\n",
+		report.NoLint, report.IsPerfect, report.IsSkipped,
+	)
+	fmt.Println("  <alerts>")
 
 	if len(report.Notices) != 0 {
 		r.renderAlertsAsXML("notices", report.Notices)
@@ -42,51 +46,64 @@ func (r *XMLRenderer) Report(file string, report *check.Report) {
 		r.renderAlertsAsXML("criticals", report.Criticals)
 	}
 
-	fmt.Println("</alerts>")
+	fmt.Println("  </alerts>")
+	fmt.Println("</report>")
 }
 
 // Perfect renders message about perfect spec
 func (r *XMLRenderer) Perfect(file string, report *check.Report) {
 	fmt.Println(`<?xml version="1.0" encoding="UTF-8"?>`)
-	fmt.Println("<alerts>\n</alerts>")
+	fmt.Printf(
+		"<report noLint=\"%t\" isPerfect=\"%t\" isSkipped=\"%t\">\n",
+		report.NoLint, report.IsPerfect, report.IsSkipped,
+	)
+	fmt.Println("  <alerts></alerts>")
+	fmt.Println("</report>")
 }
 
 // Perfect renders message about perfect spec
 func (r *XMLRenderer) Skipped(file string, report *check.Report) {
 	fmt.Println(`<?xml version="1.0" encoding="UTF-8"?>`)
-	fmt.Println("<alerts>\n</alerts>")
+	fmt.Printf(
+		"<report noLint=\"%t\" isPerfect=\"%t\" isSkipped=\"%t\">\n",
+		report.NoLint, report.IsPerfect, report.IsSkipped,
+	)
+	fmt.Println("  <alerts></alerts>")
+	fmt.Println("</report>")
 }
 
 // Error renders global error message
 func (r *XMLRenderer) Error(file string, err error) {
 	fmt.Println(`<?xml version="1.0" encoding="UTF-8"?>`)
-	fmt.Println("<alerts>")
-	fmt.Printf("  <error>%v</error>\n", err)
-	fmt.Println("</alerts>")
+	fmt.Println("<report>")
+	fmt.Println("  <alerts>")
+	fmt.Printf("    <error>%v</error>\n", err)
+	fmt.Println("  </alerts>")
+	fmt.Println("</report>")
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // renderAlertsAsXML renders alerts category as XML node
 func (r *XMLRenderer) renderAlertsAsXML(category string, alerts []check.Alert) {
-	fmt.Printf("  <%s>\n", category)
+	fmt.Printf("    <%s>\n", category)
 
 	for _, alert := range alerts {
-		fmt.Printf("    <alert id=\"%s\" ignored=\"%t\">\n", alert.ID, alert.IsIgnored)
-		fmt.Printf("      <info>%s</info>\n", r.escapeStringForXML(alert.Info))
+		fmt.Printf("      <alert id=\"%s\" ignored=\"%t\">\n", alert.ID, alert.IsIgnored)
+		fmt.Printf("        <info>%s</info>\n", r.escapeStringForXML(alert.Info))
 
 		if alert.Line.Index != -1 {
 			fmt.Printf(
-				"      <line index=\"%d\" skip=\"%t\">%s</line>\n",
+				"      <line index=\"%d\" ignore=\"%t\">%s</line>\n",
 				alert.Line.Index, alert.Line.Ignore,
 				r.escapeStringForXML(alert.Line.Text),
 			)
 		}
 
-		fmt.Println("    </alert>")
+		fmt.Println("      </alert>")
 	}
 
-	fmt.Printf("  </%s>\n", category)
+	fmt.Printf("    </%s>\n", category)
 }
 
 // escapeStringForXML returns properly escaped XML equivalent

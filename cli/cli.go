@@ -230,7 +230,7 @@ func checkSpec(file, format string) int {
 			rnd.Skipped(file, report)
 		}
 		return 0
-	case report.IsPerfect():
+	case report.IsPerfect:
 		if !options.GetB(OPT_QUIET) {
 			rnd.Perfect(file, report)
 		}
