@@ -63,6 +63,10 @@ func (s Alerts) Less(i, j int) bool { return s[i].Line.Index < s[j].Line.Index }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
+var osInfoFunc = system.GetOSInfo
+
+// ////////////////////////////////////////////////////////////////////////////////// //
+
 // NewAlert creates new alert
 func NewAlert(id string, level uint8, info string, line spec.Line) Alert {
 	return Alert{id, level, info, line, false}
@@ -221,7 +225,7 @@ func isApplicableTarget(s *spec.Spec) bool {
 		return true
 	}
 
-	osInfo, err := system.GetOSInfo()
+	osInfo, err := osInfoFunc()
 
 	if err != nil {
 		return false

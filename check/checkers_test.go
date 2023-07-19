@@ -8,6 +8,7 @@ package check
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/essentialkaos/ek/v12/system"
@@ -569,6 +570,14 @@ func (sc *CheckSuite) TestTargetCheck(c *chk.C) {
 	c.Assert(isTargetFit(osInfo, "el8"), chk.Equals, true)
 	c.Assert(isTargetFit(osInfo, "@fedora"), chk.Equals, true)
 	c.Assert(isTargetFit(osInfo, "test"), chk.Equals, false)
+
+	osInfoFunc = func() (*system.OSInfo, error) {
+		return nil, fmt.Errorf("error")
+	}
+
+	c.Assert(isApplicableTarget(s), chk.Equals, false)
+
+	osInfoFunc = system.GetOSInfo
 }
 
 func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
