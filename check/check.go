@@ -212,7 +212,7 @@ func Check(s *spec.Spec, lint bool, linterConfig string, ignored []string) *Repo
 	sort.Sort(Alerts(report.Errors))
 	sort.Sort(Alerts(report.Criticals))
 
-	report.IsPerfect = report.Total() == 0
+	report.IsPerfect = report.Total()-report.Ignored() == 0
 
 	return report
 }
