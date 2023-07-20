@@ -25,7 +25,8 @@ import (
 
 // TerminalRenderer renders report to terminal
 type TerminalRenderer struct {
-	Format string
+	Format       string
+	FilenameSize int
 
 	levelsPrefixes map[uint8]string
 	bgColor        map[uint8]string
@@ -61,7 +62,7 @@ func (r *TerminalRenderer) Perfect(file string, report *check.Report) {
 
 	switch r.Format {
 	case "tiny":
-		fmtc.Printf("%24s{s}:{!} {g}✔ {!}\n", specName)
+		fmtc.Printf("%s{s}:{!} {g}✔ {!}\n", fmtutil.Align(specName, fmtutil.RIGHT, r.FilenameSize+2))
 	case "summary":
 		r.renderSummary(report)
 	default:
@@ -71,11 +72,13 @@ func (r *TerminalRenderer) Perfect(file string, report *check.Report) {
 
 // Skipped renders message about skipped check
 func (r *TerminalRenderer) Skipped(file string, report *check.Report) {
+	r.initUI()
+
 	specName := strutil.Exclude(path.Base(file), ".spec")
 
 	switch r.Format {
 	case "tiny":
-		fmtc.Printf("%24s{s}:{!} {s}—{!}\n", specName)
+		fmtc.Printf("%s{s}:{!} {s}—{!}\n", fmtutil.Align(specName, fmtutil.RIGHT, r.FilenameSize+2))
 	default:
 		fmtc.Printf("{s}{*}%s.spec{!*} check skipped due to non-applicable target{!}\n", specName)
 	}
@@ -83,11 +86,16 @@ func (r *TerminalRenderer) Skipped(file string, report *check.Report) {
 
 // Error renders global error message
 func (r *TerminalRenderer) Error(file string, err error) {
+	r.initUI()
+
 	specName := strutil.Exclude(path.Base(file), ".spec")
 
 	switch r.Format {
 	case "tiny":
-		fmtc.Printf("%24s{s}:{!} {r}✖ (%v){!}\n", specName, err)
+		fmtc.Printf(
+			"%s{s}:{!} {r}✖  (%v){!}\n",
+			fmtutil.Align(specName, fmtutil.RIGHT, r.FilenameSize+2), err,
+		)
 	default:
 		fmtc.Fprintf(os.Stderr, "{r}%v{!}\n", err)
 	}
@@ -144,6 +152,10 @@ func (r *TerminalRenderer) initUI() {
 		r.bgColor[check.LEVEL_ERROR] = "{*@}{#208}"
 		r.fgColor[check.LEVEL_ERROR] = "{#208}"
 		r.hlColor[check.LEVEL_ERROR] = "{*}{#214}"
+	}
+
+	if r.FilenameSize == 0 {
+		r.FilenameSize = 24
 	}
 }
 
@@ -204,8 +216,7 @@ func (r *TerminalRenderer) renderShortReport(report *check.Report) {
 // renderTinyReport prints tiny report (useful for mass check)
 func (r *TerminalRenderer) renderTinyReport(file string, report *check.Report) {
 	specName := strutil.Exclude(path.Base(file), ".spec")
-
-	fmtc.Printf("%24s{s}:{!} ", specName)
+	fmtc.Printf("%s{s}:{!} ", fmtutil.Align(specName, fmtutil.RIGHT, r.FilenameSize+2))
 
 	categories := map[uint8][]check.Alert{
 		check.LEVEL_NOTICE:   report.Notices,
