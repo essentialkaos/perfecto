@@ -362,10 +362,6 @@ func extractSources(s *Spec) []Line {
 	var result []Line
 
 	for _, line := range s.Data {
-		if line.Ignore {
-			continue
-		}
-
 		if isSectionHeader(line.Text) {
 			break
 		}
