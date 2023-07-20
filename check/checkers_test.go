@@ -592,7 +592,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 	a, ok := parseAlertLine("test.spec: W: no-buildroot-tag", s)
 
 	c.Assert(ok, chk.Equals, true)
-	c.Assert(a.ID, chk.Equals, "LNT-0")
+	c.Assert(a.ID, chk.Equals, "LNT0")
 	c.Assert(a.Level, chk.Equals, LEVEL_ERROR)
 	c.Assert(a.Info, chk.Equals, "no-buildroot-tag")
 	c.Assert(a.Line.Index, chk.Equals, -1)
@@ -601,7 +601,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 	a, ok = parseAlertLine("test.spec: E: specfile-error error: line 10: Unknown tag: Release1", s)
 
 	c.Assert(ok, chk.Equals, true)
-	c.Assert(a.ID, chk.Equals, "LNT-0")
+	c.Assert(a.ID, chk.Equals, "LNT0")
 	c.Assert(a.Level, chk.Equals, LEVEL_CRITICAL)
 	c.Assert(a.Info, chk.Equals, "Unknown tag: Release1")
 	c.Assert(a.Line.Index, chk.Equals, 10)
@@ -610,7 +610,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 	a, ok = parseAlertLine("test.spec:67: W: macro-in-%changelog %record", s)
 
 	c.Assert(ok, chk.Equals, true)
-	c.Assert(a.ID, chk.Equals, "LNT-0")
+	c.Assert(a.ID, chk.Equals, "LNT0")
 	c.Assert(a.Level, chk.Equals, LEVEL_ERROR)
 	c.Assert(a.Info, chk.Equals, "macro-in-%changelog %record")
 	c.Assert(a.Line.Index, chk.Equals, 67)
