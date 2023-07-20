@@ -175,7 +175,7 @@ func Check(s *spec.Spec, lint bool, linterConfig string, ignored []string) *Repo
 
 	checkers := getCheckers()
 
-	if lint {
+	if lint && !sliceutil.Contains(ignored, RPMLINT_CHECK_ID) {
 		alerts := Lint(s, linterConfig)
 		appendLinterAlerts(report, alerts)
 	}
