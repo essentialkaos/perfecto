@@ -77,7 +77,7 @@ func (r *XMLRenderer) Error(file string, err error) {
 	fmt.Println(`<?xml version="1.0" encoding="UTF-8"?>`)
 	fmt.Println("<report>")
 	fmt.Println("  <alerts>")
-	fmt.Printf("    <error>%v</error>\n", err)
+	fmt.Printf("     <error>%v</error>\n", err)
 	fmt.Println("  </alerts>")
 	fmt.Println("</report>")
 }
@@ -94,7 +94,7 @@ func (r *XMLRenderer) renderAlertsAsXML(category string, alerts []check.Alert) {
 
 		if alert.Line.Index != -1 {
 			fmt.Printf(
-				"      <line index=\"%d\" ignore=\"%t\">%s</line>\n",
+				"        <line index=\"%d\" ignore=\"%t\">%s</line>\n",
 				alert.Line.Index, alert.Line.Ignore,
 				r.escapeStringForXML(alert.Line.Text),
 			)
