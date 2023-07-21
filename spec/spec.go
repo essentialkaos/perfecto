@@ -254,6 +254,7 @@ LOOP:
 			ignore++
 		case strings.Contains(text, DIRECTIVE_TARGET):
 			spec.Targets = extractTargets(text)
+			line++
 			continue
 		}
 

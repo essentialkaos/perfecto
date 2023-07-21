@@ -40,7 +40,7 @@ func (sc *CheckSuite) TestCheckForUselessSpaces(c *chk.C) {
 
 	c.Assert(alerts, chk.HasLen, 2)
 	c.Assert(alerts[0].Info, chk.Equals, "Line contains spaces at the end of line")
-	c.Assert(alerts[0].Line.Text, chk.Equals, "License:            MIT▒")
+	c.Assert(alerts[0].Line.Text, chk.Equals, "License:            MIT░")
 	c.Assert(alerts[1].Info, chk.Equals, "Line contains useless spaces")
 	c.Assert(alerts[1].Line.Index, chk.Equals, 10)
 }
@@ -369,7 +369,7 @@ func (sc *CheckSuite) TestCheckURLForHTTPS(c *chk.C) {
 
 	alerts := checkURLForHTTPS("", s)
 
-	c.Assert(alerts, chk.HasLen, 2)
+	c.Assert(alerts, chk.HasLen, 3)
 	c.Assert(alerts[0].Info, chk.Equals, "Domain kaos.st supports HTTPS. Replace http by https in URL.")
 	c.Assert(alerts[0].Line.Index, chk.Equals, 13)
 }
@@ -531,7 +531,7 @@ func (sc *CheckSuite) TestRPMLint(c *chk.C) {
 	r = Check(s, true, "", []string{"PF20", "PF21"})
 
 	c.Assert(r, chk.NotNil)
-	c.Assert(r.Warnings, chk.HasLen, 3)
+	c.Assert(r.Warnings, chk.HasLen, 4)
 	c.Assert(r.Warnings[0].IsIgnored, chk.Equals, true)
 
 	rpmLintBin = "echo"

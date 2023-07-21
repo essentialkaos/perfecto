@@ -20,9 +20,6 @@ BuildRoot:          %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -
 
 Source0:            https://source.kaos.st/perfecto/%{name}-%{version}.tar.gz
 
-# perfecto:ignore
-Source1:            http://source.kaos.st/perfecto/%{name}-%{version}.tar.gz
-
 ################################################################################
 
 %description

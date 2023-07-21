@@ -58,7 +58,7 @@ func (s *SpecSuite) TestParsing(c *C) {
 
 	c.Assert(spec.GetLine(-1), DeepEquals, Line{-1, "", false})
 	c.Assert(spec.GetLine(99), DeepEquals, Line{-1, "", false})
-	c.Assert(spec.GetLine(46), DeepEquals, Line{46, "%{__make} %{?_smp_mflags}", false})
+	c.Assert(spec.GetLine(44), DeepEquals, Line{44, "%{__make} %{?_smp_mflags}", false})
 }
 
 func (s *SpecSuite) TestSections(c *C) {
@@ -75,8 +75,8 @@ func (s *SpecSuite) TestSections(c *C) {
 	sections = spec.GetSections(SECTION_BUILD)
 	c.Assert(sections, HasLen, 1)
 	c.Assert(sections[0].Data, HasLen, 2)
-	c.Assert(sections[0].Start, Equals, 45)
-	c.Assert(sections[0].End, Equals, 47)
+	c.Assert(sections[0].Start, Equals, 42)
+	c.Assert(sections[0].End, Equals, 44)
 	c.Assert(sections[0].IsEmpty(), Equals, false)
 	sections = spec.GetSections(SECTION_SETUP)
 	c.Assert(sections[0].Name, Equals, "setup")
@@ -111,7 +111,7 @@ func (s *SpecSuite) TestHeaders(c *C) {
 	c.Assert(headers, HasLen, 2)
 	c.Assert(headers[0].Package, Equals, "")
 	c.Assert(headers[0].IsSubpackage, Equals, false)
-	c.Assert(headers[0].Data, HasLen, 16)
+	c.Assert(headers[0].Data, HasLen, 13)
 	c.Assert(headers[1].Package, Equals, "magic")
 	c.Assert(headers[1].IsSubpackage, Equals, true)
 	c.Assert(headers[1].Data, HasLen, 4)
@@ -136,6 +136,14 @@ func (s *SpecSuite) TestSourceExtractor(c *C) {
 }
 
 func (s *SpecSuite) TestIgnoreDirective(c *C) {
+	spec, err := Read("../testdata/test_18.spec")
+
+	c.Assert(err, IsNil)
+	c.Assert(spec, NotNil)
+
+	c.Assert(spec.Targets, DeepEquals, []string{"mysuppaos"})
+	c.Assert(spec.Data[22].Ignore, Equals, true)
+
 	c.Assert(extractIgnoreCount("# perfecto:ignore"), Equals, 1)
 	c.Assert(extractIgnoreCount("# perfecto:ignore ABC"), Equals, 0)
 	c.Assert(extractIgnoreCount("# perfecto:ignore 1"), Equals, 1)
