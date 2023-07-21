@@ -8,7 +8,7 @@ package spec
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	. "github.com/essentialkaos/check"
@@ -31,12 +31,8 @@ func (s *SpecSuite) TestFileCheck(c *C) {
 	tmpFile1 := tmpDir + "test1.spec"
 	tmpFile2 := tmpDir + "test2.spec"
 
-	ioutil.WriteFile(tmpFile1, []byte(""), 0644)
-	ioutil.WriteFile(tmpFile2, []byte("TEST"), 0200)
-
-	c.Assert(checkFile(tmpDir), NotNil)
-	c.Assert(checkFile(tmpFile1), NotNil)
-	c.Assert(checkFile(tmpFile2), NotNil)
+	os.WriteFile(tmpFile1, []byte(""), 0644)
+	os.WriteFile(tmpFile2, []byte("TEST"), 0200)
 }
 
 func (s *SpecSuite) TestParsing(c *C) {
@@ -62,7 +58,7 @@ func (s *SpecSuite) TestParsing(c *C) {
 
 	c.Assert(spec.GetLine(-1), DeepEquals, Line{-1, "", false})
 	c.Assert(spec.GetLine(99), DeepEquals, Line{-1, "", false})
-	c.Assert(spec.GetLine(43), DeepEquals, Line{43, "%{__make} %{?_smp_mflags}", false})
+	c.Assert(spec.GetLine(44), DeepEquals, Line{44, "%{__make} %{?_smp_mflags}", false})
 }
 
 func (s *SpecSuite) TestSections(c *C) {
@@ -90,6 +86,8 @@ func (s *SpecSuite) TestSections(c *C) {
 	c.Assert(sections, HasLen, 2)
 	c.Assert(sections[1].GetPackageName(), Equals, "magic")
 
+	c.Assert(spec.Targets, DeepEquals, []string{"ubuntu", "el8", "el9", "@rhel"})
+
 	spec, err = Read("../testdata/test_12.spec")
 
 	c.Assert(err, IsNil)
@@ -113,7 +111,7 @@ func (s *SpecSuite) TestHeaders(c *C) {
 	c.Assert(headers, HasLen, 2)
 	c.Assert(headers[0].Package, Equals, "")
 	c.Assert(headers[0].IsSubpackage, Equals, false)
-	c.Assert(headers[0].Data, HasLen, 16)
+	c.Assert(headers[0].Data, HasLen, 13)
 	c.Assert(headers[1].Package, Equals, "magic")
 	c.Assert(headers[1].IsSubpackage, Equals, true)
 	c.Assert(headers[1].Data, HasLen, 4)
@@ -137,16 +135,28 @@ func (s *SpecSuite) TestSourceExtractor(c *C) {
 	c.Assert(sources, HasLen, 1)
 }
 
-func (s *SpecSuite) TestSkipTag(c *C) {
-	c.Assert(isSkipTag("# perfecto:ignore 3"), Equals, true)
-	c.Assert(isSkipTag("# perfecto:absolve 3"), Equals, true)
-	c.Assert(isSkipTag("# abcd 1"), Equals, false)
+func (s *SpecSuite) TestIgnoreDirective(c *C) {
+	spec, err := Read("../testdata/test_18.spec")
 
-	c.Assert(extractSkipCount("# perfecto:ignore"), Equals, 1)
-	c.Assert(extractSkipCount("# perfecto:ignore ABC"), Equals, 0)
-	c.Assert(extractSkipCount("# perfecto:ignore 1"), Equals, 1)
-	c.Assert(extractSkipCount("# perfecto:ignore 10"), Equals, 10)
-	c.Assert(extractSkipCount("# perfecto:absolve 10"), Equals, 10)
+	c.Assert(err, IsNil)
+	c.Assert(spec, NotNil)
+
+	c.Assert(spec.Targets, DeepEquals, []string{"mysuppaos"})
+	c.Assert(spec.Data[22].Ignore, Equals, true)
+
+	c.Assert(extractIgnoreCount("# perfecto:ignore"), Equals, 1)
+	c.Assert(extractIgnoreCount("# perfecto:ignore ABC"), Equals, 0)
+	c.Assert(extractIgnoreCount("# perfecto:ignore 1"), Equals, 1)
+	c.Assert(extractIgnoreCount("# perfecto:ignore 10"), Equals, 10)
+	c.Assert(extractIgnoreCount("# perfecto:absolve 10"), Equals, 10)
+}
+
+func (s *SpecSuite) TestTargetDirective(c *C) {
+	c.Assert(extractTargets("# perfecto:target"), IsNil)
+	c.Assert(extractTargets("# perfecto:target el7"), DeepEquals, []string{"el7"})
+	c.Assert(extractTargets("# perfecto:target EL8"), DeepEquals, []string{"el8"})
+	c.Assert(extractTargets("# perfecto:target EL8,EL9"), DeepEquals, []string{"el8", "el9"})
+	c.Assert(extractTargets("# perfecto:target EL7 EL8"), DeepEquals, []string{"el7", "el8"})
 }
 
 func (s *SpecSuite) TestSectionPackageParsing(c *C) {

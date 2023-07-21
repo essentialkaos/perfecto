@@ -1,6 +1,6 @@
 ################################################################################
 
-# perfecto:target ubuntu el8 el9 @rhel
+# perfecto:target mysuppaos
 
 ################################################################################
 
@@ -19,6 +19,9 @@ URL:                https://domain.com
 BuildRoot:          %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Source0:            https://source.kaos.st/perfecto/%{name}-%{version}.tar.gz
+
+# perfecto:ignore
+Source1:            http://source.kaos.st/perfecto/%{name}-%{version}.tar.gz
 
 ################################################################################
 

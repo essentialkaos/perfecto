@@ -20,6 +20,11 @@ import (
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
+// RPMLINT_CHECK_ID is ID for all rpmlint checks
+const RPMLINT_CHECK_ID = "LNT0"
+
+// ////////////////////////////////////////////////////////////////////////////////// //
+
 var rpmLintBin = "rpmlint"
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -77,9 +82,9 @@ func parseAlertLine(text string, s *spec.Spec) (Alert, bool) {
 
 	switch level {
 	case "W":
-		return NewAlert("", LEVEL_ERROR, desc, s.GetLine(line)), true
+		return NewAlert(RPMLINT_CHECK_ID, LEVEL_ERROR, desc, s.GetLine(line)), true
 	case "E":
-		return NewAlert("", LEVEL_CRITICAL, desc, s.GetLine(line)), true
+		return NewAlert(RPMLINT_CHECK_ID, LEVEL_CRITICAL, desc, s.GetLine(line)), true
 	}
 
 	return Alert{}, false

@@ -22,21 +22,18 @@ type JSONRenderer struct{}
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // Report renders alerts from perfecto report
-func (r *JSONRenderer) Report(file string, report *check.Report) error {
-	data, err := json.MarshalIndent(report, "", "  ")
-
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(string(data))
-
-	return nil
+func (r *JSONRenderer) Report(file string, report *check.Report) {
+	encodeReport(report)
 }
 
 // Perfect renders message about perfect spec
-func (r *JSONRenderer) Perfect(file string) {
-	fmt.Println("{}")
+func (r *JSONRenderer) Perfect(file string, report *check.Report) {
+	encodeReport(report)
+}
+
+// Skipped renders message about skipped check
+func (r *JSONRenderer) Skipped(file string, report *check.Report) {
+	encodeReport(report)
 }
 
 // Error renders global error message
@@ -45,3 +42,8 @@ func (r *JSONRenderer) Error(file string, err error) {
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
+
+func encodeReport(report *check.Report) {
+	data, _ := json.MarshalIndent(report, "", "  ")
+	fmt.Println(string(data))
+}

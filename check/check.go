@@ -9,9 +9,12 @@ package check
 
 import (
 	"sort"
+	"strings"
 
 	"github.com/essentialkaos/ek/v12/sliceutil"
 	"github.com/essentialkaos/ek/v12/sortutil"
+	"github.com/essentialkaos/ek/v12/strutil"
+	"github.com/essentialkaos/ek/v12/system"
 
 	"github.com/essentialkaos/perfecto/spec"
 )
@@ -30,19 +33,23 @@ const (
 
 // Report contains info about all alerts
 type Report struct {
-	Notices   Alerts `json:"notices,omitempty"`
-	Warnings  Alerts `json:"warnings,omitempty"`
-	Errors    Alerts `json:"errors,omitempty"`
-	Criticals Alerts `json:"criticals,omitempty"`
+	Notices       Alerts   `json:"notices,omitempty"`
+	Warnings      Alerts   `json:"warnings,omitempty"`
+	Errors        Alerts   `json:"errors,omitempty"`
+	Criticals     Alerts   `json:"criticals,omitempty"`
+	IgnoredChecks []string `json:"ignored_checks,omitempty"`
+	NoLint        bool     `json:"no_lint"`
+	IsPerfect     bool     `json:"is_perfect"`
+	IsSkipped     bool     `json:"is_skipped"`
 }
 
 // Alert contains basic alert info
 type Alert struct {
-	ID      string    `json:"id"`
-	Level   uint8     `json:"level"`
-	Info    string    `json:"info"`
-	Line    spec.Line `json:"line"`
-	Ignored bool      `json:"ignored"`
+	ID        string    `json:"id"`
+	Level     uint8     `json:"level"`
+	Info      string    `json:"info"`
+	Line      spec.Line `json:"line"`
+	IsIgnored bool      `json:"is_ignored"`
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -56,17 +63,16 @@ func (s Alerts) Less(i, j int) bool { return s[i].Line.Index < s[j].Line.Index }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
+var osInfoFunc = system.GetOSInfo
+
+// ////////////////////////////////////////////////////////////////////////////////// //
+
 // NewAlert creates new alert
 func NewAlert(id string, level uint8, info string, line spec.Line) Alert {
 	return Alert{id, level, info, line, false}
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
-
-// IsPerfect returns true if report doesn't have any alerts
-func (r *Report) IsPerfect() bool {
-	return r.Total() == 0
-}
 
 // Total returns total number of alerts (including ignored)
 func (r *Report) Total() int {
@@ -128,7 +134,7 @@ func (r *Report) IDs() []string {
 // HasAlerts returns true if alerts contains at least one non-ignored alert
 func (a Alerts) HasAlerts() bool {
 	for _, alert := range a {
-		if alert.Ignored {
+		if alert.IsIgnored {
 			continue
 		}
 
@@ -148,7 +154,7 @@ func (a Alerts) Ignored() int {
 	var counter int
 
 	for _, alert := range a {
-		if alert.Ignored {
+		if alert.IsIgnored {
 			counter++
 		}
 	}
@@ -158,12 +164,18 @@ func (a Alerts) Ignored() int {
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
-// Check check spec
+// Check executes different checks over given spec
 func Check(s *spec.Spec, lint bool, linterConfig string, ignored []string) *Report {
-	report := &Report{}
+	report := &Report{NoLint: !lint, IgnoredChecks: ignored}
+
+	if !isApplicableTarget(s) {
+		report.IsSkipped = true
+		return report
+	}
+
 	checkers := getCheckers()
 
-	if lint {
+	if lint && !sliceutil.Contains(ignored, RPMLINT_CHECK_ID) {
 		alerts := Lint(s, linterConfig)
 		appendLinterAlerts(report, alerts)
 	}
@@ -178,8 +190,8 @@ func Check(s *spec.Spec, lint bool, linterConfig string, ignored []string) *Repo
 		ignore := sliceutil.Contains(ignored, id)
 
 		for _, alert := range alerts {
-			if ignore || alert.Line.Skip {
-				alert.Ignored = true
+			if ignore || alert.Line.Ignore {
+				alert.IsIgnored = true
 			}
 
 			switch alert.Level {
@@ -200,10 +212,60 @@ func Check(s *spec.Spec, lint bool, linterConfig string, ignored []string) *Repo
 	sort.Sort(Alerts(report.Errors))
 	sort.Sort(Alerts(report.Criticals))
 
+	report.IsPerfect = report.Total()-report.Ignored() == 0
+
 	return report
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
+
+// isApplicableTarget checks if current system is applicable for tests
+func isApplicableTarget(s *spec.Spec) bool {
+	if len(s.Targets) == 0 {
+		return true
+	}
+
+	osInfo, err := osInfoFunc()
+
+	if err != nil {
+		return false
+	}
+
+	for _, target := range s.Targets {
+		if isTargetFit(osInfo, target) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// isTargetFit returns true if current system is applicable for tests
+func isTargetFit(osInfo *system.OSInfo, target string) bool {
+	if osInfo.ID == target {
+		return true
+	}
+
+	majorVersion, _, _ := strings.Cut(osInfo.VersionID, ".")
+
+	if osInfo.ID+majorVersion == target {
+		return true
+	}
+
+	_, platform, _ := strings.Cut(osInfo.PlatformID, ":")
+
+	if target == platform {
+		return true
+	}
+
+	for _, id := range strutil.Fields(osInfo.IDLike) {
+		if "@"+id == target {
+			return true
+		}
+	}
+
+	return false
+}
 
 // appendLinterAlerts append rpmlint alerts to report
 func appendLinterAlerts(r *Report, alerts []Alert) {
@@ -212,7 +274,7 @@ func appendLinterAlerts(r *Report, alerts []Alert) {
 	}
 
 	for _, alert := range alerts {
-		if alert.Line.Skip {
+		if alert.Line.Ignore {
 			continue
 		}
 

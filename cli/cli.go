@@ -37,7 +37,7 @@ import (
 // App info
 const (
 	APP  = "Perfecto"
-	VER  = "5.0.0"
+	VER  = "6.0.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -192,8 +192,10 @@ func process(files options.Arguments) {
 		printErrorAndExit("Output format %q is not supported", format)
 	}
 
+	rndr := getRenderer(format, files)
+
 	for _, file := range files {
-		ec := checkSpec(file.Clean().String(), format)
+		ec := checkSpec(file.Clean().String(), rndr)
 		exitCode = mathutil.Max(ec, exitCode)
 	}
 
@@ -203,35 +205,40 @@ func process(files options.Arguments) {
 // codebeat:disable[ABC]
 
 // checkSpec check spec file
-func checkSpec(file, format string) int {
-	rnd := getRenderer(format)
+func checkSpec(file string, rndr render.Renderer) int {
+	var ignoreChecks []string
+
 	s, err := spec.Read(file)
 
 	if err != nil && !options.GetB(OPT_QUIET) {
-		rnd.Error(file, err)
+		rndr.Error(file, err)
 		return 1
+	}
+
+	if options.Has(OPT_IGNORE) {
+		ignoreChecks = strings.Split(options.GetS(OPT_IGNORE), ",")
 	}
 
 	report := check.Check(
 		s, !options.GetB(OPT_NO_LINT),
 		options.GetS(OPT_LINT_CONFIG),
-		strings.Split(options.GetS(OPT_IGNORE), ","),
+		ignoreChecks,
 	)
 
-	if report.IsPerfect() {
+	switch {
+	case report.IsSkipped:
 		if !options.GetB(OPT_QUIET) {
-			rnd.Perfect(file)
+			rndr.Skipped(file, report)
 		}
-
+		return 0
+	case report.IsPerfect:
+		if !options.GetB(OPT_QUIET) {
+			rndr.Perfect(file, report)
+		}
 		return 0
 	}
 
-	err = rnd.Report(file, report)
-
-	if err != nil {
-		printError(err.Error())
-		return 1
-	}
+	rndr.Report(file, report)
 
 	return getExitCode(report)
 }
@@ -257,14 +264,16 @@ func getFormat(files options.Arguments) string {
 }
 
 // getRenderer returns renderer for given format
-func getRenderer(format string) render.Renderer {
+func getRenderer(format string, files options.Arguments) render.Renderer {
+	maxFilenameSize := getMaxFilenameSize(files)
+
 	switch format {
 	case FORMAT_SUMMARY:
-		return &render.TerminalRenderer{Format: FORMAT_SUMMARY}
+		return &render.TerminalRenderer{Format: FORMAT_SUMMARY, FilenameSize: maxFilenameSize}
 	case FORMAT_TINY:
-		return &render.TerminalRenderer{Format: FORMAT_TINY}
+		return &render.TerminalRenderer{Format: FORMAT_TINY, FilenameSize: maxFilenameSize}
 	case FORMAT_SHORT:
-		return &render.TerminalRenderer{Format: FORMAT_SHORT}
+		return &render.TerminalRenderer{Format: FORMAT_SHORT, FilenameSize: maxFilenameSize}
 	case FORMAT_GITHUB:
 		return &render.GithubRenderer{}
 	case FORMAT_JSON:
@@ -272,8 +281,20 @@ func getRenderer(format string) render.Renderer {
 	case FORMAT_XML:
 		return &render.XMLRenderer{}
 	default:
-		return &render.TerminalRenderer{Format: FORMAT_FULL}
+		return &render.TerminalRenderer{Format: FORMAT_FULL, FilenameSize: maxFilenameSize}
 	}
+}
+
+// getMaxFilenameSize returns maximum filename size without extension
+func getMaxFilenameSize(files options.Arguments) int {
+	var result int
+
+	for _, file := range files {
+		filenameSize := strutil.Exclude(file.Base().Clean().String(), ".spec")
+		result = mathutil.Max(result, len(filenameSize))
+	}
+
+	return result
 }
 
 // codebeat:enable[ABC]

@@ -25,7 +25,8 @@ import (
 
 // TerminalRenderer renders report to terminal
 type TerminalRenderer struct {
-	Format string
+	Format       string
+	FilenameSize int
 
 	levelsPrefixes map[uint8]string
 	bgColor        map[uint8]string
@@ -38,7 +39,72 @@ type TerminalRenderer struct {
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // Report renders alerts from perfecto report
-func (r *TerminalRenderer) Report(file string, report *check.Report) error {
+func (r *TerminalRenderer) Report(file string, report *check.Report) {
+	r.initUI()
+
+	switch r.Format {
+	case "summary":
+		r.renderSummary(report)
+	case "short":
+		r.renderShortReport(report)
+	case "tiny":
+		r.renderTinyReport(file, report)
+	default:
+		r.renderFull(report)
+	}
+}
+
+// Perfect renders message about perfect spec
+func (r *TerminalRenderer) Perfect(file string, report *check.Report) {
+	r.initUI()
+
+	specName := strutil.Exclude(path.Base(file), ".spec")
+
+	switch r.Format {
+	case "tiny":
+		fmtc.Printf("%s{s}:{!} {g}✔ {!}\n", fmtutil.Align(specName, fmtutil.RIGHT, r.FilenameSize+2))
+	case "summary":
+		r.renderSummary(report)
+	default:
+		fmtc.Printf("{g}{*}%s.spec{!*} is perfect!{!}\n", specName)
+	}
+}
+
+// Skipped renders message about skipped check
+func (r *TerminalRenderer) Skipped(file string, report *check.Report) {
+	r.initUI()
+
+	specName := strutil.Exclude(path.Base(file), ".spec")
+
+	switch r.Format {
+	case "tiny":
+		fmtc.Printf("%s{s}:{!} {s}—{!}\n", fmtutil.Align(specName, fmtutil.RIGHT, r.FilenameSize+2))
+	default:
+		fmtc.Printf("{s}{*}%s.spec{!*} check skipped due to non-applicable target{!}\n", specName)
+	}
+}
+
+// Error renders global error message
+func (r *TerminalRenderer) Error(file string, err error) {
+	r.initUI()
+
+	specName := strutil.Exclude(path.Base(file), ".spec")
+
+	switch r.Format {
+	case "tiny":
+		fmtc.Printf(
+			"%s{s}:{!} {r}✖  (%v){!}\n",
+			fmtutil.Align(specName, fmtutil.RIGHT, r.FilenameSize+2), err,
+		)
+	default:
+		fmtc.Fprintf(os.Stderr, "{r}%v{!}\n", err)
+	}
+}
+
+// ////////////////////////////////////////////////////////////////////////////////// //
+
+// initUI initialize UI
+func (r *TerminalRenderer) initUI() {
 	r.levelsPrefixes = map[uint8]string{
 		check.LEVEL_NOTICE:   "<N>",
 		check.LEVEL_WARNING:  "<W>",
@@ -88,45 +154,10 @@ func (r *TerminalRenderer) Report(file string, report *check.Report) error {
 		r.hlColor[check.LEVEL_ERROR] = "{*}{#214}"
 	}
 
-	switch r.Format {
-	case "summary":
-		r.renderSummary(report)
-	case "short":
-		r.renderShortReport(report)
-	case "tiny":
-		r.renderTinyReport(file, report)
-	default:
-		r.renderFull(report)
-	}
-
-	return nil
-}
-
-// Perfect renders message about perfect spec
-func (r *TerminalRenderer) Perfect(file string) {
-	specName := strutil.Exclude(path.Base(file), ".spec")
-
-	switch r.Format {
-	case "tiny":
-		fmtc.Printf("%24s{s}:{!} {g}✔ {!}\n", specName)
-	default:
-		fmtc.Println("{g}This spec is perfect!{!}")
+	if r.FilenameSize == 0 {
+		r.FilenameSize = 24
 	}
 }
-
-// Error renders global error message
-func (r *TerminalRenderer) Error(file string, err error) {
-	specName := strutil.Exclude(path.Base(file), ".spec")
-
-	switch r.Format {
-	case "tiny":
-		fmtc.Printf("%24s{s}:{!} {r}✖ ERROR: %v{!}\n", specName, err)
-	default:
-		fmtc.Fprintf(os.Stderr, "{r}%v{!}\n", err)
-	}
-}
-
-// ////////////////////////////////////////////////////////////////////////////////// //
 
 // renderFull prints full report
 func (r *TerminalRenderer) renderFull(report *check.Report) {
@@ -180,17 +211,12 @@ func (r *TerminalRenderer) renderShortReport(report *check.Report) {
 	if report.Criticals.Total() != 0 {
 		r.renderShortAlerts(check.LEVEL_CRITICAL, report.Criticals)
 	}
-
-	fmtc.NewLine()
-
-	r.renderSummary(report)
 }
 
 // renderTinyReport prints tiny report (useful for mass check)
 func (r *TerminalRenderer) renderTinyReport(file string, report *check.Report) {
 	specName := strutil.Exclude(path.Base(file), ".spec")
-
-	fmtc.Printf("%24s{s}:{!} ", specName)
+	fmtc.Printf("%s{s}:{!} ", fmtutil.Align(specName, fmtutil.RIGHT, r.FilenameSize+2))
 
 	categories := map[uint8][]check.Alert{
 		check.LEVEL_NOTICE:   report.Notices,
@@ -215,13 +241,13 @@ func (r *TerminalRenderer) renderTinyReport(file string, report *check.Report) {
 
 		for _, alert := range alerts {
 			if fmtc.DisableColors {
-				if alert.Ignored {
+				if alert.IsIgnored {
 					fmtc.Printf("X ")
 				} else {
 					fmtc.Printf(r.fallbackLevel[level] + " ")
 				}
 			} else {
-				if alert.Ignored {
+				if alert.IsIgnored {
 					fmtc.Printf("{s-}%s{!}", "•")
 				} else {
 					fmtc.Printf(r.fgColor[level]+"%s{!}", "•")
@@ -265,7 +291,7 @@ func (r *TerminalRenderer) renderAlert(alert check.Alert) {
 	hl := r.hlColor[alert.Level]
 	lc := fg
 
-	if alert.Ignored {
+	if alert.IsIgnored {
 		fg = "{s}"
 		hl = "{s*}"
 	}
@@ -278,8 +304,8 @@ func (r *TerminalRenderer) renderAlert(alert check.Alert) {
 		fmtc.Printf(hl + "[global]{!} ")
 	}
 
-	if alert.Ignored {
-		fmtc.Printf("{s}[A]{!} ")
+	if alert.IsIgnored {
+		fmtc.Printf("{s}[I]{!} ")
 	}
 
 	if alert.ID != "" {
@@ -290,7 +316,11 @@ func (r *TerminalRenderer) renderAlert(alert check.Alert) {
 
 	if alert.Line.Text != "" {
 		text := strutil.Ellipsis(alert.Line.Text, 86)
-		fmtc.Printf(lc+"│ {s-}%s{!}\n", text)
+		if alert.IsIgnored {
+			fmtc.Printf(lc+"│ {s-}%s{!}\n", text)
+		} else {
+			fmtc.Printf(lc+"│ {s}%s{!}\n", text)
+		}
 	}
 }
 
@@ -307,7 +337,7 @@ func (r *TerminalRenderer) renderLinks(report *check.Report) {
 	fmtc.Println("\n{*}Links:{!}\n")
 
 	for _, id := range report.IDs() {
-		fmtc.Printf(" • %s%s\n", "https://kaos.sh/perfecto/w/", id)
+		fmtc.Printf(" {s}•{!} %s%s\n", "https://kaos.sh/perfecto/w/", id)
 	}
 
 	fmtc.NewLine()
@@ -315,7 +345,7 @@ func (r *TerminalRenderer) renderLinks(report *check.Report) {
 
 // renderSummary prints report statistics
 func (r *TerminalRenderer) renderSummary(report *check.Report) {
-	categories := map[uint8][]check.Alert{
+	categories := map[uint8]check.Alerts{
 		check.LEVEL_NOTICE:   report.Notices,
 		check.LEVEL_WARNING:  report.Warnings,
 		check.LEVEL_ERROR:    report.Errors,
@@ -331,25 +361,26 @@ func (r *TerminalRenderer) renderSummary(report *check.Report) {
 
 	var result []string
 
-	fmtc.Printf("{*}Summary:{!} ")
-
 	for _, level := range levels {
 		alerts := categories[level]
 
 		if len(alerts) == 0 {
+			result = append(result,
+				r.fgColor[level]+"{*}"+r.headers[level]+":{!*} 0{!}",
+			)
 			continue
 		}
 
-		total, absolved := report.Total(), report.Ignored()
-		actual := total - absolved
+		total, ignored := alerts.Total(), alerts.Ignored()
+		actual := total - ignored
 
-		if absolved != 0 {
+		if ignored != 0 {
 			result = append(result,
-				r.fgColor[level]+r.headers[level]+": "+strconv.Itoa(actual)+"{s}/"+strconv.Itoa(absolved)+"{!}",
+				r.fgColor[level]+"{*}"+r.headers[level]+":{!*} "+strconv.Itoa(actual)+"{s-}/"+strconv.Itoa(ignored)+"{!}",
 			)
 		} else {
 			result = append(result,
-				r.fgColor[level]+r.headers[level]+": "+strconv.Itoa(actual)+"{!}",
+				r.fgColor[level]+"{*}"+r.headers[level]+":{!*} "+strconv.Itoa(actual),
 			)
 		}
 	}
@@ -379,8 +410,8 @@ func (r *TerminalRenderer) renderShortAlert(alert check.Alert) {
 		fmtc.Printf(hl + "[global]{!} ")
 	}
 
-	if alert.Ignored {
-		fmtc.Printf("{s}[A]{!} ")
+	if alert.IsIgnored {
+		fmtc.Printf("{s}[I]{!} ")
 	}
 
 	if alert.ID != "" {

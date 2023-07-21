@@ -17,10 +17,13 @@ import (
 type Renderer interface {
 
 	// Report renders alerts from perfecto report
-	Report(file string, report *check.Report) error
+	Report(file string, report *check.Report)
 
 	// Perfect renders message about perfect spec
-	Perfect(file string)
+	Perfect(file string, report *check.Report)
+
+	// Skipped renders message about skipped check
+	Skipped(file string, report *check.Report)
 
 	// Error renders global error message
 	Error(file string, err error)

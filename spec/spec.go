@@ -45,19 +45,25 @@ const (
 	SECTION_VERIFYSCRIPT  = "verifyscript"
 )
 
+const (
+	DIRECTIVE_IGNORE = "perfecto:ignore"
+	DIRECTIVE_TARGET = "perfecto:target"
+)
+
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // Spec spec contains data from spec file
 type Spec struct {
-	File string `json:"file"`
-	Data []Line `json:"data"`
+	File    string   `json:"file"`
+	Data    []Line   `json:"data"`
+	Targets []string `json:"targets"`
 }
 
 // Line contains line data and index
 type Line struct {
-	Index int    `json:"index"`
-	Text  string `json:"text"`
-	Skip  bool   `json:"skip"`
+	Index  int    `json:"index"`
+	Text   string `json:"text"`
+	Ignore bool   `json:"ignore"`
 }
 
 // Header header contains header info and data
@@ -143,7 +149,7 @@ var sectionRegex = regexp.MustCompile(`^%(prep|setup|build|install|check|clean|f
 
 // Read read and parse rpm spec file
 func Read(file string) (*Spec, error) {
-	err := checkFile(file)
+	err := fsutil.ValidatePerms("FRS", file)
 
 	if err != nil {
 		return nil, err
@@ -226,7 +232,7 @@ func readFile(file string) (*Spec, error) {
 
 	defer fd.Close()
 
-	line, skip := 1, 0
+	line, ignore := 1, 0
 	spec := &Spec{File: file}
 	r := bufio.NewReader(fd)
 
@@ -235,52 +241,37 @@ LOOP:
 		text, err := r.ReadString('\n')
 
 		if err != nil {
-			spec.Data = append(spec.Data, Line{line, text, skip != 0})
+			spec.Data = append(spec.Data, Line{line, text, ignore != 0})
 			break LOOP
 		}
 
 		text = strings.TrimRight(text, "\r\n")
 
-		if isSkipTag(text) {
-			skip = extractSkipCount(text)
-			skip++
+		switch {
+		case strings.Contains(text, DIRECTIVE_IGNORE),
+			strings.Contains(text, "perfecto:absolve"):
+			ignore = extractIgnoreCount(text)
+			ignore++
+		case strings.Contains(text, DIRECTIVE_TARGET):
+			spec.Targets = extractTargets(text)
+			line++
+			continue
 		}
 
-		spec.Data = append(spec.Data, Line{line, text, skip != 0})
+		spec.Data = append(spec.Data, Line{line, text, ignore != 0})
 
-		if skip != 0 {
-			skip--
+		if ignore != 0 {
+			ignore--
 		}
 
 		line++
 	}
 
 	if !isSpec(spec) {
-		return nil, fmt.Errorf("File %s is not a spec file", file)
+		return nil, fmt.Errorf("File %s is not a spec file or it is misformatted", file)
 	}
 
 	return spec, nil
-}
-
-// checkFile checks file for errors
-func checkFile(file string) error {
-	if !fsutil.IsExist(file) {
-		return fmt.Errorf("File %s doesn't exist", file)
-	}
-
-	if !fsutil.IsRegular(file) {
-		return fmt.Errorf("%s isn't a regular file", file)
-	}
-
-	if !fsutil.IsReadable(file) {
-		return fmt.Errorf("File %s isn't readable", file)
-	}
-
-	if !fsutil.IsNonEmpty(file) {
-		return fmt.Errorf("File %s is empty", file)
-	}
-
-	return nil
 }
 
 // hasSection returns true if spec contains given section
@@ -372,10 +363,6 @@ func extractSources(s *Spec) []Line {
 	var result []Line
 
 	for _, line := range s.Data {
-		if line.Skip {
-			continue
-		}
-
 		if isSectionHeader(line.Text) {
 			break
 		}
@@ -473,14 +460,21 @@ func isSpec(spec *Spec) bool {
 	return count >= 3
 }
 
-// isSkipTag returns true if text contains skip tag
-func isSkipTag(text string) bool {
-	return strings.Contains(text, "perfecto:absolve") ||
-		strings.Contains(text, "perfecto:ignore")
+// getSectionRegexp creates new regex struct and cache it
+func getSectionRegexp(section string) *regexp.Regexp {
+	_, exist := regexpCache[section]
+
+	if exist {
+		return regexpCache[section]
+	}
+
+	regexpCache[section] = regexp.MustCompile(`^%` + section + `($| )`)
+
+	return regexpCache[section]
 }
 
-// extractSkipCount returns number of lines to skip
-func extractSkipCount(text string) int {
+// extractIgnoreCount extracts number of lines to ignore from directive
+func extractIgnoreCount(text string) int {
 	count := strutil.ReadField(text, 2, true)
 
 	if count == "" {
@@ -496,15 +490,19 @@ func extractSkipCount(text string) int {
 	return countInt
 }
 
-// getSectionRegexp creates new regex struct and cache it
-func getSectionRegexp(section string) *regexp.Regexp {
-	_, exist := regexpCache[section]
+// extractTargets extracts targets from directive
+func extractTargets(text string) []string {
+	var result []string
 
-	if exist {
-		return regexpCache[section]
+	for i := 2; i < 32; i++ {
+		target := strutil.ReadField(text, i, true, " ", ",")
+
+		if target == "" {
+			break
+		}
+
+		result = append(result, strings.ToLower(target))
 	}
 
-	regexpCache[section] = regexp.MustCompile(`^%` + section + `($| )`)
-
-	return regexpCache[section]
+	return result
 }
