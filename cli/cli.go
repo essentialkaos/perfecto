@@ -13,11 +13,11 @@ import (
 	"strings"
 
 	"github.com/essentialkaos/ek/v12/fmtc"
-	"github.com/essentialkaos/ek/v12/fsutil"
 	"github.com/essentialkaos/ek/v12/mathutil"
 	"github.com/essentialkaos/ek/v12/options"
 	"github.com/essentialkaos/ek/v12/sliceutil"
 	"github.com/essentialkaos/ek/v12/strutil"
+	"github.com/essentialkaos/ek/v12/terminal/tty"
 	"github.com/essentialkaos/ek/v12/usage"
 	"github.com/essentialkaos/ek/v12/usage/completion/bash"
 	"github.com/essentialkaos/ek/v12/usage/completion/fish"
@@ -36,8 +36,8 @@ import (
 
 // App info
 const (
-	APP  = "Perfecto"
-	VER  = "6.0.0"
+	APP  = "perfecto"
+	VER  = "6.1.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -108,6 +108,12 @@ var formats = []string{
 	"",
 }
 
+// colorTagApp is app name color tag
+var colorTagApp string
+
+// colorTagVer is app version color tag
+var colorTagVer string
+
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // Run is main utility function
@@ -145,24 +151,7 @@ func Run(gitRev string, gomod []byte) {
 
 // preConfigureUI preconfigures UI based on information about user terminal
 func preConfigureUI() {
-	term := os.Getenv("TERM")
-
-	fmtc.DisableColors = true
-	strutil.EllipsisSuffix = "…"
-
-	if term != "" {
-		switch {
-		case strings.Contains(term, "xterm"),
-			strings.Contains(term, "color"),
-			term == "screen":
-			fmtc.DisableColors = false
-		}
-	}
-
-	// Check for output redirect using pipes
-	if fsutil.IsCharacterDevice("/dev/stdin") &&
-		!fsutil.IsCharacterDevice("/dev/stdout") &&
-		os.Getenv("FAKETTY") == "" {
+	if !fmtc.IsColorsSupported() && !tty.IsTTY() {
 		fmtc.DisableColors = true
 	}
 
@@ -179,6 +168,17 @@ func preConfigureUI() {
 func configureUI() {
 	if options.GetB(OPT_NO_COLOR) {
 		fmtc.DisableColors = true
+	}
+
+	strutil.EllipsisSuffix = "…"
+
+	switch {
+	case fmtc.IsTrueColorSupported():
+		colorTagApp, colorTagVer = "{*}{&}{#FFC336}", "{#FFC336}"
+	case fmtc.Is256ColorsSupported():
+		colorTagApp, colorTagVer = "{*}{&}{#214}", "{#214}"
+	default:
+		colorTagApp, colorTagVer = "{*}{&}{y}", "{y}"
 	}
 }
 
@@ -380,6 +380,8 @@ func printMan() {
 func genUsage() *usage.Info {
 	info := usage.NewInfo("", "spec…")
 
+	info.AppNameColorTag = colorTagApp
+
 	info.AddOption(OPT_IGNORE, "Disable one or more checks by their ID", "id…")
 	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny|short|github|json|xml){!}", "format")
 	info.AddOption(OPT_LINT_CONFIG, "Path to RPMLint configuration file", "file")
@@ -423,11 +425,16 @@ func genUsage() *usage.Info {
 // genAbout generates info about version
 func genAbout(gitRev string) *usage.About {
 	about := &usage.About{
-		App:           APP,
-		Version:       VER,
-		Desc:          DESC,
-		Year:          2006,
-		Owner:         "ESSENTIAL KAOS",
+		App:     APP,
+		Version: VER,
+		Desc:    DESC,
+		Year:    2006,
+		Owner:   "ESSENTIAL KAOS",
+
+		AppNameColorTag: colorTagApp,
+		VersionColorTag: colorTagVer,
+		DescSeparator:   "—",
+
 		License:       "Apache License, Version 2.0 <https://www.apache.org/licenses/LICENSE-2.0>",
 		UpdateChecker: usage.UpdateChecker{"essentialkaos/perfecto", update.GitHubChecker},
 	}
