@@ -254,10 +254,8 @@ func getFormat(files options.Arguments) string {
 		case "":
 			format = FORMAT_TINY
 		}
-	} else {
-		if format == "" && os.Getenv("GITHUB_ACTIONS") == "true" {
-			format = FORMAT_GITHUB
-		}
+	} else if format == "" && os.Getenv("GITHUB_ACTIONS") == "true" {
+		format = FORMAT_GITHUB
 	}
 
 	return format
@@ -354,11 +352,11 @@ func printCompletion() int {
 
 	switch options.GetS(OPT_COMPLETION) {
 	case "bash":
-		fmt.Printf(bash.Generate(info, "perfecto", "spec"))
+		fmt.Print(bash.Generate(info, "perfecto", "spec"))
 	case "fish":
-		fmt.Printf(fish.Generate(info, "perfecto"))
+		fmt.Print(fish.Generate(info, "perfecto"))
 	case "zsh":
-		fmt.Printf(zsh.Generate(info, optMap, "perfecto", "*.spec"))
+		fmt.Print(zsh.Generate(info, optMap, "perfecto", "*.spec"))
 	default:
 		os.Exit(1)
 	}
