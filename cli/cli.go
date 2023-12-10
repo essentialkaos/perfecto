@@ -48,6 +48,7 @@ const (
 	OPT_ERROR_LEVEL = "e:error-level"
 	OPT_IGNORE      = "I:ignore"
 	OPT_QUIET       = "q:quiet"
+	OPT_PAGER       = "P:pager"
 	OPT_NO_LINT     = "nl:no-lint"
 	OPT_NO_COLOR    = "nc:no-color"
 	OPT_HELP        = "h:help"
@@ -266,20 +267,36 @@ func getRenderer(format string, files options.Arguments) render.Renderer {
 	maxFilenameSize := getMaxFilenameSize(files)
 
 	switch format {
-	case FORMAT_SUMMARY:
-		return &render.TerminalRenderer{Format: FORMAT_SUMMARY, FilenameSize: maxFilenameSize}
-	case FORMAT_TINY:
-		return &render.TerminalRenderer{Format: FORMAT_TINY, FilenameSize: maxFilenameSize}
-	case FORMAT_SHORT:
-		return &render.TerminalRenderer{Format: FORMAT_SHORT, FilenameSize: maxFilenameSize}
 	case FORMAT_GITHUB:
 		return &render.GithubRenderer{}
 	case FORMAT_JSON:
 		return &render.JSONRenderer{}
 	case FORMAT_XML:
 		return &render.XMLRenderer{}
+	case FORMAT_SUMMARY:
+		return &render.TerminalRenderer{
+			Format:       FORMAT_SUMMARY,
+			FilenameSize: maxFilenameSize,
+			UsePager:     options.GetB(OPT_PAGER),
+		}
+	case FORMAT_TINY:
+		return &render.TerminalRenderer{
+			Format:       FORMAT_TINY,
+			FilenameSize: maxFilenameSize,
+			UsePager:     options.GetB(OPT_PAGER),
+		}
+	case FORMAT_SHORT:
+		return &render.TerminalRenderer{
+			Format:       FORMAT_SHORT,
+			FilenameSize: maxFilenameSize,
+			UsePager:     options.GetB(OPT_PAGER),
+		}
 	default:
-		return &render.TerminalRenderer{Format: FORMAT_FULL, FilenameSize: maxFilenameSize}
+		return &render.TerminalRenderer{
+			Format:       FORMAT_FULL,
+			FilenameSize: maxFilenameSize,
+			UsePager:     options.GetB(OPT_PAGER),
+		}
 	}
 }
 
@@ -385,6 +402,7 @@ func genUsage() *usage.Info {
 	info.AddOption(OPT_LINT_CONFIG, "Path to RPMLint configuration file", "file")
 	info.AddOption(OPT_ERROR_LEVEL, "Return non-zero exit code if alert level greater than given {s-}(notice|warning|error|critical){!}", "level")
 	info.AddOption(OPT_QUIET, "Suppress all normal output")
+	info.AddOption(OPT_PAGER, "Use pager for long output")
 	info.AddOption(OPT_NO_LINT, "Disable RPMLint checks")
 	info.AddOption(OPT_NO_COLOR, "Disable colors in output")
 	info.AddOption(OPT_HELP, "Show this help message")
