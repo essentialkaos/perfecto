@@ -449,7 +449,7 @@ func genAbout(gitRev string) *usage.About {
 
 		AppNameColorTag: colorTagApp,
 		VersionColorTag: colorTagVer,
-		DescSeparator:   "—",
+		DescSeparator:   "{s}—{!}",
 
 		License:       "Apache License, Version 2.0 <https://www.apache.org/licenses/LICENSE-2.0>",
 		UpdateChecker: usage.UpdateChecker{"essentialkaos/perfecto", update.GitHubChecker},
