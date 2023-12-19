@@ -15,6 +15,7 @@ import (
 
 	"github.com/essentialkaos/ek/v12/fmtc"
 	"github.com/essentialkaos/ek/v12/fmtutil"
+	"github.com/essentialkaos/ek/v12/pager"
 	"github.com/essentialkaos/ek/v12/path"
 	"github.com/essentialkaos/ek/v12/strutil"
 
@@ -27,6 +28,7 @@ import (
 type TerminalRenderer struct {
 	Format       string
 	FilenameSize int
+	UsePager     bool
 
 	levelsPrefixes map[uint8]string
 	bgColor        map[uint8]string
@@ -41,6 +43,12 @@ type TerminalRenderer struct {
 // Report renders alerts from perfecto report
 func (r *TerminalRenderer) Report(file string, report *check.Report) {
 	r.initUI()
+
+	if r.UsePager {
+		if pager.Setup() == nil {
+			defer pager.Complete()
+		}
+	}
 
 	switch r.Format {
 	case "summary":

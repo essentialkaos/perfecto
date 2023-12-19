@@ -117,7 +117,7 @@ func checkForUselessSpaces(id string, s *spec.Spec) []Alert {
 	for _, line := range s.Data {
 		if contains(line, " ") {
 			if strings.TrimSpace(line.Text) == "" {
-				impLine := spec.Line{line.Index, strings.Replace(line.Text, " ", "░", -1), line.Ignore}
+				impLine := spec.Line{line.Index, strings.ReplaceAll(line.Text, " ", "░"), line.Ignore}
 				result = append(result, NewAlert(id, LEVEL_NOTICE, "Line contains useless spaces", impLine))
 			} else if strings.TrimRight(line.Text, " ") != line.Text {
 				cleanLine := strings.TrimRight(line.Text, " ")
@@ -1105,7 +1105,7 @@ func isComment(line spec.Line) bool {
 // isEmptyData check if data is empty or contains only spaces
 func isEmptyData(data []spec.Line) bool {
 	for _, line := range data {
-		if strings.Replace(line.Text, " ", "", -1) != "" {
+		if strings.ReplaceAll(line.Text, " ", "") != "" {
 			return false
 		}
 	}

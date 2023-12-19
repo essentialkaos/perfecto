@@ -13,11 +13,11 @@ import (
 	"strings"
 
 	"github.com/essentialkaos/ek/v12/fmtc"
-	"github.com/essentialkaos/ek/v12/fsutil"
 	"github.com/essentialkaos/ek/v12/mathutil"
 	"github.com/essentialkaos/ek/v12/options"
 	"github.com/essentialkaos/ek/v12/sliceutil"
 	"github.com/essentialkaos/ek/v12/strutil"
+	"github.com/essentialkaos/ek/v12/terminal/tty"
 	"github.com/essentialkaos/ek/v12/usage"
 	"github.com/essentialkaos/ek/v12/usage/completion/bash"
 	"github.com/essentialkaos/ek/v12/usage/completion/fish"
@@ -36,8 +36,8 @@ import (
 
 // App info
 const (
-	APP  = "Perfecto"
-	VER  = "6.0.0"
+	APP  = "perfecto"
+	VER  = "6.1.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -48,6 +48,7 @@ const (
 	OPT_ERROR_LEVEL = "e:error-level"
 	OPT_IGNORE      = "I:ignore"
 	OPT_QUIET       = "q:quiet"
+	OPT_PAGER       = "P:pager"
 	OPT_NO_LINT     = "nl:no-lint"
 	OPT_NO_COLOR    = "nc:no-color"
 	OPT_HELP        = "h:help"
@@ -108,6 +109,12 @@ var formats = []string{
 	"",
 }
 
+// colorTagApp is app name color tag
+var colorTagApp string
+
+// colorTagVer is app version color tag
+var colorTagVer string
+
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 // Run is main utility function
@@ -145,24 +152,7 @@ func Run(gitRev string, gomod []byte) {
 
 // preConfigureUI preconfigures UI based on information about user terminal
 func preConfigureUI() {
-	term := os.Getenv("TERM")
-
-	fmtc.DisableColors = true
-	strutil.EllipsisSuffix = "…"
-
-	if term != "" {
-		switch {
-		case strings.Contains(term, "xterm"),
-			strings.Contains(term, "color"),
-			term == "screen":
-			fmtc.DisableColors = false
-		}
-	}
-
-	// Check for output redirect using pipes
-	if fsutil.IsCharacterDevice("/dev/stdin") &&
-		!fsutil.IsCharacterDevice("/dev/stdout") &&
-		os.Getenv("FAKETTY") == "" {
+	if !fmtc.IsColorsSupported() && !tty.IsTTY() {
 		fmtc.DisableColors = true
 	}
 
@@ -179,6 +169,17 @@ func preConfigureUI() {
 func configureUI() {
 	if options.GetB(OPT_NO_COLOR) {
 		fmtc.DisableColors = true
+	}
+
+	strutil.EllipsisSuffix = "…"
+
+	switch {
+	case fmtc.IsTrueColorSupported():
+		colorTagApp, colorTagVer = "{*}{&}{#FFC336}", "{#FFC336}"
+	case fmtc.Is256ColorsSupported():
+		colorTagApp, colorTagVer = "{*}{&}{#214}", "{#214}"
+	default:
+		colorTagApp, colorTagVer = "{*}{&}{y}", "{y}"
 	}
 }
 
@@ -254,10 +255,8 @@ func getFormat(files options.Arguments) string {
 		case "":
 			format = FORMAT_TINY
 		}
-	} else {
-		if format == "" && os.Getenv("GITHUB_ACTIONS") == "true" {
-			format = FORMAT_GITHUB
-		}
+	} else if format == "" && os.Getenv("GITHUB_ACTIONS") == "true" {
+		format = FORMAT_GITHUB
 	}
 
 	return format
@@ -268,20 +267,36 @@ func getRenderer(format string, files options.Arguments) render.Renderer {
 	maxFilenameSize := getMaxFilenameSize(files)
 
 	switch format {
-	case FORMAT_SUMMARY:
-		return &render.TerminalRenderer{Format: FORMAT_SUMMARY, FilenameSize: maxFilenameSize}
-	case FORMAT_TINY:
-		return &render.TerminalRenderer{Format: FORMAT_TINY, FilenameSize: maxFilenameSize}
-	case FORMAT_SHORT:
-		return &render.TerminalRenderer{Format: FORMAT_SHORT, FilenameSize: maxFilenameSize}
 	case FORMAT_GITHUB:
 		return &render.GithubRenderer{}
 	case FORMAT_JSON:
 		return &render.JSONRenderer{}
 	case FORMAT_XML:
 		return &render.XMLRenderer{}
+	case FORMAT_SUMMARY:
+		return &render.TerminalRenderer{
+			Format:       FORMAT_SUMMARY,
+			FilenameSize: maxFilenameSize,
+			UsePager:     options.GetB(OPT_PAGER),
+		}
+	case FORMAT_TINY:
+		return &render.TerminalRenderer{
+			Format:       FORMAT_TINY,
+			FilenameSize: maxFilenameSize,
+			UsePager:     options.GetB(OPT_PAGER),
+		}
+	case FORMAT_SHORT:
+		return &render.TerminalRenderer{
+			Format:       FORMAT_SHORT,
+			FilenameSize: maxFilenameSize,
+			UsePager:     options.GetB(OPT_PAGER),
+		}
 	default:
-		return &render.TerminalRenderer{Format: FORMAT_FULL, FilenameSize: maxFilenameSize}
+		return &render.TerminalRenderer{
+			Format:       FORMAT_FULL,
+			FilenameSize: maxFilenameSize,
+			UsePager:     options.GetB(OPT_PAGER),
+		}
 	}
 }
 
@@ -354,11 +369,11 @@ func printCompletion() int {
 
 	switch options.GetS(OPT_COMPLETION) {
 	case "bash":
-		fmt.Printf(bash.Generate(info, "perfecto", "spec"))
+		fmt.Print(bash.Generate(info, "perfecto", "spec"))
 	case "fish":
-		fmt.Printf(fish.Generate(info, "perfecto"))
+		fmt.Print(fish.Generate(info, "perfecto"))
 	case "zsh":
-		fmt.Printf(zsh.Generate(info, optMap, "perfecto", "*.spec"))
+		fmt.Print(zsh.Generate(info, optMap, "perfecto", "*.spec"))
 	default:
 		os.Exit(1)
 	}
@@ -380,11 +395,14 @@ func printMan() {
 func genUsage() *usage.Info {
 	info := usage.NewInfo("", "spec…")
 
+	info.AppNameColorTag = colorTagApp
+
 	info.AddOption(OPT_IGNORE, "Disable one or more checks by their ID", "id…")
 	info.AddOption(OPT_FORMAT, "Output format {s-}(summary|tiny|short|github|json|xml){!}", "format")
 	info.AddOption(OPT_LINT_CONFIG, "Path to RPMLint configuration file", "file")
 	info.AddOption(OPT_ERROR_LEVEL, "Return non-zero exit code if alert level greater than given {s-}(notice|warning|error|critical){!}", "level")
 	info.AddOption(OPT_QUIET, "Suppress all normal output")
+	info.AddOption(OPT_PAGER, "Use pager for long output")
 	info.AddOption(OPT_NO_LINT, "Disable RPMLint checks")
 	info.AddOption(OPT_NO_COLOR, "Disable colors in output")
 	info.AddOption(OPT_HELP, "Show this help message")
@@ -423,11 +441,16 @@ func genUsage() *usage.Info {
 // genAbout generates info about version
 func genAbout(gitRev string) *usage.About {
 	about := &usage.About{
-		App:           APP,
-		Version:       VER,
-		Desc:          DESC,
-		Year:          2006,
-		Owner:         "ESSENTIAL KAOS",
+		App:     APP,
+		Version: VER,
+		Desc:    DESC,
+		Year:    2006,
+		Owner:   "ESSENTIAL KAOS",
+
+		AppNameColorTag: colorTagApp,
+		VersionColorTag: colorTagVer,
+		DescSeparator:   "{s}—{!}",
+
 		License:       "Apache License, Version 2.0 <https://www.apache.org/licenses/LICENSE-2.0>",
 		UpdateChecker: usage.UpdateChecker{"essentialkaos/perfecto", update.GitHubChecker},
 	}
