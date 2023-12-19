@@ -10,7 +10,7 @@
 
 Summary:        Tool for checking perfectly written RPM specs
 Name:           perfecto
-Version:        6.0.0
+Version:        6.1.0
 Release:        0%{?dist}
 Group:          Development/Tools
 License:        Apache License, Version 2.0
@@ -22,7 +22,7 @@ Source100:      checksum.sha512
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:  golang >= 1.19
+BuildRequires:  golang >= 1.21
 
 Requires:       rpmlint
 
@@ -105,6 +105,12 @@ fi
 ################################################################################
 
 %changelog
+* Tue Dec 19 2023 Anton Novojilov <andy@essentialkaos.com> - 6.1.0-0
+- Added '-P'/'--pager' option to use pager for long output
+- Improved verbose version info generation
+- Code refactoring
+- Dependencies update
+
 * Thu Jul 20 2023 Anton Novojilov <andy@essentialkaos.com> - 6.0.0-0
 - Added 'target' directive
 - Improved XML render
