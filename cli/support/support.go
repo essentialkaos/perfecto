@@ -146,7 +146,7 @@ func showEnvInfo() {
 	if strings.Count(dataStr, " ") == 0 {
 		printInfo(7, "RPMLint", dataStr)
 	} else {
-		printInfo(7, "RPMLint", strutil.ReadField(dataStr, 2, false, " "))
+		printInfo(7, "RPMLint", strutil.ReadField(dataStr, 2, false, ' '))
 	}
 }
 
