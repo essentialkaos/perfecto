@@ -2,7 +2,7 @@ package check
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 //                                                                                    //
-//                         Copyright (c) 2023 ESSENTIAL KAOS                          //
+//                         Copyright (c) 2024 ESSENTIAL KAOS                          //
 //      Apache License, Version 2.0 <https://www.apache.org/licenses/LICENSE-2.0>     //
 //                                                                                    //
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -754,7 +754,7 @@ func checkURLForHTTPS(id string, s *spec.Spec) []Alert {
 
 	for _, line := range urls {
 		lineText := strings.TrimLeft(line.Text, "\t ")
-		url := strutil.ReadField(lineText, 1, true, " ")
+		url := strutil.ReadField(lineText, 1, true, ' ')
 
 		if !strings.HasPrefix(url, "http://") {
 			continue
@@ -1138,7 +1138,7 @@ func containsTag(data []spec.Line, tag string) bool {
 // extractDomainFromURL extracts domain name from source URL
 func extractDomainFromURL(url string) string {
 	url = strutil.Exclude(url, "http://")
-	return strutil.ReadField(url, 0, false, "/")
+	return strutil.ReadField(url, 0, false, '/')
 }
 
 // isHostSupportsHTTPS return true if domain supports HTTPS protocol

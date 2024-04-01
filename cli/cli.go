@@ -2,7 +2,7 @@ package cli
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 //                                                                                    //
-//                         Copyright (c) 2023 ESSENTIAL KAOS                          //
+//                         Copyright (c) 2024 ESSENTIAL KAOS                          //
 //      Apache License, Version 2.0 <https://www.apache.org/licenses/LICENSE-2.0>     //
 //                                                                                    //
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -10,6 +10,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/essentialkaos/ek/v12/fmtc"
@@ -17,6 +18,9 @@ import (
 	"github.com/essentialkaos/ek/v12/options"
 	"github.com/essentialkaos/ek/v12/sliceutil"
 	"github.com/essentialkaos/ek/v12/strutil"
+	"github.com/essentialkaos/ek/v12/support"
+	"github.com/essentialkaos/ek/v12/support/deps"
+	"github.com/essentialkaos/ek/v12/support/pkgs"
 	"github.com/essentialkaos/ek/v12/terminal/tty"
 	"github.com/essentialkaos/ek/v12/usage"
 	"github.com/essentialkaos/ek/v12/usage/completion/bash"
@@ -29,7 +33,6 @@ import (
 	"github.com/essentialkaos/perfecto/spec"
 
 	"github.com/essentialkaos/perfecto/cli/render"
-	"github.com/essentialkaos/perfecto/cli/support"
 )
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -37,7 +40,7 @@ import (
 // App info
 const (
 	APP  = "perfecto"
-	VER  = "6.1.0"
+	VER  = "6.1.1"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -140,7 +143,12 @@ func Run(gitRev string, gomod []byte) {
 		genAbout(gitRev).Print(options.GetS(OPT_VER))
 		os.Exit(0)
 	case options.GetB(OPT_VERB_VER):
-		support.Print(APP, VER, gitRev, gomod)
+		support.Collect(APP, VER).
+			WithRevision(gitRev).
+			WithDeps(deps.Extract(gomod)).
+			WithPackages(pkgs.Collect("rpmlint", "rpmdevtools", "rpm-build")).
+			WithApps(getRPMLintInfo()).
+			Print()
 		os.Exit(0)
 	case options.GetB(OPT_HELP) || len(args) == 0:
 		genUsage().Print()
@@ -362,6 +370,24 @@ func printErrorAndExit(f string, a ...interface{}) {
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
+
+// getRPMLintInfo returns info about rpmlint
+func getRPMLintInfo() support.App {
+	cmd := exec.Command("rpmlint", "--version")
+	data, err := cmd.Output()
+
+	if err != nil {
+		return support.App{"RPMLint", ""}
+	}
+
+	dataStr := strings.Trim(string(data), "\r\n\t")
+
+	if strings.Count(dataStr, " ") == 0 {
+		return support.App{"RPMLint", dataStr}
+	}
+
+	return support.App{"RPMLint", strutil.ReadField(dataStr, 2, false, ' ')}
+}
 
 // printCompletion prints completion for given shell
 func printCompletion() int {

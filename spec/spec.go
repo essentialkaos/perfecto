@@ -2,7 +2,7 @@ package spec
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 //                                                                                    //
-//                         Copyright (c) 2023 ESSENTIAL KAOS                          //
+//                         Copyright (c) 2024 ESSENTIAL KAOS                          //
 //      Apache License, Version 2.0 <https://www.apache.org/licenses/LICENSE-2.0>     //
 //                                                                                    //
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -302,7 +302,7 @@ func extractSections(s *Spec, names []string) []*Section {
 				section = nil
 			}
 
-			if !isSectionMatch(strutil.ReadField(line.Text, 0, true, " "), names) {
+			if !isSectionMatch(strutil.ReadField(line.Text, 0, true, ' '), names) {
 				continue
 			}
 
@@ -495,7 +495,7 @@ func extractTargets(text string) []string {
 	var result []string
 
 	for i := 2; i < 32; i++ {
-		target := strutil.ReadField(text, i, true, " ", ",")
+		target := strutil.ReadField(text, i, true, ' ', ',')
 
 		if target == "" {
 			break
