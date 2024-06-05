@@ -112,7 +112,7 @@ jobs:
           fi
 
           if [[ "${{ github.event.inputs.force_rebuild }}" == "true" ]] ; then
-            echo "::warning::Rebuild ${{matrix.version}} (reason: forced rebuild)"
+            echo "::warning::Rebuild ${{matrix.image}} (reason: forced rebuild)"
             echo "build=true" >> $GITHUB_OUTPUT
             exit 0
           fi
