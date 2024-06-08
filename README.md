@@ -121,41 +121,7 @@ Additional information about action configuration can be found on [the official 
 
 ### Usage
 
-```
-Usage: perfecto {options} spec…
-
-Options
-
-  --ignore, -I id…           Disable one or more checks by their ID
-  --format, -f format        Output format (summary|tiny|short|github|json|xml)
-  --lint-config, -c file     Path to RPMLint configuration file
-  --error-level, -e level    Return non-zero exit code if alert level greater than given (notice|warning|error|critical)
-  --quiet, -q                Suppress all normal output
-  --no-lint, -nl             Disable RPMLint checks
-  --no-color, -nc            Disable colors in output
-  --help, -h                 Show this help message
-  --version, -v              Show version
-
-Examples
-
-  perfecto app.spec
-  Check spec and print extended report
-
-  perfecto --no-lint app.spec
-  Check spec without rpmlint and print extended report
-
-  perfecto --ignore PF2,PF12 app.spec
-  Check spec without PF2 and PF12 checks
-
-  perfecto --format tiny app.spec
-  Check spec and print tiny report
-
-  perfecto --format summary app.spec
-  Check spec and print summary
-
-  perfecto --format json app.spec 1> report.json
-  Check spec, generate report in JSON format and save as report.json
-```
+<img src=".github/images/usage.svg" />
 
 ### Build Status
 
