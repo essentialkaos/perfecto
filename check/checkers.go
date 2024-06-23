@@ -101,6 +101,7 @@ func getCheckers() map[string]Checker {
 		"PF25": checkForDotInSummary,
 		"PF26": checkForChownAndChmod,
 		"PF27": checkForUnclosedCondition,
+		"PF28": checkForLongSummary,
 	}
 }
 
@@ -1058,6 +1059,32 @@ func checkForUnclosedCondition(id string, s *spec.Spec) []Alert {
 	if len(conditions) != 0 {
 		for _, line := range conditions {
 			result = append(result, NewAlert(id, LEVEL_CRITICAL, "Scriptlet contains unclosed IF condition", line))
+		}
+	}
+
+	return result
+}
+
+// checkForLongSummary checks Summary tag length
+func checkForLongSummary(id string, s *spec.Spec) []Alert {
+	if len(s.Data) == 0 {
+		return nil
+	}
+
+	var result []Alert
+
+	for _, header := range s.GetHeaders() {
+		for _, line := range header.Data {
+			if prefix(line, "Summary:") {
+				summary := strutil.Substr(line.Text, 8, 999)
+				summary = strings.TrimLeft(summary, " ")
+				summaryLen := strutil.LenVisual(summary)
+
+				if strutil.LenVisual(summary) >= 70 {
+					desc := fmt.Sprintf("Package summary is too long (%d ≥ 70)", summaryLen)
+					result = append(result, NewAlert(id, LEVEL_WARNING, desc, line))
+				}
+			}
 		}
 	}
 

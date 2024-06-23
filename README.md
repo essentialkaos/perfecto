@@ -1,4 +1,4 @@
-<p align="center"><a href="#readme"><img src="https://gh.kaos.st/perfecto.svg"/></a></p>
+<p align="center"><a href="#readme"><img src=".github/images/card.svg"/></a></p>
 
 <p align="center">
   <a href="https://kaos.sh/r/perfecto"><img src="https://kaos.sh/r/perfecto.svg" alt="GoReportCard" /></a>
@@ -8,18 +8,18 @@
   <a href="https://kaos.sh/c/perfecto"><img src="https://kaos.sh/c/perfecto.svg" alt="Coverage Status" /></a>
   <a href="https://kaos.sh/w/perfecto/ci"><img src="https://kaos.sh/w/perfecto/ci.svg" alt="GitHub Actions CI Status" /></a>
   <a href="https://kaos.sh/w/perfecto/codeql"><img src="https://kaos.sh/w/perfecto/codeql.svg" alt="GitHub Actions CodeQL Status" /></a>
-  <a href="#license"><img src="https://gh.kaos.st/apache2.svg"></a>
+  <a href="#license"><img src=".github/images/license.svg"/></a>
 </p>
 
-<p align="center"><a href="#checks">Checks</a> • <a href="#installing">Installing</a> • <a href="#usage">Usage</a> • <a href="#build-status">Build Status</a> • <a href="#license">License</a></p>
+<p align="center"><a href="#checks">Checks</a> • <a href="#installing">Installing</a> • <a href="#usage">Usage</a> • <a href="#ci-status">CI Status</a> • <a href="#license">License</a></p>
 
 <br/>
 
-_perfecto_ is tool for checking perfectly written RPM specs. Currently, _perfecto_ used by default for checking specs for [EK Public Repository](https://yum.kaos.st).
+_perfecto_ is tool for checking perfectly written RPM specs. Currently, _perfecto_ used by default for checking specs for [EK Public Repository](https://kaos.sh/kaos-repo).
 
-![Screenshot](https://gh.kaos.st/perfecto.png)
+![Screenshot](.github/images/screenshot1.png)
 
-![Screenshot](https://gh.kaos.st/perfecto2.png)
+![Screenshot](.github/images/screenshot2.png)
 
 ### Checks
 
@@ -29,7 +29,7 @@ You can find additional information about every _perfecto_ check in [project wik
 
 #### From sources
 
-Make sure you have a working Go 1.19+ workspace ([instructions](https://go.dev/doc/install)), then:
+Make sure you have a working Go 1.21+ workspace ([instructions](https://go.dev/doc/install)), then:
 
 ```bash
 go install github.com/essentialkaos/perfecto@latest
@@ -38,10 +38,7 @@ go install github.com/essentialkaos/perfecto@latest
 #### From [ESSENTIAL KAOS Public Repository](https://kaos.sh/kaos-repo)
 
 ```bash
-sudo yum install -y https://pkgs.kaos.st/kaos-repo-latest.el$(grep 'CPE_NAME' /etc/os-release | tr -d '"' | cut -d':' -f5).noarch.rpm
-
-# EL7 (OracleLinux/CentOS 7)
-sudo yum install perfecto
+sudo dnf install -y https://pkgs.kaos.st/kaos-repo-latest.el$(grep 'CPE_NAME' /etc/os-release | tr -d '"' | cut -d':' -f5).noarch.rpm
 
 # EL8 (OracleLinux/Alma/Rocky 8)
 sudo dnf install perfecto
@@ -121,43 +118,9 @@ Additional information about action configuration can be found on [the official 
 
 ### Usage
 
-```
-Usage: perfecto {options} spec…
+<p align="center"><img src=".github/images/usage.svg"/></p>
 
-Options
-
-  --ignore, -I id…           Disable one or more checks by their ID
-  --format, -f format        Output format (summary|tiny|short|github|json|xml)
-  --lint-config, -c file     Path to RPMLint configuration file
-  --error-level, -e level    Return non-zero exit code if alert level greater than given (notice|warning|error|critical)
-  --quiet, -q                Suppress all normal output
-  --no-lint, -nl             Disable RPMLint checks
-  --no-color, -nc            Disable colors in output
-  --help, -h                 Show this help message
-  --version, -v              Show version
-
-Examples
-
-  perfecto app.spec
-  Check spec and print extended report
-
-  perfecto --no-lint app.spec
-  Check spec without rpmlint and print extended report
-
-  perfecto --ignore PF2,PF12 app.spec
-  Check spec without PF2 and PF12 checks
-
-  perfecto --format tiny app.spec
-  Check spec and print tiny report
-
-  perfecto --format summary app.spec
-  Check spec and print summary
-
-  perfecto --format json app.spec 1> report.json
-  Check spec, generate report in JSON format and save as report.json
-```
-
-### Build Status
+### CI Status
 
 | Branch | Status |
 |--------|--------|

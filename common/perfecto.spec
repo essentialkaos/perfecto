@@ -10,7 +10,7 @@
 
 Summary:        Tool for checking perfectly written RPM specs
 Name:           perfecto
-Version:        6.1.1
+Version:        6.2.0
 Release:        0%{?dist}
 Group:          Development/Tools
 License:        Apache License, Version 2.0
@@ -39,13 +39,15 @@ Tool for checking perfectly written RPM specs.
 %{crc_check}
 
 %setup -q
-
-%build
 if [[ ! -d "%{name}/vendor" ]] ; then
-  echo "This package requires vendored dependencies"
+  echo -e "----\nThis package requires vendored dependencies\n----"
+  exit 1
+elif [[ -f "%{name}/%{name}" ]] ; then
+  echo -e "----\nSources must not contain precompiled binaries\n----"
   exit 1
 fi
 
+%build
 pushd %{name}
   go build %{name}.go
   cp LICENSE ..
@@ -105,6 +107,11 @@ fi
 ################################################################################
 
 %changelog
+* Sun Jun 23 2024 Anton Novojilov <andy@essentialkaos.com> - 6.2.0-0
+- Added check PF28 for checking summary tag length
+- Code refactoring
+- Dependencies update
+
 * Thu Mar 28 2024 Anton Novojilov <andy@essentialkaos.com> - 6.1.1-0
 - Improved support information gathering
 - Code refactoring
