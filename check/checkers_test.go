@@ -482,6 +482,19 @@ func (sc *CheckSuite) TestCheckForUnclosedCondition(c *chk.C) {
 	c.Assert(r.Criticals, chk.Not(chk.HasLen), 0)
 }
 
+func (sc *CheckSuite) TestCheckForLongSummary(c *chk.C) {
+	s, err := spec.Read("../testdata/test_19.spec")
+
+	c.Assert(err, chk.IsNil)
+	c.Assert(s, chk.NotNil)
+
+	alerts := checkForLongSummary("", s)
+
+	c.Assert(alerts, chk.HasLen, 1)
+}
+
+// ////////////////////////////////////////////////////////////////////////////////// //
+
 func (sc *CheckSuite) TestAutoGenerators(c *chk.C) {
 	s, err := spec.Read("../testdata/test_17.spec")
 
@@ -636,7 +649,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 
 func (sc *CheckSuite) TestAux(c *chk.C) {
 	// This test will fail if new checkers was added
-	c.Assert(getCheckers(), chk.HasLen, 27)
+	c.Assert(getCheckers(), chk.HasLen, 28)
 
 	r := &Report{}
 	c.Assert(r.IsPerfect, chk.Equals, false)
