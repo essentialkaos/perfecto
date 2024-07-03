@@ -10,7 +10,7 @@
 
 Summary:        Tool for checking perfectly written RPM specs
 Name:           perfecto
-Version:        6.2.0
+Version:        6.2.1
 Release:        0%{?dist}
 Group:          Development/Tools
 License:        Apache License, Version 2.0
@@ -107,6 +107,9 @@ fi
 ################################################################################
 
 %changelog
+* Wed Jul 03 2024 Anton Novojilov <andy@essentialkaos.com> - 6.2.1-0
+- Level changed for PF28 to notice
+
 * Sun Jun 23 2024 Anton Novojilov <andy@essentialkaos.com> - 6.2.0-0
 - Added check PF28 for checking summary tag length
 - Code refactoring

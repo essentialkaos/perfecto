@@ -1082,7 +1082,7 @@ func checkForLongSummary(id string, s *spec.Spec) []Alert {
 
 				if strutil.LenVisual(summary) >= 70 {
 					desc := fmt.Sprintf("Package summary is too long (%d ≥ 70)", summaryLen)
-					result = append(result, NewAlert(id, LEVEL_WARNING, desc, line))
+					result = append(result, NewAlert(id, LEVEL_NOTICE, desc, line))
 				}
 			}
 		}
