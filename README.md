@@ -4,9 +4,10 @@
   <a href="https://kaos.sh/r/perfecto"><img src="https://kaos.sh/r/perfecto.svg" alt="GoReportCard" /></a>
   <a href="https://kaos.sh/l/perfecto"><img src="https://kaos.sh/l/19f019d1310c2cb69b29.svg" alt="Code Climate Maintainability" /></a>
   <a href="https://kaos.sh/b/perfecto"><img src="https://kaos.sh/b/74af2307-8aa2-48eb-afd5-2ae3620a1149.svg" alt="Codebeat badge" /></a>
+  <a href="https://kaos.sh/y/perfecto"><img src="https://kaos.sh/y/f33aad6645de4b798dbc86ad1d82abdc.svg" alt="Codacy badge" /></a>
   <br/>
   <a href="https://kaos.sh/c/perfecto"><img src="https://kaos.sh/c/perfecto.svg" alt="Coverage Status" /></a>
-  <a href="https://kaos.sh/w/perfecto/ci"><img src="https://kaos.sh/w/perfecto/ci.svg" alt="GitHub Actions CI Status" /></a>
+  <a href="https://kaos.sh/w/perfecto/ci-push"><img src="https://kaos.sh/w/perfecto/ci-push.svg" alt="GitHub Actions CI Status" /></a>
   <a href="https://kaos.sh/w/perfecto/codeql"><img src="https://kaos.sh/w/perfecto/codeql.svg" alt="GitHub Actions CodeQL Status" /></a>
   <a href="#license"><img src=".github/images/license.svg"/></a>
 </p>
@@ -71,11 +72,9 @@ perfecto your.spec
 Official container images with _perfecto_:
 
 - [`ghcr.io/essentialkaos/perfecto:micro`](https://kaos.sh/p/perfecto)
-- [`ghcr.io/essentialkaos/perfecto:ol7`](https://kaos.sh/p/perfecto)
 - [`ghcr.io/essentialkaos/perfecto:ol8`](https://kaos.sh/p/perfecto)
 - [`ghcr.io/essentialkaos/perfecto:ol9`](https://kaos.sh/p/perfecto)
 - [`essentialkaos/perfecto:micro`](https://kaos.sh/d/perfecto)
-- [`essentialkaos/perfecto:ol7`](https://kaos.sh/d/perfecto)
 - [`essentialkaos/perfecto:ol8`](https://kaos.sh/d/perfecto)
 - [`essentialkaos/perfecto:ol9`](https://kaos.sh/d/perfecto)
 
@@ -124,8 +123,8 @@ Additional information about action configuration can be found on [the official 
 
 | Branch | Status |
 |--------|--------|
-| `master` | [![CI](https://kaos.sh/w/perfecto/ci.svg?branch=master)](https://kaos.sh/w/perfecto/ci?query=branch:master) |
-| `develop` | [![CI](https://kaos.sh/w/perfecto/ci.svg?branch=develop)](https://kaos.sh/w/perfecto/ci?query=branch:develop) |
+| `master` | [![CI](https://kaos.sh/w/perfecto/ci-push.svg?branch=master)](https://kaos.sh/w/perfecto/ci-push?query=branch:master) |
+| `develop` | [![CI](https://kaos.sh/w/perfecto/ci-push.svg?branch=develop)](https://kaos.sh/w/perfecto/ci-push?query=branch:develop) |
 
 ### License
 
