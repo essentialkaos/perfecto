@@ -10,7 +10,7 @@
 
 Summary:        Tool for checking perfectly written RPM specs
 Name:           perfecto
-Version:        6.2.1
+Version:        6.3.0
 Release:        0%{?dist}
 Group:          Development/Tools
 License:        Apache License, Version 2.0
@@ -22,7 +22,7 @@ Source100:      checksum.sha512
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:  golang >= 1.21
+BuildRequires:  golang >= 1.22
 
 Requires:       rpmlint
 
@@ -59,9 +59,7 @@ rm -rf %{buildroot}
 install -dm 755 %{buildroot}%{_bindir}
 install -pm 755 %{name}/%{name} %{buildroot}%{_bindir}/
 
-%if 0%{?rhel} >= 8
 install -pDm 644 %{name}/common/perfecto.toml %{buildroot}%{_sysconfdir}/xdg/rpmlint/perfecto.toml
-%endif
 
 %clean
 rm -rf %{buildroot}
@@ -100,13 +98,16 @@ fi
 %defattr(-,root,root,-)
 %doc LICENSE
 %{_bindir}/%{name}
-%if 0%{?rhel} >= 8
 %{_sysconfdir}/xdg/rpmlint/perfecto.toml
-%endif
 
 ################################################################################
 
 %changelog
+* Wed Sep 04 2024 Anton Novojilov <andy@essentialkaos.com> - 6.3.0-0
+- ek package updated to v13
+- Code refactoring
+- Dependencies update
+
 * Wed Jul 03 2024 Anton Novojilov <andy@essentialkaos.com> - 6.2.1-0
 - Level changed for PF28 to notice
 

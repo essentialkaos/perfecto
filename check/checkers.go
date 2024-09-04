@@ -11,12 +11,12 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"time"
 
-	"github.com/essentialkaos/ek/v12/cache"
-	"github.com/essentialkaos/ek/v12/req"
-	"github.com/essentialkaos/ek/v12/sliceutil"
-	"github.com/essentialkaos/ek/v12/strutil"
+	"github.com/essentialkaos/ek/v13/cache"
+	"github.com/essentialkaos/ek/v13/cache/memory"
+	"github.com/essentialkaos/ek/v13/req"
+	"github.com/essentialkaos/ek/v13/sliceutil"
+	"github.com/essentialkaos/ek/v13/strutil"
 
 	"github.com/essentialkaos/perfecto/spec"
 )
@@ -33,7 +33,7 @@ type macro struct {
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
-var httpCheckCache *cache.Cache
+var httpCheckCache cache.Cache
 
 var pathMacroSlice = []macro{
 	{"/etc/init", "%{_initddir}"},
@@ -738,7 +738,9 @@ func checkURLForHTTPS(id string, s *spec.Spec) []Alert {
 	}
 
 	if httpCheckCache == nil {
-		httpCheckCache = cache.New(time.Hour, 0)
+		httpCheckCache, _ = memory.New(memory.Config{
+			DefaultExpiration: cache.HOUR,
+		})
 	}
 
 	var result []Alert

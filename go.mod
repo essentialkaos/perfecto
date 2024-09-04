@@ -1,10 +1,10 @@
 module github.com/essentialkaos/perfecto
 
-go 1.18
+go 1.21
 
 require (
 	github.com/essentialkaos/check v1.4.0
-	github.com/essentialkaos/ek/v12 v12.130.0
+	github.com/essentialkaos/ek/v13 v13.3.5
 )
 
 require (
