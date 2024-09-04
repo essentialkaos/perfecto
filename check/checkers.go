@@ -10,13 +10,13 @@ package check
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
-	"time"
 
-	"github.com/essentialkaos/ek/v12/cache"
-	"github.com/essentialkaos/ek/v12/req"
-	"github.com/essentialkaos/ek/v12/sliceutil"
-	"github.com/essentialkaos/ek/v12/strutil"
+	"github.com/essentialkaos/ek/v13/cache"
+	"github.com/essentialkaos/ek/v13/cache/memory"
+	"github.com/essentialkaos/ek/v13/req"
+	"github.com/essentialkaos/ek/v13/strutil"
 
 	"github.com/essentialkaos/perfecto/spec"
 )
@@ -33,7 +33,7 @@ type macro struct {
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 
-var httpCheckCache *cache.Cache
+var httpCheckCache cache.Cache
 
 var pathMacroSlice = []macro{
 	{"/etc/init", "%{_initddir}"},
@@ -738,7 +738,9 @@ func checkURLForHTTPS(id string, s *spec.Spec) []Alert {
 	}
 
 	if httpCheckCache == nil {
-		httpCheckCache = cache.New(time.Hour, 0)
+		httpCheckCache, _ = memory.New(memory.Config{
+			DefaultExpiration: cache.HOUR,
+		})
 	}
 
 	var result []Alert
@@ -1121,7 +1123,7 @@ func containsMacro(line spec.Line, macro string) bool {
 
 // containsField return true if line contains given field
 func containsField(line spec.Line, value string) bool {
-	return sliceutil.Contains(strutil.Fields(line.Text), value)
+	return slices.Contains(strutil.Fields(line.Text), value)
 }
 
 // isComment return true if current line is commented
@@ -1143,7 +1145,7 @@ func isEmptyData(data []spec.Line) bool {
 // containsArgs return true if section contains given args
 func containsArgs(section *spec.Section, args ...string) bool {
 	for _, arg := range args {
-		if !sliceutil.Contains(section.Args, arg) {
+		if !slices.Contains(section.Args, arg) {
 			return false
 		}
 	}

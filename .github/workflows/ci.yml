@@ -1,4 +1,4 @@
-name: CI (Push)
+name: CI
 
 on:
   workflow_call:
@@ -18,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        go: [ '1.21.x', '1.22.x' ]
+        go: [ '1.22.x', '1.23.x' ]
 
     steps:
       - name: Checkout

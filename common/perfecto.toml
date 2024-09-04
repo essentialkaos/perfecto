@@ -1,5 +1,19 @@
 Filters = [
   ## Perfecto related configuration
-  # We check without packages, so no files it's okay
+
+  # We check without files, so no files it is okay
   'sh: .*: No such file or directory',
+
+  # Ignore local sources
+  'invalid-url Source.* [^\/]*',
+
+  # We can't check some packages, so it is optional
+  'no-%check-section',
+
+  # No need to use extra logic hidden behind a macro
+  'lib-package-without-%mklibname',
+
+  # Currently, there is no need for this section, but we also
+  # don't want to force users to rewrite the spec because of it.
+  'superfluous-%clean-section',
 ]

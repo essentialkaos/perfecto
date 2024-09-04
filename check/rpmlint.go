@@ -12,8 +12,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/essentialkaos/ek/v12/env"
-	"github.com/essentialkaos/ek/v12/strutil"
+	"github.com/essentialkaos/ek/v13/env"
+	"github.com/essentialkaos/ek/v13/strutil"
 
 	"github.com/essentialkaos/perfecto/spec"
 )

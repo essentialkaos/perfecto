@@ -30,7 +30,7 @@ You can find additional information about every _perfecto_ check in [project wik
 
 #### From sources
 
-Make sure you have a working Go 1.21+ workspace ([instructions](https://go.dev/doc/install)), then:
+Make sure you have a working Go 1.22+ workspace ([instructions](https://go.dev/doc/install)), then:
 
 ```bash
 go install github.com/essentialkaos/perfecto@latest
@@ -71,12 +71,12 @@ perfecto your.spec
 
 Official container images with _perfecto_:
 
-- [`ghcr.io/essentialkaos/perfecto:micro`](https://kaos.sh/p/perfecto)
-- [`ghcr.io/essentialkaos/perfecto:ol8`](https://kaos.sh/p/perfecto)
-- [`ghcr.io/essentialkaos/perfecto:ol9`](https://kaos.sh/p/perfecto)
-- [`essentialkaos/perfecto:micro`](https://kaos.sh/d/perfecto)
-- [`essentialkaos/perfecto:ol8`](https://kaos.sh/d/perfecto)
-- [`essentialkaos/perfecto:ol9`](https://kaos.sh/d/perfecto)
+- [`ghcr.io/essentialkaos/perfecto:micro`](https://kaos.sh/p/perfecto) (_without_ `rpmlint`)
+- [`ghcr.io/essentialkaos/perfecto:ol8`](https://kaos.sh/p/perfecto) (_with_ `rpmlint`)
+- [`ghcr.io/essentialkaos/perfecto:ol9`](https://kaos.sh/p/perfecto) (_with_ `rpmlint`)
+- [`essentialkaos/perfecto:micro`](https://kaos.sh/d/perfecto) (_without_ `rpmlint`)
+- [`essentialkaos/perfecto:ol8`](https://kaos.sh/d/perfecto) (_with_ `rpmlint`)
+- [`essentialkaos/perfecto:ol9`](https://kaos.sh/d/perfecto) (_with_ `rpmlint`)
 
 #### Using with Github Actions
 

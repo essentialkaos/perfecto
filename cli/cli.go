@@ -11,23 +11,23 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"slices"
 	"strings"
 
-	"github.com/essentialkaos/ek/v12/fmtc"
-	"github.com/essentialkaos/ek/v12/mathutil"
-	"github.com/essentialkaos/ek/v12/options"
-	"github.com/essentialkaos/ek/v12/sliceutil"
-	"github.com/essentialkaos/ek/v12/strutil"
-	"github.com/essentialkaos/ek/v12/support"
-	"github.com/essentialkaos/ek/v12/support/deps"
-	"github.com/essentialkaos/ek/v12/support/pkgs"
-	"github.com/essentialkaos/ek/v12/terminal/tty"
-	"github.com/essentialkaos/ek/v12/usage"
-	"github.com/essentialkaos/ek/v12/usage/completion/bash"
-	"github.com/essentialkaos/ek/v12/usage/completion/fish"
-	"github.com/essentialkaos/ek/v12/usage/completion/zsh"
-	"github.com/essentialkaos/ek/v12/usage/man"
-	"github.com/essentialkaos/ek/v12/usage/update"
+	"github.com/essentialkaos/ek/v13/fmtc"
+	"github.com/essentialkaos/ek/v13/mathutil"
+	"github.com/essentialkaos/ek/v13/options"
+	"github.com/essentialkaos/ek/v13/strutil"
+	"github.com/essentialkaos/ek/v13/support"
+	"github.com/essentialkaos/ek/v13/support/deps"
+	"github.com/essentialkaos/ek/v13/support/pkgs"
+	"github.com/essentialkaos/ek/v13/terminal/tty"
+	"github.com/essentialkaos/ek/v13/usage"
+	"github.com/essentialkaos/ek/v13/usage/completion/bash"
+	"github.com/essentialkaos/ek/v13/usage/completion/fish"
+	"github.com/essentialkaos/ek/v13/usage/completion/zsh"
+	"github.com/essentialkaos/ek/v13/usage/man"
+	"github.com/essentialkaos/ek/v13/usage/update"
 
 	"github.com/essentialkaos/perfecto/check"
 	"github.com/essentialkaos/perfecto/spec"
@@ -40,7 +40,7 @@ import (
 // App info
 const (
 	APP  = "perfecto"
-	VER  = "6.2.1"
+	VER  = "6.3.0"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -197,7 +197,7 @@ func process(files options.Arguments) {
 
 	format := getFormat(files)
 
-	if !sliceutil.Contains(formats, format) {
+	if !slices.Contains(formats, format) {
 		printErrorAndExit("Output format %q is not supported", format)
 	}
 
