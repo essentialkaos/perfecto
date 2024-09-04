@@ -30,7 +30,7 @@ You can find additional information about every _perfecto_ check in [project wik
 
 #### From sources
 
-Make sure you have a working Go 1.21+ workspace ([instructions](https://go.dev/doc/install)), then:
+Make sure you have a working Go 1.22+ workspace ([instructions](https://go.dev/doc/install)), then:
 
 ```bash
 go install github.com/essentialkaos/perfecto@latest
