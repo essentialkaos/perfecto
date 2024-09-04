@@ -11,12 +11,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"slices"
 	"strings"
 
 	"github.com/essentialkaos/ek/v13/fmtc"
 	"github.com/essentialkaos/ek/v13/mathutil"
 	"github.com/essentialkaos/ek/v13/options"
-	"github.com/essentialkaos/ek/v13/sliceutil"
 	"github.com/essentialkaos/ek/v13/strutil"
 	"github.com/essentialkaos/ek/v13/support"
 	"github.com/essentialkaos/ek/v13/support/deps"
@@ -197,7 +197,7 @@ func process(files options.Arguments) {
 
 	format := getFormat(files)
 
-	if !sliceutil.Contains(formats, format) {
+	if !slices.Contains(formats, format) {
 		printErrorAndExit("Output format %q is not supported", format)
 	}
 

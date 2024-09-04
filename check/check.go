@@ -8,10 +8,10 @@ package check
 // ////////////////////////////////////////////////////////////////////////////////// //
 
 import (
+	"slices"
 	"sort"
 	"strings"
 
-	"github.com/essentialkaos/ek/v13/sliceutil"
 	"github.com/essentialkaos/ek/v13/sortutil"
 	"github.com/essentialkaos/ek/v13/strutil"
 	"github.com/essentialkaos/ek/v13/system"
@@ -175,7 +175,7 @@ func Check(s *spec.Spec, lint bool, linterConfig string, ignored []string) *Repo
 
 	checkers := getCheckers()
 
-	if lint && !sliceutil.Contains(ignored, RPMLINT_CHECK_ID) {
+	if lint && !slices.Contains(ignored, RPMLINT_CHECK_ID) {
 		alerts := Lint(s, linterConfig)
 		appendLinterAlerts(report, alerts)
 	}
@@ -187,7 +187,7 @@ func Check(s *spec.Spec, lint bool, linterConfig string, ignored []string) *Repo
 			continue
 		}
 
-		ignore := sliceutil.Contains(ignored, id)
+		ignore := slices.Contains(ignored, id)
 
 		for _, alert := range alerts {
 			if ignore || alert.Line.Ignore {

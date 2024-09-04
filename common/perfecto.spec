@@ -24,8 +24,6 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  golang >= 1.22
 
-Requires:       rpmlint
-
 Provides:       %{name} = %{version}-%{release}
 
 ################################################################################
@@ -107,6 +105,7 @@ fi
 - ek package updated to v13
 - Code refactoring
 - Dependencies update
+- rpmlint removed from dependencies
 
 * Wed Jul 03 2024 Anton Novojilov <andy@essentialkaos.com> - 6.2.1-0
 - Level changed for PF28 to notice

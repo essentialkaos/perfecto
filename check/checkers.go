@@ -10,12 +10,12 @@ package check
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/essentialkaos/ek/v13/cache"
 	"github.com/essentialkaos/ek/v13/cache/memory"
 	"github.com/essentialkaos/ek/v13/req"
-	"github.com/essentialkaos/ek/v13/sliceutil"
 	"github.com/essentialkaos/ek/v13/strutil"
 
 	"github.com/essentialkaos/perfecto/spec"
@@ -1123,7 +1123,7 @@ func containsMacro(line spec.Line, macro string) bool {
 
 // containsField return true if line contains given field
 func containsField(line spec.Line, value string) bool {
-	return sliceutil.Contains(strutil.Fields(line.Text), value)
+	return slices.Contains(strutil.Fields(line.Text), value)
 }
 
 // isComment return true if current line is commented
@@ -1145,7 +1145,7 @@ func isEmptyData(data []spec.Line) bool {
 // containsArgs return true if section contains given args
 func containsArgs(section *spec.Section, args ...string) bool {
 	for _, arg := range args {
-		if !sliceutil.Contains(section.Args, arg) {
+		if !slices.Contains(section.Args, arg) {
 			return false
 		}
 	}
