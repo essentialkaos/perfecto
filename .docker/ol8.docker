@@ -34,10 +34,12 @@ COPY --from=builder /go/src/github.com/essentialkaos/perfecto/perfecto /usr/bin/
 RUN dnf -y -q install https://yum.kaos.st/kaos-repo-latest.el8.noarch.rpm && \
     dnf -y -q install oracle-epel-release-el8 && \
     dnf -y -q module disable "*" && \
-    dnf -y -q install @python36 && \
-    dnf -y -q install rpmlint && \
+    dnf -y -q install uv && \
+    uv tool install rpmlint --no-cache --no-progress && \
+    dnf -y -q remove uv && \
     dnf clean all && \
-    rm -rf /var/cache/dnf /var/log/dnf.*
+    rm -rf /var/cache/dnf /var/log/dnf.* && \
+    ln -sf /root/.local/bin/rpmlint /usr/bin/rpmlint
 
 COPY common/perfecto.toml /etc/xdg/rpmlint/perfecto.toml
 
