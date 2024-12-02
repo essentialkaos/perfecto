@@ -70,11 +70,11 @@ func (r *TerminalRenderer) Perfect(file string, report *check.Report) {
 
 	switch r.Format {
 	case "tiny":
-		fmtc.Printf("%s{s}:{!} {g}✔ {!}\n", fmtutil.Align(specName, fmtutil.RIGHT, r.FilenameSize+2))
+		fmtc.Printfn("%s{s}:{!} {g}✔ {!}", fmtutil.Align(specName, fmtutil.RIGHT, r.FilenameSize+2))
 	case "summary":
 		r.renderSummary(report)
 	default:
-		fmtc.Printf("{g}{*}%s.spec{!*} is perfect!{!}\n", specName)
+		fmtc.Printfn("{g}{*}%s.spec{!*} is perfect!{!}", specName)
 	}
 }
 
@@ -86,9 +86,9 @@ func (r *TerminalRenderer) Skipped(file string, report *check.Report) {
 
 	switch r.Format {
 	case "tiny":
-		fmtc.Printf("%s{s}:{!} {s}—{!}\n", fmtutil.Align(specName, fmtutil.RIGHT, r.FilenameSize+2))
+		fmtc.Printfn("%s{s}:{!} {s}—{!}", fmtutil.Align(specName, fmtutil.RIGHT, r.FilenameSize+2))
 	default:
-		fmtc.Printf("{s}{*}%s.spec{!*} check skipped due to non-applicable target{!}\n", specName)
+		fmtc.Printfn("{s}{*}%s.spec{!*} check skipped due to non-applicable target{!}", specName)
 	}
 }
 
@@ -100,8 +100,8 @@ func (r *TerminalRenderer) Error(file string, err error) {
 
 	switch r.Format {
 	case "tiny":
-		fmtc.Printf(
-			"%s{s}:{!} {r}✖  (%v){!}\n",
+		fmtc.Printfn(
+			"%s{s}:{!} {r}✖  (%v){!}",
 			fmtutil.Align(specName, fmtutil.RIGHT, r.FilenameSize+2), err,
 		)
 	default:
@@ -274,8 +274,8 @@ func (r *TerminalRenderer) renderHeader(level uint8, count int) {
 	fg := r.fgColor[level]
 	bg := r.bgColor[level]
 
-	fmtc.Printf(bg+" ••• %-83s{!}\n", header)
-	fmtc.Printf(fg + "│{!}\n")
+	fmtc.Printfn(bg+" ••• %-83s{!}", header)
+	fmtc.Printfn(fg + "│{!}")
 }
 
 // renderAlerts prints all alerts from given slice
@@ -286,7 +286,7 @@ func (r *TerminalRenderer) renderAlerts(level uint8, alerts []check.Alert) {
 		r.renderAlert(alert)
 
 		if index+1 < totalAlerts {
-			fmtc.Printf(r.fgColor[level] + "│{!}\n")
+			fmtc.Printfn(r.fgColor[level] + "│{!}")
 		}
 	}
 
@@ -317,17 +317,17 @@ func (r *TerminalRenderer) renderAlert(alert check.Alert) {
 	}
 
 	if alert.ID != "" {
-		fmtc.Printf(fg+"(%s) %s{!}\n", alert.ID, alert.Info)
+		fmtc.Printfn(fg+"(%s) %s{!}", alert.ID, alert.Info)
 	} else {
-		fmtc.Printf(fg+"(rpmlint) %s{!}\n", alert.Info)
+		fmtc.Printfn(fg+"(rpmlint) %s{!}", alert.Info)
 	}
 
 	if alert.Line.Text != "" {
 		text := strutil.Ellipsis(alert.Line.Text, 86)
 		if alert.IsIgnored {
-			fmtc.Printf(lc+"│ {s-}%s{!}\n", text)
+			fmtc.Printfn(lc+"│ {s-}%s{!}", text)
 		} else {
-			fmtc.Printf(lc+"│ {s}%s{!}\n", text)
+			fmtc.Printfn(lc+"│ {s}%s{!}", text)
 		}
 	}
 }
@@ -345,7 +345,7 @@ func (r *TerminalRenderer) renderLinks(report *check.Report) {
 	fmtc.Println("\n{*}Links:{!}\n")
 
 	for _, id := range report.IDs() {
-		fmtc.Printf(" {s}•{!} %s%s\n", "https://kaos.sh/perfecto/w/", id)
+		fmtc.Printfn(" {s}•{!} %s%s", "https://kaos.sh/perfecto/w/", id)
 	}
 
 	fmtc.NewLine()
@@ -423,9 +423,9 @@ func (r *TerminalRenderer) renderShortAlert(alert check.Alert) {
 	}
 
 	if alert.ID != "" {
-		fmtc.Printf(fg+"(%s) %s{!}\n", alert.ID, alert.Info)
+		fmtc.Printfn(fg+"(%s) %s{!}", alert.ID, alert.Info)
 	} else {
-		fmtc.Printf(fg+"(rpmlint) %s{!}\n", alert.Info)
+		fmtc.Printfn(fg+"(rpmlint) %s{!}", alert.Info)
 	}
 }
 
