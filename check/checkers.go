@@ -152,7 +152,7 @@ func checkForLineLength(id string, s *spec.Spec) []Alert {
 				continue
 			}
 
-			if strings.IndexRune(strutil.Substr(line.Text, 2, 999), ' ') == -1 {
+			if !strings.ContainsRune(strutil.Substr(line.Text, 2, 999), ' ') {
 				continue
 			}
 
@@ -456,8 +456,6 @@ func checkForHeaderTags(id string, s *spec.Spec) []Alert {
 	return result
 }
 
-// codebeat:disable[BLOCK_NESTING]
-
 // checkForUnescapedPercent checks changelog and descriptions for unescaped percent symbol
 func checkForUnescapedPercent(id string, s *spec.Spec) []Alert {
 	if len(s.Data) == 0 {
@@ -484,8 +482,6 @@ func checkForUnescapedPercent(id string, s *spec.Spec) []Alert {
 
 	return result
 }
-
-// codebeat:enable[BLOCK_NESTING]
 
 // checkForMacroDefinitionPosition checks for macro defined after description
 func checkForMacroDefinitionPosition(id string, s *spec.Spec) []Alert {

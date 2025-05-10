@@ -21,6 +21,7 @@ import (
 	"github.com/essentialkaos/ek/v13/support"
 	"github.com/essentialkaos/ek/v13/support/deps"
 	"github.com/essentialkaos/ek/v13/support/pkgs"
+	"github.com/essentialkaos/ek/v13/terminal"
 	"github.com/essentialkaos/ek/v13/terminal/tty"
 	"github.com/essentialkaos/ek/v13/usage"
 	"github.com/essentialkaos/ek/v13/usage/completion/bash"
@@ -40,7 +41,7 @@ import (
 // App info
 const (
 	APP  = "perfecto"
-	VER  = "6.3.0"
+	VER  = "6.3.1"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -126,8 +127,9 @@ func Run(gitRev string, gomod []byte) {
 
 	args, errs := options.Parse(optMap)
 
-	if len(errs) != 0 {
-		printError(errs[0].Error())
+	if !errs.IsEmpty() {
+		terminal.Error("Options parsing errors:")
+		terminal.Error(errs.Error(" - "))
 		os.Exit(1)
 	}
 
@@ -155,7 +157,13 @@ func Run(gitRev string, gomod []byte) {
 		os.Exit(0)
 	}
 
-	process(args)
+	ec, err := process(args)
+
+	if err != nil {
+		terminal.Error(err)
+	}
+
+	os.Exit(ec)
 }
 
 // preConfigureUI preconfigures UI based on information about user terminal
@@ -166,10 +174,6 @@ func preConfigureUI() {
 
 	if os.Getenv("CI") != "" {
 		fmtc.DisableColors = false
-	}
-
-	if os.Getenv("NO_COLOR") != "" {
-		fmtc.DisableColors = true
 	}
 }
 
@@ -192,13 +196,17 @@ func configureUI() {
 }
 
 // process start spec file processing
-func process(files options.Arguments) {
+func process(files options.Arguments) (int, error) {
 	var exitCode int
 
-	format := getFormat(files)
+	format, err := getFormat(files)
+
+	if err != nil {
+		return 1, err
+	}
 
 	if !slices.Contains(formats, format) {
-		printErrorAndExit("Output format %q is not supported", format)
+		return 1, fmt.Errorf("Output format %q is not supported", format)
 	}
 
 	rndr := getRenderer(format, files)
@@ -208,10 +216,8 @@ func process(files options.Arguments) {
 		exitCode = mathutil.Max(ec, exitCode)
 	}
 
-	os.Exit(exitCode)
+	return exitCode, nil
 }
-
-// codebeat:disable[ABC]
 
 // checkSpec check spec file
 func checkSpec(file string, rndr render.Renderer) int {
@@ -253,13 +259,13 @@ func checkSpec(file string, rndr render.Renderer) int {
 }
 
 // getFormat returns output format
-func getFormat(files options.Arguments) string {
+func getFormat(files options.Arguments) (string, error) {
 	format := options.GetS(OPT_FORMAT)
 
 	if len(files) > 1 {
 		switch format {
 		case FORMAT_JSON, FORMAT_XML:
-			printErrorAndExit("Can't check multiple files with %q output format", format)
+			return "", fmt.Errorf("Can't check multiple files with %q output format", format)
 		case "":
 			format = FORMAT_TINY
 		}
@@ -267,7 +273,7 @@ func getFormat(files options.Arguments) string {
 		format = FORMAT_GITHUB
 	}
 
-	return format
+	return format, nil
 }
 
 // getRenderer returns renderer for given format
@@ -320,8 +326,6 @@ func getMaxFilenameSize(files options.Arguments) int {
 	return result
 }
 
-// codebeat:enable[ABC]
-
 // getExitCode return exit code based on report data
 func getExitCode(r *check.Report) int {
 	var maxLevel int
@@ -356,17 +360,6 @@ func getExitCode(r *check.Report) int {
 	}
 
 	return 0
-}
-
-// printError prints error message to console
-func printError(f string, a ...interface{}) {
-	fmtc.Fprintf(os.Stderr, "{r}"+f+"{!}\n", a...)
-}
-
-// printErrorAndExit print error message and exit with exit code 1
-func printErrorAndExit(f string, a ...interface{}) {
-	printError(f, a...)
-	os.Exit(1)
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -409,12 +402,7 @@ func printCompletion() int {
 
 // printMan prints man page
 func printMan() {
-	fmt.Println(
-		man.Generate(
-			genUsage(),
-			genAbout(""),
-		),
-	)
+	fmt.Println(man.Generate(genUsage(), genAbout("")))
 }
 
 // genUsage generates usage info

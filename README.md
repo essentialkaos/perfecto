@@ -2,9 +2,7 @@
 
 <p align="center">
   <a href="https://kaos.sh/r/perfecto"><img src="https://kaos.sh/r/perfecto.svg" alt="GoReportCard" /></a>
-  <a href="https://kaos.sh/l/perfecto"><img src="https://kaos.sh/l/19f019d1310c2cb69b29.svg" alt="Code Climate Maintainability" /></a>
   <a href="https://kaos.sh/y/perfecto"><img src="https://kaos.sh/y/f33aad6645de4b798dbc86ad1d82abdc.svg" alt="Codacy badge" /></a>
-  <br/>
   <a href="https://kaos.sh/c/perfecto"><img src="https://kaos.sh/c/perfecto.svg" alt="Coverage Status" /></a>
   <a href="https://kaos.sh/w/perfecto/ci-push"><img src="https://kaos.sh/w/perfecto/ci-push.svg" alt="GitHub Actions CI Status" /></a>
   <a href="https://kaos.sh/w/perfecto/codeql"><img src="https://kaos.sh/w/perfecto/codeql.svg" alt="GitHub Actions CodeQL Status" /></a>

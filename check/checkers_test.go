@@ -630,6 +630,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 	alerts = append(alerts, a)
 
 	a, ok = parseAlertLine("test.spec:68: W: macro-in-%changelog %record", s)
+	c.Assert(ok, chk.Equals, true)
 	a.Line.Ignore = true
 	alerts = append(alerts, a)
 
