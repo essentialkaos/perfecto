@@ -2,7 +2,7 @@ package check
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 //                                                                                    //
-//                         Copyright (c) 2024 ESSENTIAL KAOS                          //
+//                         Copyright (c) 2025 ESSENTIAL KAOS                          //
 //      Apache License, Version 2.0 <https://www.apache.org/licenses/LICENSE-2.0>     //
 //                                                                                    //
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -630,6 +630,7 @@ func (sc *CheckSuite) TestRPMLintParser(c *chk.C) {
 	alerts = append(alerts, a)
 
 	a, ok = parseAlertLine("test.spec:68: W: macro-in-%changelog %record", s)
+	c.Assert(ok, chk.Equals, true)
 	a.Line.Ignore = true
 	alerts = append(alerts, a)
 

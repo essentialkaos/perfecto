@@ -10,7 +10,7 @@
 
 Summary:        Tool for checking perfectly written RPM specs
 Name:           perfecto
-Version:        6.3.0
+Version:        6.3.1
 Release:        0%{?dist}
 Group:          Development/Tools
 License:        Apache License, Version 2.0
@@ -22,7 +22,7 @@ Source100:      checksum.sha512
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:  golang >= 1.22
+BuildRequires:  make golang >= 1.23
 
 Provides:       %{name} = %{version}-%{release}
 
@@ -34,9 +34,9 @@ Tool for checking perfectly written RPM specs.
 ################################################################################
 
 %prep
-%{crc_check}
+%crc_check
+%autosetup
 
-%setup -q
 if [[ ! -d "%{name}/vendor" ]] ; then
   echo -e "----\nThis package requires vendored dependencies\n----"
   exit 1
@@ -47,7 +47,7 @@ fi
 
 %build
 pushd %{name}
-  go build %{name}.go
+  %{make_build} all
   cp LICENSE ..
 popd
 
@@ -58,9 +58,6 @@ install -dm 755 %{buildroot}%{_bindir}
 install -pm 755 %{name}/%{name} %{buildroot}%{_bindir}/
 
 install -pDm 644 %{name}/common/perfecto.toml %{buildroot}%{_sysconfdir}/xdg/rpmlint/perfecto.toml
-
-%clean
-rm -rf %{buildroot}
 
 %post
 if [[ -d %{_sysconfdir}/bash_completion.d ]] ; then
@@ -101,6 +98,10 @@ fi
 ################################################################################
 
 %changelog
+* Sat May 10 2025 Anton Novojilov <andy@essentialkaos.com> - 6.3.1-0
+- Code refactoring
+- Dependencies update
+
 * Wed Sep 04 2024 Anton Novojilov <andy@essentialkaos.com> - 6.3.0-0
 - ek package updated to v13
 - Code refactoring

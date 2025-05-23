@@ -2,7 +2,7 @@ package spec
 
 // ////////////////////////////////////////////////////////////////////////////////// //
 //                                                                                    //
-//                         Copyright (c) 2024 ESSENTIAL KAOS                          //
+//                         Copyright (c) 2025 ESSENTIAL KAOS                          //
 //      Apache License, Version 2.0 <https://www.apache.org/licenses/LICENSE-2.0>     //
 //                                                                                    //
 // ////////////////////////////////////////////////////////////////////////////////// //
@@ -83,30 +83,6 @@ type Section struct {
 }
 
 // ////////////////////////////////////////////////////////////////////////////////// //
-
-// sections is slice with rpm spec sections
-var sections = []string{
-	"prep",
-	"setup",
-	"build",
-	"install",
-	"check",
-	"clean",
-	"files",
-	"changelog",
-	"package",
-	"description",
-	"verifyscript",
-	"pretrans",
-	"pre",
-	"post",
-	"preun",
-	"postun",
-	"posttrans",
-	"triggerin",
-	"triggerun",
-	"triggerpostun",
-}
 
 // tags is slice with header tags
 var tags = []string{
