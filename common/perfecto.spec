@@ -10,7 +10,7 @@
 
 Summary:        Tool for checking perfectly written RPM specs
 Name:           perfecto
-Version:        6.3.1
+Version:        6.3.2
 Release:        0%{?dist}
 Group:          Development/Tools
 License:        Apache License, Version 2.0
@@ -98,6 +98,10 @@ fi
 ################################################################################
 
 %changelog
+* Wed Aug 13 2025 Anton Novojilov <andy@essentialkaos.com> - 6.3.2-0
+- Code refactoring
+- Dependencies update
+
 * Sat May 10 2025 Anton Novojilov <andy@essentialkaos.com> - 6.3.1-0
 - Code refactoring
 - Dependencies update

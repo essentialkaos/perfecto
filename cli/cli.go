@@ -15,7 +15,6 @@ import (
 	"strings"
 
 	"github.com/essentialkaos/ek/v13/fmtc"
-	"github.com/essentialkaos/ek/v13/mathutil"
 	"github.com/essentialkaos/ek/v13/options"
 	"github.com/essentialkaos/ek/v13/strutil"
 	"github.com/essentialkaos/ek/v13/support"
@@ -41,7 +40,7 @@ import (
 // App info
 const (
 	APP  = "perfecto"
-	VER  = "6.3.1"
+	VER  = "6.3.2"
 	DESC = "Tool for checking perfectly written RPM specs"
 )
 
@@ -213,7 +212,7 @@ func process(files options.Arguments) (int, error) {
 
 	for _, file := range files {
 		ec := checkSpec(file.Clean().String(), rndr)
-		exitCode = mathutil.Max(ec, exitCode)
+		exitCode = max(ec, exitCode)
 	}
 
 	return exitCode, nil
@@ -320,7 +319,7 @@ func getMaxFilenameSize(files options.Arguments) int {
 
 	for _, file := range files {
 		filenameSize := strutil.Exclude(file.Base().Clean().String(), ".spec")
-		result = mathutil.Max(result, len(filenameSize))
+		result = max(result, len(filenameSize))
 	}
 
 	return result
