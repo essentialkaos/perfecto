@@ -13,10 +13,10 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/essentialkaos/ek/v13/cache"
-	"github.com/essentialkaos/ek/v13/cache/memory"
-	"github.com/essentialkaos/ek/v13/req"
-	"github.com/essentialkaos/ek/v13/strutil"
+	"github.com/essentialkaos/ek/v14/cache"
+	"github.com/essentialkaos/ek/v14/cache/memory"
+	"github.com/essentialkaos/ek/v14/req"
+	"github.com/essentialkaos/ek/v14/strutil"
 
 	"github.com/essentialkaos/perfecto/spec"
 )

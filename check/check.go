@@ -12,9 +12,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/essentialkaos/ek/v13/sortutil"
-	"github.com/essentialkaos/ek/v13/strutil"
-	"github.com/essentialkaos/ek/v13/system"
+	"github.com/essentialkaos/ek/v14/sortutil"
+	"github.com/essentialkaos/ek/v14/strutil"
+	"github.com/essentialkaos/ek/v14/system"
 
 	"github.com/essentialkaos/perfecto/spec"
 )
