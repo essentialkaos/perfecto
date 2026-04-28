@@ -10,7 +10,7 @@
 
 Summary:        Tool for checking perfectly written RPM specs
 Name:           perfecto
-Version:        6.4.1
+Version:        6.4.0
 Release:        0%{?dist}
 Group:          Development/Tools
 License:        Apache License, Version 2.0
@@ -98,9 +98,6 @@ fi
 ################################################################################
 
 %changelog
-* Tue Apr 28 2026 Anton Novojilov <andy@essentialkaos.com> - 6.4.1-0
-- Dependencies update
-
 * Mon Apr 20 2026 Anton Novojilov <andy@essentialkaos.com> - 6.4.0-0
 - Migrated to ek.v14
 - Dependencies update
