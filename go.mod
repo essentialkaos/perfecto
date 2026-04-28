@@ -1,6 +1,6 @@
 module github.com/essentialkaos/perfecto
 
-go 1.25.0
+go 1.25.9
 
 require (
 	github.com/essentialkaos/check v1.4.1
