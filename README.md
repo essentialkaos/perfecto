@@ -29,7 +29,7 @@ You can find additional information about every _perfecto_ check in [project wik
 Make sure you have a working [Go 1.26+](https://github.com/essentialkaos/.github/blob/master/GO-VERSION-SUPPORT.md) workspace ([instructions](https://go.dev/doc/install)), then:
 
 ```bash
-go install github.com/essentialkaos/perfecto@latest
+go install github.com/essentialkaos/perfecto@master
 ```
 
 #### From [ESSENTIAL KAOS Public Repository](https://kaos.sh/kaos-repo)
