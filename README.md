@@ -1,7 +1,6 @@
 <p align="center"><a href="#readme"><img src=".github/images/card.svg"/></a></p>
 
 <p align="center">
-  <a href="https://kaos.sh/r/perfecto"><img src="https://kaos.sh/r/perfecto.svg" alt="GoReportCard" /></a>
   <a href="https://kaos.sh/y/perfecto"><img src="https://kaos.sh/y/f33aad6645de4b798dbc86ad1d82abdc.svg" alt="Codacy badge" /></a>
   <a href="https://kaos.sh/c/perfecto"><img src="https://kaos.sh/c/perfecto.svg" alt="Coverage Status" /></a>
   <a href="https://kaos.sh/w/perfecto/ci-push"><img src="https://kaos.sh/w/perfecto/ci-push.svg" alt="GitHub Actions CI Status" /></a>
@@ -27,18 +26,18 @@ You can find additional information about every _perfecto_ check in [project wik
 
 #### From sources
 
-Make sure you have a working [Go 1.23+](https://github.com/essentialkaos/.github/blob/master/GO-VERSION-SUPPORT.md) workspace ([instructions](https://go.dev/doc/install)), then:
+Make sure you have a working [Go 1.26+](https://github.com/essentialkaos/.github/blob/master/GO-VERSION-SUPPORT.md) workspace ([instructions](https://go.dev/doc/install)), then:
 
 ```bash
-go install github.com/essentialkaos/perfecto@latest
+go install github.com/essentialkaos/perfecto@master
 ```
 
 #### From [ESSENTIAL KAOS Public Repository](https://kaos.sh/kaos-repo)
 
 ```bash
-sudo dnf install -y https://pkgs.kaos.st/kaos-repo-latest.el$(grep 'CPE_NAME' /etc/os-release | tr -d '"' | cut -d':' -f5).noarch.rpm
+sudo dnf install -y https://pkgs.kaos.st/kaos-repo-latest.el$(rpm -E '%{rhel}').noarch.rpm
 
-# EL8 (OracleLinux/Alma/Rocky 8)
+# EL8/10
 sudo dnf install perfecto
 
 # Alma/Rocky 9

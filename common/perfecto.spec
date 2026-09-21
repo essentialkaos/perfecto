@@ -10,7 +10,7 @@
 
 Summary:        Tool for checking perfectly written RPM specs
 Name:           perfecto
-Version:        6.3.2
+Version:        6.4.0
 Release:        0%{?dist}
 Group:          Development/Tools
 License:        Apache License, Version 2.0
@@ -22,7 +22,7 @@ Source100:      checksum.sha512
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:  make golang >= 1.23
+BuildRequires:  make golang >= 1.25
 
 Provides:       %{name} = %{version}-%{release}
 
@@ -98,6 +98,10 @@ fi
 ################################################################################
 
 %changelog
+* Mon Apr 20 2026 Anton Novojilov <andy@essentialkaos.com> - 6.4.0-0
+- Migrated to ek.v14
+- Dependencies update
+
 * Wed Aug 13 2025 Anton Novojilov <andy@essentialkaos.com> - 6.3.2-0
 - Code refactoring
 - Dependencies update
