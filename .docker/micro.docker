@@ -14,7 +14,7 @@ RUN make deps && make all
 
 ## FINAL IMAGE #################################################################
 
-FROM ${REGISTRY}/essentialkaos/alpine:3.23 AS final
+FROM ${REGISTRY}/essentialkaos/alpine:3.24 AS final
 
 LABEL org.opencontainers.image.title="perfecto" \
       org.opencontainers.image.description="Tool for checking perfectly written RPM specs" \
