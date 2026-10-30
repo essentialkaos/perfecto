@@ -22,7 +22,7 @@ Source100:      checksum.sha512
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:  make golang >= 1.25
+BuildRequires:  make golang >= 1.26
 
 Provides:       %{name} = %{version}-%{release}
 
@@ -98,7 +98,7 @@ fi
 ################################################################################
 
 %changelog
-* Mon Apr 20 2026 Anton Novojilov <andy@essentialkaos.com> - 6.4.0-0
+* Fri Oct 30 2026 Anton Novojilov <andy@essentialkaos.com> - 6.4.0-0
 - Migrated to ek.v14
 - Dependencies update
 
